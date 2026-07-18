@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>WeatherDash</title>
+<meta name="theme-color" content="#0b1120">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+<link rel="apple-touch-icon" href="/public/favicon.svg">
+<title>WeatherDash</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -436,7 +442,7 @@ function updateSun(idx){
       let mins=((ssP.h*60+ssP.m)-(srP.h*60+srP.m));
       if(mins<0)mins+=1440;
       const h=Math.floor(mins/60),m=mins%60;
-      document.getElementById('sunsetSub').textContent=h+'h '+m+'m';
+      document.getElementById('sunsetSub').textContent='\n'+h+'h '+m+'m';
     }
   }
   document.getElementById('uvMaxVal').textContent=d.daily.uv_index_max?d.daily.uv_index_max[idx].toFixed(1):'--';
@@ -467,7 +473,7 @@ function updateUV(idx){
   let safeText='';
   if(morningSafe>0)safeText='Before '+fmtTime(times[morningSafe-1]);
   if(morningSafe>0&&eveningSafe<uv.length-1)safeText+=' • ';
-  if(eveningSafe<uv.length-1)safeText+='After '+fmtTime(times[eveningSafe+1]);
+  if(eveningSafe<uv.length-1)safeText+='\nAfter '+fmtTime(times[eveningSafe+1]);
   document.getElementById('uvBelowVal').textContent=safeText||'All day above 2';
 }
 

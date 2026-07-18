@@ -1,0 +1,17 @@
+{
+  "name": "WeatherDash",
+  "short_name": "WeatherDash",
+  "description": "Weather dashboard for San Francisco beaches and neighborhoods",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#0b1120",
+  "icons": [
+    {
+      "src": "/public/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
