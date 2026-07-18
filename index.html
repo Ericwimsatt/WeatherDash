@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WeatherDash</title>
+<link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0b1120;color:#e2e8f0;min-height:100vh;padding:0 12px 48px}
+img,svg{display:block;max-width:100%}
+button{cursor:pointer;font-family:inherit}
+
+/* Header */
+header{padding:16px 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;position:sticky;top:0;z-index:10;background:#0b1120}
+header h1{font-size:1.35rem;font-weight:700;letter-spacing:-0.02em;color:#f1f5f9}
+header .updated{font-size:0.75rem;color:#64748b;margin-left:auto}
+
+/* Day tabs */
+.day-tabs{display:flex;gap:6px;width:100%;margin-top:8px}
+.day-tabs button{flex:1;padding:10px 6px;border:1px solid #1e293b;border-radius:10px;background:transparent;color:#64748b;font-size:0.8rem;font-weight:600;text-align:center;line-height:1.3;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.day-tabs button small{display:block;font-weight:400;font-size:0.7rem;color:#475569;margin-top:1px}
+.day-tabs button.active{border-color:#3b82f6;background:rgba(59,130,246,0.12);color:#93c5fd}
+.day-tabs button.active small{color:#60a5fa}
+
+/* Card grid */
+.card-grid{display:grid;gap:12px}
+.card{background:#141e33;border:1px solid #1e293b;border-radius:14px;padding:16px}
+.card h2{font-size:1.05rem;font-weight:600;color:#e2e8f0;margin-bottom:12px;letter-spacing:-0.01em}
+@media(min-width:768px){.card-grid{grid-template-columns:1fr 1fr}.card-grid .full{grid-column:1/-1}}
+
+/* Inner Richmond grid */
+.richmond-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.richmond-grid .stat-box{background:rgba(255,255,255,0.03);border-radius:10px;padding:12px}
+.richmond-grid .stat-box .label{display:block;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;margin-bottom:4px}
+.richmond-grid .stat-box .value{font-size:1.25rem;font-weight:600;color:#e2e8f0}
+.richmond-grid .stat-box .sub{font-size:0.75rem;color:#94a3b8;margin-top:2px}
+
+/* Chart containers */
+.chart-wrap{position:relative;width:100%;margin-top:4px}
+.chart-wrap canvas{width:100%!important;max-height:180px}
+
+/* Tide times */
+.tide-times{display:flex;gap:12px;margin:8px 0 12px}
+.tide-times .tide-item{flex:1;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 12px;text-align:center}
+.tide-times .tide-item .tide-type{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:2px}
+.tide-times .tide-item.high .tide-type{color:#60a5fa}
+.tide-times .tide-item.low .tide-type{color:#f59e0b}
+.tide-times .tide-item .tide-time{font-size:1.1rem;font-weight:600;color:#e2e8f0}
+.tide-times .tide-item .tide-height{font-size:0.85rem;color:#94a3b8;margin-top:1px}
+.water-temp{text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:10px;font-size:0.85rem;color:#94a3b8}
+.water-temp strong{color:#e2e8f0;font-size:1rem}
+
+/* Regions */
+.region-group{margin-top:12px}
+.region-group:first-child{margin-top:0}
+.region-group .group-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;margin-bottom:6px;padding:0 4px}
+.region-row{display:flex;flex-wrap:wrap;gap:6px}
+.region-item{flex:1 1 calc(50% - 3px);min-width:0;background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:6px}
+.region-item .name{font-size:0.75rem;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex-shrink:1}
+.region-item .temps{font-size:0.85rem;font-weight:600;color:#e2e8f0;white-space:nowrap}
+.region-item .precip{font-size:0.7rem;color:#60a5fa;margin-left:auto;white-space:nowrap}
+.region-item .weather{font-size:1rem;flex-shrink:0}
+
+/* Loading */
+.loading{text-align:center;padding:40px 16px;color:#64748b;font-size:0.9rem}
+.loading .spinner{display:inline-block;width:24px;height:24px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Error */
+.error{color:#fca5a5;font-size:0.8rem;padding:4px 0}
+
+/* Desktop */
+@media(min-width:768px){
+  body{padding:0 24px 48px}
+  .region-item{flex:1 1 calc(25% - 5px)}
+}
+@media(min-width:1024px){
+  body{padding:0 48px 48px;max-width:1200px;margin:0 auto}
+  .region-item{flex:1 1 calc(20% - 5px)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>WeatherDash</h1>
+  <div class="updated" id="updated"></div>
+  <div class="day-tabs" id="dayTabs" style="display:none"></div>
+</header>
+
+<main id="main">
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div>Loading weather data…</div>
+  </div>
+</main>
+
+<script>
+// ── Config ──
+const OM_BASE = 'https://api.open-meteo.com/v1/forecast';
+
+const LOCATIONS = [
+  { id:'innerRichmond',  name:'Inner Richmond',  short:'In.Rich', lat:37.7811, lon:-122.4635, group:'San Francisco' },
+  { id:'outerRichmond',  name:'Outer Richmond',  short:'Out.Rich', lat:37.7761, lon:-122.4895, group:'San Francisco' },
+  { id:'innerSunset',    name:'Inner Sunset',    short:'In.Sunset', lat:37.7626, lon:-122.4684, group:'San Francisco' },
+  { id:'outerSunset',    name:'Outer Sunset',    short:'Out.Sunset', lat:37.7626, lon:-122.4945, group:'San Francisco' },
+  { id:'marketStreet',   name:'Market Street',   short:'Market', lat:37.7749, lon:-122.4194, group:'San Francisco' },
+  { id:'pacHeights',     name:'Pacific Heights', short:'Pac.Hts', lat:37.7914, lon:-122.4362, group:'San Francisco' },
+  { id:'marina',         name:'Marina',          short:'Marina', lat:37.8027, lon:-122.4348, group:'San Francisco' },
+  { id:'mission',        name:'Mission',         short:'Mission', lat:37.7599, lon:-122.4148, group:'San Francisco' },
+  { id:'millValley',     name:'Mill Valley',     short:'Mill Vly', lat:37.9060, lon:-122.5450, group:'Marin' },
+  { id:'mtTam',          name:'Mt. Tamalpais',   short:'Mt.Tam', lat:37.9235, lon:-122.5965, group:'Marin' },
+  { id:'pacifica',       name:'Pacifica',        short:'Pacifica', lat:37.6138, lon:-122.4869, group:'Peninsula' },
+  { id:'oakland',        name:'Oakland',         short:'Oakland', lat:37.8044, lon:-122.2712, group:'East Bay' },
+  { id:'berkeley',       name:'Berkeley',        short:'Berkeley', lat:37.8716, lon:-122.2727, group:'East Bay' },
+  { id:'encinitas',      name:'Encinitas',       short:'Encinitas', lat:33.0370, lon:-117.2924, group:'San Diego' },
+];
+
+const BAKER_BEACH = { lat:37.7946, lon:-122.4829 };
+
+const WMO = {
+  0:{t:'Clear',i:'☀'},1:{t:'Mostly Clear',i:'☀'},2:{t:'Partly Cloudy',i:'⛅'},
+  3:{t:'Overcast',i:'☁'},45:{t:'Foggy',i:'☁'},48:{t:'Fog',i:'☁'},
+  51:{t:'Drizzle',i:'☂'},53:{t:'Drizzle',i:'☂'},55:{t:'Drizzle',i:'☂'},
+  61:{t:'Rain',i:'☔'},63:{t:'Rain',i:'☔'},65:{t:'Rain',i:'☔'},
+  71:{t:'Snow',i:'❄'},73:{t:'Snow',i:'❄'},75:{t:'Snow',i:'❄'},
+  80:{t:'Showers',i:'☔'},81:{t:'Showers',i:'☔'},82:{t:'Showers',i:'☔'},
+  95:{t:'Storm',i:'⚡'},96:{t:'Storm',i:'⚡'},99:{t:'Storm',i:'⚡'},
+};
+
+function wmoInfo(code){
+  const c=typeof code==='number'?code:+code;
+  return WMO[c]||{t:'Unknown',i:'❓'};
+}
+
+const DIRS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+
+// ── State ──
+const state = {
+  activeDay: 0,
+  dayDates: [],
+  irData: null,
+  bbData: null,
+  regions: {},
+  tides: null,
+};
+
+function findHighLow(predictions){
+  const pts=predictions.map(p=>({t:p.t,v:+p.v}));
+  const hl=[];
+  for(let i=1;i<pts.length-1;i++){
+    if(pts[i].v>pts[i-1].v&&pts[i].v>pts[i+1].v)
+      hl.push({t:pts[i].t,v:String(pts[i].v),type:'H'});
+    if(pts[i].v<pts[i-1].v&&pts[i].v<pts[i+1].v)
+      hl.push({t:pts[i].t,v:String(pts[i].v),type:'L'});
+  }
+  return {predictions:hl};
+}
+
+// ── Helpers ──
+function degToDir(d){return DIRS[Math.round(d/22.5)%16]}
+function parseTime(s){const m=s.match(/T(\d{2}):(\d{2})/);return m?{h:+m[1],m:+m[2]}:null}
+function parseDate(s){const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
+function fmtTime(s){const p=parseTime(s);if(!p)return'--';const a=p.h>=12?'p':'a';const h=p.h%12||12;return h+':'+String(p.m).padStart(2,'0')+a}
+function fmtHour(s){const p=parseTime(s);if(!p)return'';const a=p.h>=12?'p':'a';return(p.h%12||12)+a}
+function dayLabel(dateStr,i){const d=new Date(dateStr+'T12:00-07:00');const opts={weekday:'short',month:'short',day:'numeric'};return i===0?'Today':i===1?'Tomorrow':d.toLocaleDateString('en-US',opts)}
+
+function ymdDash(d){return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6)}
+
+async function fetchOM(lat,lon,extra){
+  const p=new URLSearchParams({
+    latitude:lat,longitude:lon,
+    timezone:'America/Los_Angeles',
+    temperature_unit:'fahrenheit',
+    wind_speed_unit:'mph',
+    forecast_days:'3',
+  });
+  extra.split('&').forEach(kv=>{
+    const i=kv.indexOf('=');
+    if(i<0)return;
+    p.set(decodeURIComponent(kv.slice(0,i)), decodeURIComponent(kv.slice(i+1)));
+  });
+  const r=await fetch(OM_BASE+'?'+p.toString());
+  if(!r.ok)throw new Error('OM '+r.status);
+  return r.json();
+}
+
+async function fetchTides(date,product){
+  const r=await fetch('/api/tides?date='+date+'&product='+product);
+  if(!r.ok)throw new Error('Tides '+r.status);
+  return r.json();
+}
+
+// ── Main ──
+async function init(){
+  try {
+    const now=new Date();
+    const ds=String(now.getFullYear())+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
+    const dt=new Date(now); dt.setDate(dt.getDate()+2);
+    const de=String(dt.getFullYear())+String(dt.getMonth()+1).padStart(2,'0')+String(dt.getDate()).padStart(2,'0');
+
+    state.dayDates=[ds,de];
+    for(let i=0;i<3;i++){
+      const d=new Date(now); d.setDate(d.getDate()+i);
+      state.dayDates[i]=String(d.getFullYear())+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+    }
+
+    // Build date strings for labels
+    const dateLabels=state.dayDates.map((d,i)=>{
+      const y=d.slice(0,4),m=d.slice(4,6),dd=d.slice(6);
+      return dayLabel(y+'-'+m+'-'+dd,i);
+    });
+
+    // Fetch all
+    const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
+    const irParams=common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index';
+    const bbParams=common+'&hourly=wind_speed_10m,wind_direction_10m';
+    const regParams=common+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code';
+
+    const p1=fetchOM(LOCATIONS[0].lat,LOCATIONS[0].lon,irParams); // Inner Richmond
+    const p2=fetchOM(BAKER_BEACH.lat,BAKER_BEACH.lon,bbParams); // Baker Beach wind
+    const tidePromises=state.dayDates.map(d=>fetchTides(d,'predictions'));
+    const regPromises=LOCATIONS.map(l=>fetchOM(l.lat,l.lon,regParams));
+
+    const [irData,bbData,...rest]=await Promise.all([p1,p2,...tidePromises,...regPromises]);
+    const tideResults=rest.slice(0,3);
+    const regResults=rest.slice(3);
+    state.tides={predictions:tideResults.flatMap(r=>r.predictions||[])};
+
+    state.irData=irData;
+    state.bbData=bbData;
+
+    const regMap={};
+    LOCATIONS.forEach((l,i)=>{regMap[l.id]={data:regResults[i],name:l.name,group:l.group}});
+    state.regions=regMap;
+
+    // Build DOM
+    buildUI(dateLabels);
+    renderDay(0);
+
+  } catch(e){
+    document.getElementById('loading').innerHTML='<div class="error">Failed to load weather data. Please refresh.</div>';
+    console.error(e);
+  }
+}
+
+// ── Build UI ──
+function buildUI(dateLabels){
+  const main=document.getElementById('main');
+  main.innerHTML='';
+
+  // Tabs
+  const tabs=document.getElementById('dayTabs');
+  tabs.style.display='flex';
+  tabs.innerHTML=dateLabels.map((l,i)=>`<button data-day="${i}">${l.split(' ')[0]}<small>${l.split(' ').slice(1).join(' ')||''}</small></button>`).join('');
+  tabs.querySelector('button').classList.add('active');
+  tabs.addEventListener('click',e=>{
+    const btn=e.target.closest('button');
+    if(!btn)return;
+    const day=+btn.dataset.day;
+    if(day===state.activeDay)return;
+    tabs.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.activeDay=day;
+    renderDay(day);
+  });
+
+  // Build cards
+  main.innerHTML=`
+    <div class="card-grid">
+    <div class="card" id="irCard">
+      <h2>☀ Inner Richmond</h2>
+      <div class="richmond-grid">
+        <div class="stat-box"><span class="label">Sunrise</span><span class="value" id="sunriseVal">--</span><span class="sub" id="sunriseSub"></span></div>
+        <div class="stat-box"><span class="label">Sunset</span><span class="value" id="sunsetVal">--</span><span class="sub" id="sunsetSub"></span></div>
+        <div class="stat-box"><span class="label">Max UV</span><span class="value" id="uvMaxVal">--</span></div>
+        <div class="stat-box"><span class="label">UV Safe Window</span><span class="value" id="uvBelowVal" style="font-size:0.85rem;word-break:break-word">--</span></div>
+      </div>
+      <div class="chart-wrap"><canvas id="uvChart"></canvas></div>
+    </div>
+
+    <div class="card" id="bbCard">
+      <h2>Baker Swim Conditions</h2>
+      <div class="tide-times" id="tideTimes"></div>
+      <div class="chart-wrap"><canvas id="tideChart"></canvas></div>
+      <div class="chart-wrap" style="margin-top:12px"><canvas id="windChart"></canvas></div>
+      <div class="water-temp" id="waterTemp"></div>
+    </div>
+
+    <div class="card full" id="regCard">
+      <h2>Regional Temps</h2>
+      <div id="regionContainer"></div>
+    </div>
+    </div>
+  `;
+
+  // Init charts
+  initUVChart();
+  initTideChart();
+  initWindChart();
+}
+
+// ── Charts ──
+let uvChart, tideChart, windChart;
+
+// UV threshold plugin
+const uvThreshold={
+  id:'uvThreshold',
+  beforeDraw(chart){
+    const {ctx,chartArea:ca,scales}=chart;
+    if(!scales.y)return;
+    const y=scales.y.getPixelForValue(2);
+    if(y<ca.top||y>ca.bottom)return;
+    ctx.save();
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle='rgba(239,68,68,0.6)';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(ca.left,y);ctx.lineTo(ca.right,y);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(239,68,68,0.7)';
+    ctx.font='10px system-ui';
+    ctx.textAlign='left';
+    ctx.fillText('UV 2',ca.left+6,y-4);
+    ctx.restore();
+  }
+};
+
+function initUVChart(){
+  const ctx=document.getElementById('uvChart');
+  if(!ctx)return;
+  uvChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:[],datasets:[{
+      label:'UV Index',
+      data:[],
+      borderColor:'#f59e0b',
+      backgroundColor:'rgba(245,158,11,0.12)',
+      fill:true,
+      tension:0.3,
+      pointRadius:3,
+      pointHoverRadius:5,
+      pointBackgroundColor:'#f59e0b',
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#475569',font:{size:10},maxRotation:0}},
+        y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10},stepSize:2}},
+      },
+    },
+    plugins:[uvThreshold],
+  });
+}
+
+function initTideChart(){
+  const ctx=document.getElementById('tideChart');
+  if(!ctx)return;
+  tideChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:[],datasets:[{
+      label:'Tide Height',
+      data:[],
+      borderColor:'#60a5fa',
+      backgroundColor:'rgba(96,165,250,0.1)',
+      fill:true,
+      tension:0.4,
+      pointRadius:2,
+      pointHoverRadius:5,
+      pointBackgroundColor:'#60a5fa',
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+'ft'}}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#475569',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10},callback:v=>v+'ft'}},
+      },
+    },
+  });
+}
+
+function initWindChart(){
+  const ctx=document.getElementById('windChart');
+  if(!ctx)return;
+  windChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:[],datasets:[{
+      label:'Wind (mph)',
+      data:[],
+      backgroundColor:[],
+      borderRadius:3,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
+        label:ctx=>ctx.parsed.y+' mph',
+        afterLabel:ctx=>{
+          const dirs=windChart.data.datasets[0]._directions||[];
+          return dirs[ctx.dataIndex]?'Direction: '+dirs[ctx.dataIndex]:'';
+        }
+      }}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#475569',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10}}},
+      },
+    },
+  });
+}
+
+// ── Render ──
+function renderDay(idx){
+  updateSun(idx);
+  updateUV(idx);
+  updateTideTimes(idx);
+  updateTideChart(idx);
+  updateWindChart(idx);
+  updateWaterTemp(idx);
+  updateRegions(idx);
+  document.getElementById('updated').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+
+function updateSun(idx){
+  const d=state.irData;
+  if(!d||!d.daily)return;
+  const sr=d.daily.sunrise[idx],ss=d.daily.sunset[idx];
+  document.getElementById('sunriseVal').textContent=sr?fmtTime(sr):'--';
+  document.getElementById('sunsetVal').textContent=ss?fmtTime(ss):'--';
+  // Compute day length
+  if(sr&&ss){
+    const srP=parseTime(sr),ssP=parseTime(ss);
+    if(srP&&ssP){
+      let mins=((ssP.h*60+ssP.m)-(srP.h*60+srP.m));
+      if(mins<0)mins+=1440;
+      const h=Math.floor(mins/60),m=mins%60;
+      document.getElementById('sunsetSub').textContent=h+'h '+m+'m';
+    }
+  }
+  document.getElementById('uvMaxVal').textContent=d.daily.uv_index_max?d.daily.uv_index_max[idx].toFixed(1):'--';
+}
+
+function updateUV(idx){
+  const d=state.irData;
+  if(!d||!d.hourly||!uvChart)return;
+  const start=idx*24,end=start+24;
+  const times=d.hourly.time.slice(start,end);
+  const uv=d.hourly.uv_index.slice(start,end);
+
+  // Filter to daytime hours (6a-9p) for cleaner chart
+  const dayIdx=[];
+  const dayTimes=[];
+  const dayUV=[];
+  times.forEach((t,i)=>{
+    const p=parseTime(t);
+    if(p&&p.h>=5&&p.h<=21){dayIdx.push(i);dayTimes.push(fmtHour(t));dayUV.push(uv[i])}
+  });
+
+  uvChart.data.labels=dayTimes;
+  uvChart.data.datasets[0].data=dayUV;
+  uvChart.update();
+
+  const morningSafe=uv.findIndex(v=>v>=2);
+  const eveningSafe=uv.length-1-[...uv].reverse().findIndex(v=>v>=2);
+  let safeText='';
+  if(morningSafe>0)safeText='Before '+fmtTime(times[morningSafe-1]);
+  if(morningSafe>0&&eveningSafe<uv.length-1)safeText+=' • ';
+  if(eveningSafe<uv.length-1)safeText+='After '+fmtTime(times[eveningSafe+1]);
+  document.getElementById('uvBelowVal').textContent=safeText||'All day above 2';
+}
+
+function updateTideTimes(idx){
+  if(!state.tides||!state.tides.predictions)return;
+  const targetDate=ymdDash(state.dayDates[idx]);
+  const dayData=state.tides.predictions.filter(p=>p.t.startsWith(targetDate));
+  const hl=findHighLow(dayData);
+  if(!hl||!hl.predictions)return;
+  const dayHL=hl.predictions;
+
+  let html='';
+  dayHL.forEach(p=>{
+    const cls=p.type==='H'?'high':'low';
+    const icon=p.type==='H'?'⬆':'⬇';
+    html+=`<div class="tide-item ${cls}"><div class="tide-type">${icon} ${p.type==='H'?'HIGH':'LOW'}</div><div class="tide-time">${p.t.slice(-5)}</div><div class="tide-height">${p.v} ft</div></div>`;
+  });
+  document.getElementById('tideTimes').innerHTML=html||'<div style="color:#64748b;font-size:0.8rem;text-align:center;padding:8px">No tide data</div>';
+}
+
+function updateTideChart(idx){
+  if(!state.tides||!state.tides.predictions||!tideChart)return;
+  const targetDate=ymdDash(state.dayDates[idx]);
+  const dayData=state.tides.predictions.filter(p=>p.t.startsWith(targetDate));
+
+  const labels=dayData.map(p=>{const m=p.t.match(/\s(\d{2}):(\d{2})/);return m?fmtHour('T'+m[1]+':'+m[2]):''});
+  const heights=dayData.map(p=>+p.v);
+
+  tideChart.data.labels=labels;
+  tideChart.data.datasets[0].data=heights;
+  tideChart.update();
+}
+
+function updateWindChart(idx){
+  const d=state.bbData;
+  if(!d||!d.hourly||!windChart)return;
+  const start=idx*24,end=start+24;
+  const times=d.hourly.time.slice(start,end);
+  const spd=d.hourly.wind_speed_10m?d.hourly.wind_speed_10m.slice(start,end):[];
+  const dir=d.hourly.wind_direction_10m?d.hourly.wind_direction_10m.slice(start,end):[];
+
+  // Filter daytime-ish hours (6a-9p)
+  const fTimes=[],fSpd=[],fDir=[];
+  times.forEach((t,i)=>{
+    const p=parseTime(t);
+    if(p&&p.h>=5&&p.h<=21&&spd[i]!==null){
+      fTimes.push(fmtHour(t));
+      fSpd.push(spd[i]);
+      fDir.push(dir[i]?degToDir(dir[i]):'');
+    }
+  });
+
+  windChart.data.labels=fTimes;
+  windChart.data.datasets[0].data=fSpd;
+  windChart.data.datasets[0]._directions=fDir;
+  windChart.data.datasets[0].backgroundColor=fSpd.map(s=>{
+    if(s<5)return 'rgba(96,165,250,0.3)';
+    if(s<12)return 'rgba(96,165,250,0.55)';
+    if(s<20)return 'rgba(96,165,250,0.75)';
+    return 'rgba(239,68,68,0.7)';
+  });
+  windChart.update();
+}
+
+function updateWaterTemp(idx){
+  const el=document.getElementById('waterTemp');
+  if(idx!==0){el.innerHTML='';return}
+  el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>...</strong>';
+  fetch('https://marine-api.open-meteo.com/v1/marine?latitude=37.79&longitude=-122.48&hourly=sea_surface_temperature&forecast_days=1&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit')
+    .then(r=>r.json()).then(d=>{
+      if(d&&d.hourly&&d.hourly.sea_surface_temperature){
+        const temps=d.hourly.sea_surface_temperature.filter(t=>t!==null);
+        if(temps.length>0){
+          const avg=Math.round(temps.reduce((a,b)=>a+b,0)/temps.length);
+          el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>'+avg+'°F</strong> <span style="color:#64748b">(forecast)</span>';
+          return;
+        }
+      }
+      el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>-- °F</strong>';
+    }).catch(()=>{el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>-- °F</strong>'});
+}
+
+function updateRegions(idx){
+  const container=document.getElementById('regionContainer');
+  if(!container)return;
+
+  // Group regions
+  const groups={};
+  LOCATIONS.forEach(l=>{
+    if(!groups[l.group])groups[l.group]=[];
+    groups[l.group].push(l);
+  });
+
+  let html='';
+  Object.keys(groups).forEach(group=>{
+    html+=`<div class="region-group"><div class="group-title">${group}</div><div class="region-row">`;
+    groups[group].forEach(l=>{
+      const r=state.regions[l.id];
+      const d=r&&r.data&&r.data.daily;
+      if(d){
+        const hi=d.temperature_2m_max?d.temperature_2m_max[idx]:null;
+        const lo=d.temperature_2m_min?d.temperature_2m_min[idx]:null;
+        const pr=d.precipitation_sum?d.precipitation_sum[idx]:null;
+        const wc=d.weather_code?d.weather_code[idx]:null;
+        const wi=wc!==null?wmoInfo(wc):{i:'❓',t:''};
+        const tempStr=hi!==null&&lo!==null?Math.round(hi)+'°/'+Math.round(lo)+'°':hi!==null?Math.round(hi)+'°':'--';
+        const prStr=pr!==null?pr.toFixed(1):'--';
+        html+=`<div class="region-item"><span class="weather">${wi.i}</span><span class="name">${l.short||l.name}</span><span class="temps">${tempStr}</span><span class="precip">${prStr}″</span></div>`;
+      } else {
+        html+=`<div class="region-item"><span class="weather">--</span><span class="name">${l.short||l.name}</span><span class="temps">--</span><span class="precip">--</span></div>`;
+      }
+    });
+    html+=`</div></div>`;
+  });
+  container.innerHTML=html;
+}
+
+// ── Start ──
+init();
+</script>
+</body>
+</html>
