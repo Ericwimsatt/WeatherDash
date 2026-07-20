@@ -1,11 +1,11 @@
 {
-  "name": "WeatherDash",
-  "short_name": "WeatherDash",
+  "name": "EricWeather",
+  "short_name": "Weather",
   "description": "Weather dashboard for San Francisco beaches and neighborhoods",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b1120",
-  "theme_color": "#0b1120",
+  "background_color": "#687a97",
+  "theme_color": "#60a5fa",
   "icons": [
     {
       "src": "/public/favicon.svg",
