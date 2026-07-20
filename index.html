@@ -15,25 +15,25 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;-webkit-text-size-adjust:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0b1120;color:#e2e8f0;min-height:100vh;padding:0 12px 48px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#322e2e;color:#e2e8f0;min-height:100vh;padding:0 12px 48px}
 img,svg{display:block;max-width:100%}
 button{cursor:pointer;font-family:inherit}
 
 /* Header */
-header{padding:16px 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;position:sticky;top:0;z-index:10;background:#0b1120}
+header{padding:16px 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;position:sticky;top:0;z-index:10;}
 header h1{font-size:1.35rem;font-weight:700;letter-spacing:-0.02em;color:#f1f5f9}
-header .updated{font-size:0.75rem;color:#64748b;margin-left:auto}
+header .updated{font-size:0.75rem;color:#a2aab6;margin-left:auto}
 
 /* Day tabs */
 .day-tabs{display:flex;gap:6px;width:100%;margin-top:8px}
-.day-tabs button{flex:1;padding:10px 6px;border:1px solid #1e293b;border-radius:10px;background:transparent;color:#64748b;font-size:0.8rem;font-weight:600;text-align:center;line-height:1.3;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
-.day-tabs button small{display:block;font-weight:400;font-size:0.7rem;color:#475569;margin-top:1px}
-.day-tabs button.active{border-color:#3b82f6;background:rgba(59,130,246,0.12);color:#93c5fd}
+.day-tabs button{flex:1;padding:10px 6px;border:1px solid #687a97;border-radius:10px;background:#65656540;color:#c7d1e1;font-size:0.8rem;font-weight:600;text-align:center;line-height:1.3;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.day-tabs button small{display:block;font-weight:400;font-size:0.7rem;color:#93a1b6;margin-top:1px}
+.day-tabs button.active{border-color:#3b82f6;background:rgba(59,130,246,0.12);color:#bad9fd}
 .day-tabs button.active small{color:#60a5fa}
 
 /* Card grid */
 .card-grid{display:grid;gap:12px}
-.card{background:#141e33;border:1px solid #1e293b;border-radius:14px;padding:16px}
+.card{border:1px solid #687a97;border-radius:4px;padding:16px}
 .card h2{font-size:1.05rem;font-weight:600;color:#e2e8f0;margin-bottom:12px;letter-spacing:-0.01em}
 @media(min-width:768px){.card-grid{grid-template-columns:1fr 1fr}.card-grid .full{grid-column:1/-1}}
 
@@ -62,13 +62,19 @@ header .updated{font-size:0.75rem;color:#64748b;margin-left:auto}
 /* Regions */
 .region-group{margin-top:12px}
 .region-group:first-child{margin-top:0}
-.region-group .group-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;margin-bottom:6px;padding:0 4px}
+.region-group .group-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#cad2dd;margin-bottom:6px;padding:0 4px}
 .region-row{display:flex;flex-wrap:wrap;gap:6px}
-.region-item{flex:1 1 calc(50% - 3px);min-width:0;background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:6px}
-.region-item .name{font-size:0.75rem;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex-shrink:1}
+.region-item{flex:1 1 100%;border-radius:2px;padding:12px 14px;display:flex;align-items:center;gap:10px;background-size:cover;background-position:center;background-repeat:no-repeat;min-height:60px}
+.region-item .name{font-size:0.85rem;font-weight:500;color:#e2e8f0;min-width:0}
 .region-item .temps{font-size:0.85rem;font-weight:600;color:#e2e8f0;white-space:nowrap}
-.region-item .precip{font-size:0.7rem;color:#60a5fa;margin-left:auto;white-space:nowrap}
-.region-item .weather{font-size:1rem;flex-shrink:0}
+.region-item .precip{font-size:0.75rem;color:#003fbe;margin-left:auto;white-space:nowrap}
+.region-item.sunny{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/sunny.jpg')}
+.region-item.cloudy{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.4)),url('/images/cloudy.jpg')}
+.region-item.partly-cloudy{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/partly-cloudy.jpg')}
+.region-item.rainy{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/rainy.jpg')}
+.region-item.snowy{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/snowy.jpg')}
+.region-item.thunder{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/thunder.jpg')}
+.region-item.hail{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/hail.jpg')}
 
 /* Loading */
 .loading{text-align:center;padding:40px 16px;color:#64748b;font-size:0.9rem}
@@ -79,6 +85,9 @@ header .updated{font-size:0.75rem;color:#64748b;margin-left:auto}
 .error{color:#fca5a5;font-size:0.8rem;padding:4px 0}
 
 /* Desktop */
+@media(min-width:640px){
+  .region-item{flex:1 1 calc(50% - 3px)}
+}
 @media(min-width:768px){
   body{padding:0 24px 48px}
   .region-item{flex:1 1 calc(25% - 5px)}
@@ -92,7 +101,7 @@ header .updated{font-size:0.75rem;color:#64748b;margin-left:auto}
 <body>
 
 <header>
-  <h1>WeatherDash</h1>
+  <h1>EricWeather</h1>
   <div class="updated" id="updated"></div>
   <div class="day-tabs" id="dayTabs" style="display:none"></div>
 </header>
@@ -128,18 +137,18 @@ const LOCATIONS = [
 const BAKER_BEACH = { lat:37.7946, lon:-122.4829 };
 
 const WMO = {
-  0:{t:'Clear',i:'☀'},1:{t:'Mostly Clear',i:'☀'},2:{t:'Partly Cloudy',i:'⛅'},
-  3:{t:'Overcast',i:'☁'},45:{t:'Foggy',i:'☁'},48:{t:'Fog',i:'☁'},
-  51:{t:'Drizzle',i:'☂'},53:{t:'Drizzle',i:'☂'},55:{t:'Drizzle',i:'☂'},
-  61:{t:'Rain',i:'☔'},63:{t:'Rain',i:'☔'},65:{t:'Rain',i:'☔'},
-  71:{t:'Snow',i:'❄'},73:{t:'Snow',i:'❄'},75:{t:'Snow',i:'❄'},
-  80:{t:'Showers',i:'☔'},81:{t:'Showers',i:'☔'},82:{t:'Showers',i:'☔'},
-  95:{t:'Storm',i:'⚡'},96:{t:'Storm',i:'⚡'},99:{t:'Storm',i:'⚡'},
+  0:{t:'Clear',c:'sunny'},1:{t:'Mostly Clear',c:'sunny'},2:{t:'Partly Cloudy',c:'partly-cloudy'},
+  3:{t:'Overcast',c:'cloudy'},45:{t:'Foggy',c:'cloudy'},48:{t:'Fog',c:'cloudy'},
+  51:{t:'Drizzle',c:'rainy'},53:{t:'Drizzle',c:'rainy'},55:{t:'Drizzle',c:'rainy'},
+  61:{t:'Rain',c:'rainy'},63:{t:'Rain',c:'rainy'},65:{t:'Rain',c:'rainy'},
+  71:{t:'Snow',c:'snowy'},73:{t:'Snow',c:'snowy'},75:{t:'Snow',c:'snowy'},
+  80:{t:'Showers',c:'rainy'},81:{t:'Showers',c:'rainy'},82:{t:'Showers',c:'rainy'},
+  95:{t:'Storm',c:'thunder'},96:{t:'Storm',c:'thunder'},99:{t:'Storm',c:'hail'},
 };
 
 function wmoInfo(code){
   const c=typeof code==='number'?code:+code;
-  return WMO[c]||{t:'Unknown',i:'❓'};
+  return WMO[c]||{t:'Unknown',c:''};
 }
 
 const DIRS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
@@ -278,7 +287,7 @@ function buildUI(dateLabels){
   main.innerHTML=`
     <div class="card-grid">
     <div class="card" id="irCard">
-      <h2>☀ Inner Richmond</h2>
+      <h2>☀☀☀☀☀☀☀☀☀☀☀☀☀☀☀☀☀☀☀</h2>
       <div class="richmond-grid">
         <div class="stat-box"><span class="label">Sunrise</span><span class="value" id="sunriseVal">--</span><span class="sub" id="sunriseSub"></span></div>
         <div class="stat-box"><span class="label">Sunset</span><span class="value" id="sunsetVal">--</span><span class="sub" id="sunsetSub"></span></div>
@@ -382,8 +391,8 @@ function initTideChart(){
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+'ft'}}},
       scales:{
-        x:{grid:{display:false},ticks:{color:'#475569',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10},callback:v=>v+'ft'}},
+        x:{grid:{display:false},ticks:{color:'#677589',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10},callback:v=>v+'ft'}},
       },
     },
   });
@@ -410,8 +419,8 @@ function initWindChart(){
         }
       }}},
       scales:{
-        x:{grid:{display:false},ticks:{color:'#475569',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
-        y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:'#677589',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10}}},
       },
     },
   });
@@ -578,12 +587,12 @@ function updateRegions(idx){
         const lo=d.temperature_2m_min?d.temperature_2m_min[idx]:null;
         const pr=d.precipitation_sum?d.precipitation_sum[idx]:null;
         const wc=d.weather_code?d.weather_code[idx]:null;
-        const wi=wc!==null?wmoInfo(wc):{i:'❓',t:''};
+        const wi=wc!==null?wmoInfo(wc):{t:'Unknown',c:''};
         const tempStr=hi!==null&&lo!==null?Math.round(hi)+'°/'+Math.round(lo)+'°':hi!==null?Math.round(hi)+'°':'--';
         const prStr=pr!==null?pr.toFixed(1):'--';
-        html+=`<div class="region-item"><span class="weather">${wi.i}</span><span class="name">${l.short||l.name}</span><span class="temps">${tempStr}</span><span class="precip">${prStr}″</span></div>`;
+        html+=`<div class="region-item ${wi.c}"><span class="name">${l.short||l.name}</span><span class="temps">${tempStr}</span><span class="precip">${prStr}″</span></div>`;
       } else {
-        html+=`<div class="region-item"><span class="weather">--</span><span class="name">${l.short||l.name}</span><span class="temps">--</span><span class="precip">--</span></div>`;
+        html+=`<div class="region-item"><span class="name">${l.short||l.name}</span><span class="temps">--</span><span class="precip">--</span></div>`;
       }
     });
     html+=`</div></div>`;
