@@ -40,7 +40,7 @@ header .updated{font-size:0.75rem;color:#a2aab6;margin-left:auto}
 /* Inner Richmond grid */
 .richmond-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .richmond-grid .stat-box{background:rgba(255,255,255,0.03);border-radius:10px;padding:12px}
-.richmond-grid .stat-box .label{display:block;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;margin-bottom:4px}
+.richmond-grid .stat-box .label{display:block;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:4px}
 .richmond-grid .stat-box .value{font-size:1.25rem;font-weight:600;color:#e2e8f0}
 .richmond-grid .stat-box .sub{font-size:0.75rem;color:#94a3b8;margin-top:2px}
 
@@ -56,7 +56,7 @@ header .updated{font-size:0.75rem;color:#a2aab6;margin-left:auto}
 .tide-times .tide-item.low .tide-type{color:#f59e0b}
 .tide-times .tide-item .tide-time{font-size:1.1rem;font-weight:600;color:#e2e8f0}
 .tide-times .tide-item .tide-height{font-size:0.85rem;color:#94a3b8;margin-top:1px}
-.water-temp{text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:10px;font-size:0.85rem;color:#94a3b8}
+.water-temp{text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:10px;font-size:0.85rem;color:#b0bcc8}
 .water-temp strong{color:#e2e8f0;font-size:1rem}
 
 /* Regions */
@@ -292,7 +292,7 @@ function buildUI(dateLabels){
         <div class="stat-box"><span class="label">Sunrise</span><span class="value" id="sunriseVal">--</span><span class="sub" id="sunriseSub"></span></div>
         <div class="stat-box"><span class="label">Sunset</span><span class="value" id="sunsetVal">--</span><span class="sub" id="sunsetSub"></span></div>
         <div class="stat-box"><span class="label">Max UV</span><span class="value" id="uvMaxVal">--</span></div>
-        <div class="stat-box"><span class="label">UV Safe Window</span><span class="value" id="uvBelowVal" style="font-size:0.85rem;word-break:break-word">--</span></div>
+        <div class="stat-box"><span class="label">UV Safe Window</span><span class="value" id="uvBelowVal" style="font-size:0.85rem;word-break:break-word;white-space:pre-line">--</span></div>
       </div>
       <div class="chart-wrap"><canvas id="uvChart"></canvas></div>
     </div>
@@ -392,7 +392,7 @@ function initTideChart(){
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+'ft'}}},
       scales:{
         x:{grid:{display:false},ticks:{color:'#677589',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10},callback:v=>v+'ft'}},
+        y:{min:-2,max:9,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10},callback:v=>v+'ft'}},
       },
     },
   });
@@ -481,8 +481,8 @@ function updateUV(idx){
   const eveningSafe=uv.length-1-[...uv].reverse().findIndex(v=>v>=2);
   let safeText='';
   if(morningSafe>0)safeText='Before '+fmtTime(times[morningSafe-1]);
-  if(morningSafe>0&&eveningSafe<uv.length-1)safeText+=' • ';
-  if(eveningSafe<uv.length-1)safeText+='\nAfter '+fmtTime(times[eveningSafe+1]);
+  if(morningSafe>0&&eveningSafe<uv.length-1)safeText+='\n';
+  if(eveningSafe<uv.length-1)safeText+='After '+fmtTime(times[eveningSafe+1]);
   document.getElementById('uvBelowVal').textContent=safeText||'All day above 2';
 }
 
@@ -550,19 +550,19 @@ function updateWindChart(idx){
 function updateWaterTemp(idx){
   const el=document.getElementById('waterTemp');
   if(idx!==0){el.innerHTML='';return}
-  el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>...</strong>';
+  el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>...</strong>';
   fetch('https://marine-api.open-meteo.com/v1/marine?latitude=37.79&longitude=-122.48&hourly=sea_surface_temperature&forecast_days=1&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit')
     .then(r=>r.json()).then(d=>{
       if(d&&d.hourly&&d.hourly.sea_surface_temperature){
         const temps=d.hourly.sea_surface_temperature.filter(t=>t!==null);
         if(temps.length>0){
           const avg=Math.round(temps.reduce((a,b)=>a+b,0)/temps.length);
-          el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>'+avg+'°F</strong> <span style="color:#64748b">(forecast)</span>';
+          el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>'+avg+'°F</strong>';
           return;
         }
       }
-      el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>-- °F</strong>';
-    }).catch(()=>{el.innerHTML='<span style="color:#64748b">Water temp: </span><strong>-- °F</strong>'});
+      el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>-- °F</strong>';
+    }).catch(()=>{el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>-- °F</strong>'});
 }
 
 function updateRegions(idx){
