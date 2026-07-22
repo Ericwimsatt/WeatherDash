@@ -343,6 +343,21 @@ const uvThreshold={
   }
 };
 
+const tideZeroLine={
+  id:'tideZeroLine',
+  beforeDraw(chart){
+    const {ctx,chartArea:ca,scales}=chart;
+    if(!scales.y)return;
+    const y=scales.y.getPixelForValue(0);
+    if(y<ca.top||y>ca.bottom)return;
+    ctx.save();
+    ctx.strokeStyle='#c2a060';
+    ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(ca.left,y);ctx.lineTo(ca.right,y);ctx.stroke();
+    ctx.restore();
+  }
+};
+
 function initUVChart(){
   const ctx=document.getElementById('uvChart');
   if(!ctx)return;
@@ -392,9 +407,10 @@ function initTideChart(){
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+'ft'}}},
       scales:{
         x:{grid:{display:false},ticks:{color:'#677589',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
-        y:{min:-2,max:9,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10},callback:v=>v+'ft'}},
+        y:{min:-2,max:9,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10},stepSize:1,callback:v=>v+'ft'}},
       },
     },
+    plugins:[tideZeroLine],
   });
 }
 
