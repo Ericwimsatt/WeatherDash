@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WeatherDash — mobile theme directions</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 18px 72px;
+      background: #111316;
+      color: #f5f4ef;
+      font: 15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .intro { max-width: 720px; margin: 0 auto 42px; }
+    .intro p { margin: 8px 0 0; color: #9ea4ad; max-width: 58ch; }
+    .intro h1 { margin: 0; font-size: clamp(28px, 6vw, 52px); line-height: .98; letter-spacing: -.055em; }
+    .intro .meta { margin-top: 18px; color: #737a84; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    .directions { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 390px)); justify-content: center; gap: 42px 28px; }
+    .direction { display: grid; gap: 14px; justify-items: center; }
+    .direction h2 { width: 100%; margin: 0; font-size: 17px; letter-spacing: -.02em; }
+    .direction h2 span { color: #737a84; font-weight: 500; font-size: 12px; margin-left: 7px; letter-spacing: .06em; text-transform: uppercase; }
+    .direction p { width: 100%; margin: -7px 0 0; color: #8e959e; font-size: 13px; }
+    .phone {
+      width: min(100%, 390px); height: 844px; overflow: hidden; position: relative;
+      border: 8px solid #24272c; border-radius: 38px; background: var(--paper); color: var(--ink);
+      box-shadow: 0 22px 54px #0009, 0 0 0 1px #ffffff12;
+    }
+    .screen { height: 100%; overflow: auto; scrollbar-width: none; padding: 24px 18px 34px; background: var(--paper); }
+    .screen::-webkit-scrollbar { display: none; }
+    .status { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .04em; margin-bottom: 20px; }
+    .brand-row { display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; }
+    .brand { font-size: 21px; font-weight: 800; letter-spacing: -.06em; }
+    .updated { color: var(--muted); font-size: 10px; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 18px; }
+    .tabs div { padding: 9px 5px; text-align: center; border: 1px solid var(--line); color: var(--muted); font-size: 11px; font-weight: 700; }
+    .tabs small { display: block; margin-top: 3px; color: var(--muted); opacity: .58; font-size: 9px; font-weight: 500; letter-spacing: 0; }
+    .tabs div:first-child small { color: inherit; opacity: .7; }
+    .tabs div:first-child { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+    .eyebrow { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .hero-temp { display: flex; align-items: end; gap: 10px; margin: 5px 0 12px; }
+    .temp { font-size: 64px; line-height: .84; letter-spacing: -.09em; font-weight: 800; }
+    .condition { color: var(--accent); font-size: 13px; font-weight: 750; padding-bottom: 4px; }
+    .card { border: 1px solid var(--line); padding: 15px; margin-top: 12px; background: var(--card); }
+    .card h3 { margin: 0 0 12px; font-size: 14px; letter-spacing: -.02em; }
+    .card-top { display:flex; justify-content:space-between; gap: 10px; align-items: start; }
+    .subtle { color: var(--muted); font-size: 11px; }
+    .stat-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .stat { padding: 10px; background: var(--stat); }
+    .stat b { display:block; margin-top: 3px; font-size: 18px; letter-spacing: -.04em; }
+    .stat small { color: var(--muted); font-size: 10px; }
+    .chart { height: 78px; margin-top: 12px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
+    .chart svg { width: 100%; height: 100%; overflow: visible; }
+    .uv-layout { display: grid; grid-template-columns: 70px 1fr; align-items: end; gap: 12px; }
+    .uv-number { font-size: 40px; line-height: .8; font-weight: 850; letter-spacing: -.08em; color: var(--accent); }
+    .uv-number small { display: block; margin-top: 7px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+    .uv-graph { height: 58px; border-bottom: 1px solid var(--line); }
+    .uv-graph svg { width: 100%; height: 100%; }
+    .uv-scale { display: flex; justify-content: space-between; margin-top: 6px; color: var(--muted); font-size: 9px; }
+    .tides { display:grid; grid-template-columns: repeat(3,1fr); gap:6px; }
+    .tide { padding: 8px 4px; text-align:center; background: var(--stat); }
+    .tide strong { display:block; font-size: 13px; }
+    .tide span { color: var(--muted); display:block; font-size: 10px; }
+    .group { margin-top: 20px; }
+    .group-title { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px; }
+    .location { display:grid; grid-template-columns: 1fr auto auto; gap: 9px; align-items:center; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+    .location b { font-size: 12px; }
+    .location .weather { color: var(--accent); font-size: 11px; }
+    .location .rain { color: var(--muted); font-size: 10px; }
+    .mini-action { margin-top: 22px; width:100%; padding: 11px; border: 1px solid var(--accent); color: var(--accent); background: transparent; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+
+    /* 01 — Coastal Signal */
+    .coastal { --paper:#e8edf0; --ink:#152936; --muted:#627783; --line:#bdcbd0; --card:#f2f5f5; --stat:#dce7e9; --accent:#167e9b; --accent-soft:#d2e9ee; }
+    .coastal .screen { background: linear-gradient(180deg,#d5e4e8 0 185px,var(--paper) 370px); }
+    .coastal .brand { font-family: Georgia, serif; font-weight: 500; }
+    .coastal .card { border-radius: 18px; box-shadow: 0 8px 22px rgba(0,0,0,.08); }
+    .coastal .tabs div, .coastal .mini-action { border-radius: 12px; }
+
+    /* 02 — Sunline */
+    .sunline { --paper:#fbf1df; --ink:#2d2018; --muted:#9b7359; --line:#ead3b4; --card:#fff8eb; --stat:#f5e5c8; --accent:#e85d32; --accent-soft:#fbe0c5; }
+    .sunline .screen { position: relative; background: linear-gradient(160deg,#f7dfb6 0 210px,var(--paper) 380px); }
+    .sunline .screen::before { content: ""; position: absolute; top: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: #ffbd58; border: 2px solid #ff9b4b; }
+    .sunline .brand { font-size: 25px; font-weight: 900; }
+    .sunline .card { border: 0; border-radius: 24px; box-shadow: 0 10px 0 #e8c695; }
+    .sunline .tabs div { border: 0; border-radius: 100px; background: #fff7e9aa; }
+    .sunline .tabs div:first-child { background: var(--accent); color: #fff; }
+
+    /* 03 — Field Notes */
+    .field { --paper:#f2eee5; --ink:#23251f; --muted:#77796e; --line:#c9c6b8; --card:#f8f5ed; --stat:#e6e4d8; --accent:#315b42; --accent-soft:#d8e1d4; }
+    .field .screen { background-color: var(--paper); background-image: linear-gradient(#5b745814 1px,transparent 1px); background-size: 100% 34px; }
+    .field .brand { font-family: Georgia,serif; font-weight: 700; letter-spacing: -.08em; }
+    .field .card { border: 1px solid #7b806e; border-radius: 0; transform: rotate(-.35deg); }
+    .field .tabs div { border-width: 1px 0; border-color: var(--line); }
+    .field .tabs div:first-child { background: transparent; color: var(--accent); border-color: var(--accent); }
+
+    /* 04 — Harbor Chart */
+    .harbor { --paper:#0c2433; --ink:#e5f2f1; --muted:#85aab1; --line:#275064; --card:#112f40; --stat:#173b4d; --accent:#63e0c6; --accent-soft:#163e48; }
+    .harbor .screen { background: linear-gradient(125deg,#0d2b3a,#071c29 55%,#12394a); }
+    .harbor .brand { font-family: ui-monospace, monospace; text-transform: uppercase; font-size: 17px; letter-spacing: .04em; }
+    .harbor .card { border: 1px solid var(--line); border-radius: 3px; }
+    .harbor .tabs div { border-color: var(--line); background:#0b2534; }
+    .harbor .tabs div:first-child { background: var(--accent-soft); }
+
+    /* 05 — Airplane Mode */
+    .air { --paper:#f7f8fa; --ink:#1d2733; --muted:#7c8794; --line:#dce2e8; --card:#fff; --stat:#eef2f5; --accent:#4c71d8; --accent-soft:#e9edfc; }
+    .air .screen { background: linear-gradient(180deg,#e6ebf7,#f7f8fa 290px); }
+    .air .brand { font-weight: 650; letter-spacing: -.08em; }
+    .air .card { border:0; border-radius: 20px; box-shadow: 0 9px 28px rgba(0,0,0,.07); }
+    .air .tabs { padding: 4px; border-radius: 15px; background:#ffffff99; }
+    .air .tabs div { border:0; border-radius: 11px; }
+
+    /* 06 — Night Watch */
+    .night { --paper:#101315; --ink:#edf5e7; --muted:#83917e; --line:#2d3830; --card:#171c19; --stat:#1f2922; --accent:#b5f36a; --accent-soft:#24361e; }
+    .night .screen { background: radial-gradient(circle at 20% 14%,#324628 0,#101315 35%); }
+    .night .brand { font-family: ui-monospace,monospace; font-size: 18px; letter-spacing: .01em; }
+    .night .card { border-radius: 10px; box-shadow: inset 0 0 0 1px #b5f36a08; }
+    .night .tabs div { border-radius: 6px; }
+    .night .tabs div:first-child { box-shadow: inset 0 -2px var(--accent); }
+
+    /* 07 — Clay Forecast */
+    .clay { --paper:#d98368; --ink:#2c1d1b; --muted:#704944; --line:#b86454; --card:#eaa083; --stat:#d17660; --accent:#f8e9c9; --accent-soft:#b96655; }
+    .clay .screen { background: linear-gradient(135deg,#c66d5b,#e39a7a 48%,#d27a64); }
+    .clay .brand { font-size: 24px; font-weight: 950; }
+    .clay .card { border: 2px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 var(--ink); }
+    .clay .tabs div { border: 2px solid var(--ink); color: var(--ink); border-radius: 4px; }
+    .clay .tabs div:first-child { background: var(--accent); color:var(--ink); }
+    .clay .location { border-bottom: 2px solid var(--ink); }
+    .clay .mini-action { border: 2px solid var(--ink); color: var(--ink); font-weight: 950; }
+
+    /* 08 — Moss & Fog */
+    .moss { --paper:#dfe3d3; --ink:#253128; --muted:#68756b; --line:#b6c0b1; --card:#e9ecdf; --stat:#d0d9cb; --accent:#426a52; --accent-soft:#c7d7c7; }
+    .moss .screen { background: linear-gradient(180deg,#b6c6b9 0,#dfe3d3 280px); }
+    .moss .brand { font-size: 24px; font-weight: 500; letter-spacing: -.07em; }
+    .moss .card { border: 0; border-radius: 28px 8px 28px 8px; }
+    .moss .tabs div { border: 0; border-radius: 3px; background:#ffffff44; }
+    .moss .tabs div:first-child { background: var(--accent); color:#edf3e7; }
+
+    /* Replacement direction — sand + ocean */
+    .beach { --paper:#f4e7cf; --ink:#153d4c; --muted:#66828a; --line:#c4d4ce; --card:#fbf3e5; --stat:#deebe5; --accent:#0e8090; --accent-soft:#d3e7dd; }
+    .beach .screen { background: linear-gradient(180deg,#c4ded5 0 170px,#e6d7bd 310px,#f4e7cf 430px); }
+    .beach .brand { font-family: Georgia, serif; font-size: 24px; font-weight: 600; }
+    .beach .card { border: 2px solid var(--ink); border-radius: 4px; box-shadow: 5px 5px 0 #b98b58; }
+    .beach .tabs div { border-color: #a8c3bb; border-radius: 10px; background: #f8efe0aa; }
+    .beach .tabs div:first-child { background: var(--accent); color: #f4e7cf; }
+  </style>
+</head>
+<body>
+  <header class="intro">
+    <h1>Pick a weather mood.</h1>
+    <p>Four mobile-first visual directions for EricWeather. The data, day switching, tide view, UV graph, and neighborhood list stay the same — only the surface changes.</p>
+    <div class="meta">Static theme exploration · scroll each phone to see the full dashboard</div>
+  </header>
+
+  <main class="directions">
+    <article class="direction"><h2>01 · Coastal Signal <span>calm / coastal</span></h2><p>Soft marine blue, editorial type, and a quiet sense of depth.</p><div class="phone coastal"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+
+    <article class="direction"><h2>02 · Sunline <span>warm / optimistic</span></h2><p>A sunrise dashboard with rounded warmth and high glanceability.</p><div class="phone sunline"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+
+    <article class="direction"><h2>03 · Field Notes <span>tactile / grounded</span></h2><p>A pocket forecast journal: practical, personal, and a little analog.</p><div class="phone field"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+
+    <article class="direction"><h2>04 · Harbor Chart <span>nautical / precise</span></h2><p>Deep-water navy and luminous aqua make tides feel like the main event.</p><div class="phone harbor"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+
+    <article class="direction"><h2>05 · Airplane Mode <span>clean / effortless</span></h2><p>Lightweight layers and generous breathing room for a quick daily check.</p><div class="phone air"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+
+    <article class="direction"><h2>06 · Night Watch <span>dark / focused</span></h2><p>A low-light mode built for checking conditions before heading out.</p><div class="phone night"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+
+    <article class="direction"><h2>07 · Clay Forecast <span>bold / playful</span></h2><p>Graphic, tactile, and unmistakable — a weather tool with a point of view.</p><div class="phone clay"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+
+    <article class="direction"><h2>08 · Moss &amp; Fog <span>natural / quiet</span></h2><p>A muted Bay Area palette with organic edges and a softer reading rhythm.</p><div class="phone moss"><div class="screen"><div class="status"><span>9:41</span><span>WEATHER DASH</span></div><div class="brand-row"><div class="brand">EricWeather</div><div class="updated">Updated 2m ago</div></div><div class="tabs"><div>Today<small>Aug 1</small></div><div>Tomorrow<small>Aug 2</small></div><div>Sat<small>Aug 3</small></div></div><div class="eyebrow">Inner Richmond</div><div class="hero-temp"><div class="temp">62°</div><div class="condition">Partly cloudy</div></div><div class="card"><div class="card-top"><h3>Beach conditions</h3><div class="subtle">Baker Beach</div></div><div class="stat-pair"><div class="stat"><small>Wind</small><b>12 mph</b></div><div class="stat"><small>Water</small><b>56°</b></div></div><div class="chart"><svg viewBox="0 0 340 78" preserveAspectRatio="none"><path d="M0 50 C35 22 48 64 83 40 S135 24 170 47 S226 62 262 28 S315 20 340 36" fill="none" stroke="var(--accent)" stroke-width="3"/></svg></div></div><div class="card"><div class="card-top"><h3>Tides</h3><div class="subtle">today</div></div><div class="tides"><div class="tide"><strong>HIGH</strong><span>6:42a · 5.1ft</span></div><div class="tide"><strong>LOW</strong><span>1:18p · 0.8ft</span></div><div class="tide"><strong>HIGH</strong><span>7:54p · 4.6ft</span></div></div></div><div class="group"><div class="group-title">San Francisco</div><div class="location"><b>Inner Richmond</b><span class="weather">62° / 55°</span><span class="rain">10%</span></div><div class="location"><b>Outer Richmond</b><span class="weather">61° / 54°</span><span class="rain">15%</span></div><div class="location"><b>Inner Sunset</b><span class="weather">63° / 55°</span><span class="rain">12%</span></div></div><button class="mini-action">View neighborhood detail</button></div></div></article>
+  </main>
+  <script>
+    // Keep the exploration static, but make shared product evidence consistent across every direction.
+    const uvMarkup = '<div class="card uv-card"><div class="card-top"><h3>UV index</h3><div class="subtle">today · 12pm</div></div><div class="uv-layout"><div class="uv-number">6<small>HIGH</small></div><div class="uv-graph"><svg viewBox="0 0 250 58" preserveAspectRatio="none"><path d="M0 46 C28 43 42 29 67 34 S103 45 126 22 S164 10 185 28 S218 33 250 8" fill="none" stroke="var(--accent)" stroke-width="3"/><path d="M0 46 C28 43 42 29 67 34 S103 45 126 22 S164 10 185 28 S218 33 250 8 L250 58 L0 58Z" fill="var(--accent-soft)" opacity=".72"/></svg></div></div><div class="uv-scale"><span>8am</span><span>12pm</span><span>4pm</span></div></div>';
+    document.querySelectorAll('.phone .group').forEach(group => group.insertAdjacentHTML('beforebegin', uvMarkup));
+
+    const removed = ['harbor', 'night', 'clay', 'moss'];
+    document.querySelectorAll('.direction').forEach(article => {
+      if (removed.some(name => article.querySelector('.' + name))) article.remove();
+    });
+
+    const beach = document.querySelector('.direction .air').closest('.direction').cloneNode(true);
+    beach.querySelector('h2').innerHTML = '06 · Beach <span>sand / ocean</span>';
+    beach.querySelector('p').textContent = 'A sun-washed coastal palette that brings the beach into the everyday forecast.';
+    const phone = beach.querySelector('.phone');
+    phone.className = 'phone beach';
+    document.querySelector('.directions').appendChild(beach);
+    document.querySelector('.direction .air').closest('.direction').remove();
+  </script>
+</body>
+</html>

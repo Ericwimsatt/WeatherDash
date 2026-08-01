@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0b1120">
+<meta name="theme-color" content="#fbf1df">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
@@ -76,6 +76,14 @@ header .updated{font-size:0.75rem;color:#a2aab6;margin-left:auto}
 .region-item.thunder{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/thunder.jpg')}
 .region-item.hail{background-image:linear-gradient(rgba(11,17,32,0.2),rgba(11,17,32,0.5)),url('/images/hail.jpg')}
 
+/* Region click */
+.region-item{cursor:pointer}
+
+/* Detail nav */
+.detail-nav{margin-bottom:12px}
+.back-btn{background:none;border:1px solid #687a97;border-radius:8px;color:#c7d1e1;padding:8px 16px;font-size:0.85rem;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.back-btn:hover{background:rgba(255,255,255,0.06);border-color:#3b82f6;color:#bad9fd}
+
 /* Loading */
 .loading{text-align:center;padding:40px 16px;color:#64748b;font-size:0.9rem}
 .loading .spinner{display:inline-block;width:24px;height:24px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px}
@@ -96,6 +104,126 @@ header .updated{font-size:0.75rem;color:#a2aab6;margin-left:auto}
   body{padding:0 48px 48px;max-width:1200px;margin:0 auto}
   .region-item{flex:1 1 calc(20% - 5px)}
 }
+
+/* Field Notes theme: visual treatment only; layout and content structure stay intact. */
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:transparent;color:#23251f}
+main{background-image:linear-gradient(rgba(49,91,66,0.07) 1px,transparent 1px);background-size:100% 34px}
+header{background:transparent}
+header h1{font-family:Georgia,'Times New Roman',serif;font-size:1.45rem;font-weight:700;letter-spacing:-0.045em;color:#23251f}
+header .updated{color:#77796e}
+.day-tabs button{border-color:#c9c6b8;border-radius:0;background:rgba(248,245,237,0.68);color:#77796e}
+.day-tabs button small{color:#9a9b8f}
+.day-tabs button.active{border-color:#315b42;background:#d8e1d4;color:#315b42}
+.day-tabs button.active small{color:#315b42}
+.card{border-color:#7b806e;border-radius:0;background:rgba(248,245,237,0.74)}
+.chart-wrap{height:180px;min-height:180px}
+.chart-wrap canvas{display:block!important;width:100%!important;height:180px!important;max-height:180px}
+.native-chart{display:block;width:100%;height:180px}
+.card h2{font-family:Georgia,'Times New Roman',serif;color:#23251f;font-weight:700}
+.richmond-grid .stat-box{background:#e6e4d8;border-radius:0}
+.richmond-grid .stat-box .label{color:#77796e}
+.richmond-grid .stat-box .value{color:#23251f}
+.richmond-grid .stat-box .sub{color:#77796e}
+.tide-times .tide-item{background:#e6e4d8;border-radius:0}
+.tide-times .tide-item.high .tide-type{color:#315b42}
+.tide-times .tide-item.low .tide-type{color:#a56d2d}
+.tide-times .tide-item .tide-time{color:#23251f}
+.tide-times .tide-item .tide-height{color:#77796e}
+.water-temp{background:#e6e4d8;border-radius:0;color:#77796e}
+.water-temp strong{color:#23251f}
+.region-group .group-title{color:#77796e}
+.region-item{border:1px solid rgba(35,37,31,0.2);border-radius:0}
+.region-item .name,.region-item .temps{color:#f8f5ed;text-shadow:0 1px 2px rgba(0,0,0,0.55)}
+.region-item .precip{color:#e6f0e8;text-shadow:0 1px 2px rgba(0,0,0,0.55)}
+.region-item.sunny{background-image:linear-gradient(rgba(35,37,31,0.16),rgba(35,37,31,0.58)),url('/images/sunny.jpg')}
+.region-item.cloudy{background-image:linear-gradient(rgba(35,37,31,0.16),rgba(35,37,31,0.58)),url('/images/cloudy.jpg')}
+.region-item.partly-cloudy{background-image:linear-gradient(rgba(35,37,31,0.16),rgba(35,37,31,0.58)),url('/images/partly-cloudy.jpg')}
+.region-item.rainy{background-image:linear-gradient(rgba(35,37,31,0.16),rgba(35,37,31,0.62)),url('/images/rainy.jpg')}
+.region-item.snowy{background-image:linear-gradient(rgba(35,37,31,0.16),rgba(35,37,31,0.58)),url('/images/snowy.jpg')}
+.region-item.thunder{background-image:linear-gradient(rgba(35,37,31,0.16),rgba(35,37,31,0.62)),url('/images/thunder.jpg')}
+.region-item.hail{background-image:linear-gradient(rgba(35,37,31,0.16),rgba(35,37,31,0.62)),url('/images/hail.jpg')}
+.back-btn{border-color:#c9c6b8;border-radius:0;color:#315b42}
+.back-btn:hover{background:#d8e1d4;border-color:#315b42;color:#23251f}
+.loading{color:#77796e}
+.loading .spinner{border-color:#e6e4d8;border-top-color:#315b42}
+.error{color:#9a4f45}
+
+/* Field Notes data accents: stronger ink, restrained ocean/ochre signals. */
+.tide-times .tide-item{border:1px solid #b8b9aa}
+.tide-times .tide-item.high .tide-type{color:#245237}
+.tide-times .tide-item.low .tide-type{color:#8b551d}
+.tide-arrow{width:12px;height:16px;display:inline-block;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chart-wrap canvas{color:#555b52}
+
+/* Sunline theme: warm, optimistic, and glanceable while preserving the dashboard's content hierarchy. */
+:root{color-scheme:light}
+body{font-family:ui-rounded,"Avenir Next",Avenir,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(160deg,#f7dfb6 0,#fbf1df 410px);color:#2d2018}
+main{position:relative;background:none}
+main::before{content:"";position:absolute;top:10px;right:20px;width:52px;height:52px;border-radius:50%;background:#ffbd58;border:2px solid #ff9b4b;pointer-events:none}
+header{position:relative;padding-top:24px}
+header h1{font-family:inherit;font-size:1.55rem;font-weight:900;letter-spacing:-.065em;color:#2d2018}
+header .updated{color:#9b7359}
+.day-tabs{gap:7px;margin-top:12px}
+.day-tabs button{border:0;border-radius:100px;background:#fff7e9aa;color:#9b7359;padding:11px 8px;font-weight:800;box-shadow:inset 0 0 0 1px #ead3b4}
+.day-tabs button small{color:#9b7359}
+.day-tabs button.active{border:0;background:#e85d32;color:#fff;box-shadow:none}
+.day-tabs button.active small{color:#fff;opacity:.78}
+.card-grid{gap:22px}
+.card{border:0;border-radius:24px;background:#fff8eb;box-shadow:0 10px 0 #e8c695;padding:18px}
+.card h2{font-family:inherit;color:#2d2018;font-weight:900;letter-spacing:-.04em}
+.richmond-grid{gap:10px}
+.richmond-grid .stat-box{background:#f5e5c8;border-radius:16px;padding:14px}
+.richmond-grid .stat-box .label{color:#9b7359}
+.richmond-grid .stat-box .value{color:#2d2018;font-weight:850}
+.richmond-grid .stat-box .sub{color:#9b7359}
+.tide-times{gap:8px}
+.tide-times .tide-item{background:#f5e5c8;border:0;border-radius:16px;padding:12px 8px}
+.tide-times .tide-item.high .tide-type{color:#e85d32}
+.tide-times .tide-item.low .tide-type{color:#b96a36}
+.tide-times .tide-item .tide-time{color:#2d2018}
+.tide-times .tide-item .tide-height{color:#9b7359}
+.tide-arrow{stroke-width:2.2}
+.water-temp{background:#f5e5c8;border-radius:16px;color:#9b7359}
+.water-temp strong{color:#2d2018}
+#bbCard{grid-column:1/-1;background:linear-gradient(180deg,rgba(216,238,244,.72),rgba(238,248,251,.34));box-shadow:none;border-radius:0;padding:22px 0 26px;border-top:1px solid #b6dce5;border-bottom:1px solid #b6dce5}
+#bbCard h2{color:#123f54}
+#bbCard .tide-times .tide-item{background:#d8eef4;border:1px solid #a8d4df}
+#bbCard .tide-times .tide-item.high .tide-type{color:#0b6f93}
+#bbCard .tide-times .tide-item.low .tide-type{color:#168ca5}
+#bbCard .tide-times .tide-item .tide-time{color:#123f54}
+#bbCard .tide-times .tide-item .tide-height{color:#4d7d8c}
+#bbCard .water-temp{background:#d8eef4;color:#4d7d8c}
+#bbCard .water-temp strong{color:#123f54}
+#bbCard .chart-wrap canvas{accent-color:#0b6f93}
+#bbCard .chart-wrap{display:inline-block;width:calc(50% - 9px);vertical-align:top}
+#bbCard .chart-wrap + .chart-wrap{margin-left:14px!important;margin-top:12px}
+.region-group .group-title{color:#9b7359;font-weight:850}
+.region-item{border:0;border-radius:16px;min-height:54px;padding:10px 14px;box-shadow:0 4px 0 #e8c695}
+.region-item .name,.region-item .temps{color:#fff8eb;text-shadow:0 1px 2px rgba(45,32,24,.62)}
+.region-item .precip{color:#fff1d9;text-shadow:0 1px 2px rgba(45,32,24,.62)}
+.back-btn{border:0;border-radius:100px;background:#fff7e9;color:#e85d32;box-shadow:inset 0 0 0 1px #ead3b4;padding:10px 17px;font-weight:850}
+.back-btn:hover{background:#e85d32;border-color:#e85d32;color:#fff}
+.loading{color:#9b7359}
+.loading .spinner{border-color:#f5e5c8;border-top-color:#e85d32}
+.error{color:#a44b3e}
+@media(max-width:639px){main::before{top:4px;right:10px;width:40px;height:40px}.card{box-shadow:0 7px 0 #e8c695}#bbCard{padding:18px 0 22px}#bbCard .chart-wrap{display:block;width:100%}#bbCard .chart-wrap + .chart-wrap{margin-left:0!important}.region-item{min-height:50px;padding:9px 12px}}
+
+/* Sunline section system: full-bleed bands replace the three outer cards. */
+body{--content-gutter:max(16px,calc((100vw - 1200px)/2));padding:0 0 48px;max-width:none;background:#fbf1df}
+header{padding:24px var(--content-gutter,16px) 14px;background:linear-gradient(160deg,#f7dfb6 0,#f6d7a5 100%)}
+header::after{display:none}
+main::before{display:none}
+.card-grid{display:block}
+.card{border-radius:0;box-shadow:none}
+#irCard,#bbCard,#regCard{width:100%;padding:26px var(--content-gutter,16px) 30px}
+#irCard{position:relative;background:#fbf1df;box-shadow:0 12px 0 #e8c695}
+#irCard::before{content:"";position:absolute;top:20px;right:var(--content-gutter,16px);width:52px;height:52px;border-radius:50%;background:#ffbd58;border:2px solid #ff9b4b;pointer-events:none}
+#irCard h2,#bbCard h2,#regCard h2{max-width:1200px;margin-left:auto;margin-right:auto}
+#irCard .richmond-grid,#irCard .chart-wrap,#bbCard .tide-times,#bbCard .chart-wrap,#bbCard .water-temp,#regCard>#regionContainer{max-width:1200px;margin-left:auto;margin-right:auto}
+#bbCard{background:linear-gradient(180deg,#d8eef4 0,#eef8fb 100%);box-shadow:0 12px 0 #b6dce5;border-radius:0;padding-top:28px;padding-bottom:32px}
+#regCard{background:#fbf1df;padding-top:28px}
+#regCard{box-shadow:none}
+@media(max-width:639px){header{padding-top:20px}#irCard,#bbCard,#regCard{padding-left:16px;padding-right:16px;padding-top:22px;padding-bottom:26px}#irCard{box-shadow:0 10px 0 #e8c695}#irCard::before{width:40px;height:40px;top:14px;right:16px}#bbCard{box-shadow:0 10px 0 #b6dce5}}
 </style>
 </head>
 <body>
@@ -125,7 +253,8 @@ const LOCATIONS = [
   { id:'marketStreet',   name:'Market Street',   short:'Market', lat:37.7749, lon:-122.4194, group:'San Francisco' },
   { id:'pacHeights',     name:'Pacific Heights', short:'Pac.Hts', lat:37.7914, lon:-122.4362, group:'San Francisco' },
   { id:'marina',         name:'Marina',          short:'Marina', lat:37.8027, lon:-122.4348, group:'San Francisco' },
-  { id:'mission',        name:'Mission',         short:'Mission', lat:37.7599, lon:-122.4148, group:'San Francisco' },
+  { id:'mission',        name:'Mission',         short:'Mission',  lat:37.7599, lon:-122.4148, group:'San Francisco' },
+  { id:'northBeach',     name:'North Beach',     short:'N.Beach',  lat:37.8005, lon:-122.4103, group:'San Francisco' },
   { id:'millValley',     name:'Mill Valley',     short:'Mill Vly', lat:37.9060, lon:-122.5450, group:'Marin' },
   { id:'mtTam',          name:'Mt. Tamalpais',   short:'Mt.Tam', lat:37.9235, lon:-122.5965, group:'Marin' },
   { id:'pacifica',       name:'Pacifica',        short:'Pacifica', lat:37.6138, lon:-122.4869, group:'Peninsula' },
@@ -134,7 +263,23 @@ const LOCATIONS = [
   { id:'encinitas',      name:'Encinitas',       short:'Encinitas', lat:33.0370, lon:-117.2924, group:'San Diego' },
 ];
 
-const BAKER_BEACH = { lat:37.7946, lon:-122.4829 };
+const SWIM_SPOTS = {
+  innerRichmond:{name:'Baker Beach',lat:37.7946,lon:-122.4829},
+  outerRichmond:{name:'Baker Beach',lat:37.7946,lon:-122.4829},
+  innerSunset:{name:'Ocean Beach',lat:37.7597,lon:-122.5108},
+  outerSunset:{name:'Ocean Beach',lat:37.7597,lon:-122.5108},
+  marketStreet:{name:'Aquatic Park',lat:37.8060,lon:-122.4220},
+  pacHeights:{name:'Crissy Field',lat:37.8025,lon:-122.4480},
+  marina:{name:'Chrissy Field East Beach',lat:37.8025,lon:-122.4480},
+  mission:{name:'Aquatic Park',lat:37.8060,lon:-122.4220},
+  northBeach:{name:'Aquatic Park',lat:37.8060,lon:-122.4220},
+  millValley:{name:'Stinson Beach',lat:37.8990,lon:-122.6463},
+  mtTam:{name:'Stinson Beach',lat:37.8990,lon:-122.6463},
+  pacifica:{name:'Linda Mar Beach',lat:37.5940,lon:-122.5010},
+  oakland:{name:'Berkeley Marina',lat:37.8650,lon:-122.3110},
+  berkeley:{name:'Berkeley Marina',lat:37.8650,lon:-122.3110},
+  encinitas:{name:'Moonlight Beach',lat:33.0487,lon:-117.2987},
+};
 
 const WMO = {
   0:{t:'Clear',c:'sunny'},1:{t:'Mostly Clear',c:'sunny'},2:{t:'Partly Cloudy',c:'partly-cloudy'},
@@ -161,6 +306,8 @@ const state = {
   bbData: null,
   regions: {},
   tides: null,
+  selectedRegion: null,
+  detailCache: {},
 };
 
 function findHighLow(predictions){
@@ -231,12 +378,12 @@ async function init(){
 
     // Fetch all
     const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
-    const irParams=common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index';
+    const irParams=common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m';
     const bbParams=common+'&hourly=wind_speed_10m,wind_direction_10m';
     const regParams=common+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code';
 
     const p1=fetchOM(LOCATIONS[0].lat,LOCATIONS[0].lon,irParams); // Inner Richmond
-    const p2=fetchOM(BAKER_BEACH.lat,BAKER_BEACH.lon,bbParams); // Baker Beach wind
+    const p2=fetchOM(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon,bbParams); // Baker Beach wind
     const tidePromises=state.dayDates.map(d=>fetchTides(d,'predictions'));
     const regPromises=LOCATIONS.map(l=>fetchOM(l.lat,l.lon,regParams));
 
@@ -252,12 +399,30 @@ async function init(){
     LOCATIONS.forEach((l,i)=>{regMap[l.id]={data:regResults[i],name:l.name,group:l.group}});
     state.regions=regMap;
 
+    // URL routing — check if a region was linked directly
+    const path=window.location.pathname.replace(/^\//,'');
+    if(path){
+      const match=LOCATIONS.find(l=>l.id===path);
+      if(match){
+        state.selectedRegion=match.id;
+        const spot=SWIM_SPOTS[match.id];
+        if(spot){
+          const [regionDetail,swimDetail]=await Promise.all([
+            fetchOM(match.lat,match.lon,irParams),
+            fetchOM(spot.lat,spot.lon,bbParams),
+          ]);
+          state.detailCache[match.id]={regionData:regionDetail,swimData:swimDetail};
+        }
+      }
+    }
+
     // Build DOM
     buildUI(dateLabels);
     renderDay(0);
 
   } catch(e){
-    document.getElementById('loading').innerHTML='<div class="error">Failed to load weather data. Please refresh.</div>';
+    const loading=document.getElementById('loading');
+    if(loading)loading.innerHTML='<div class="error">Failed to load weather data. Please refresh.</div>';
     console.error(e);
   }
 }
@@ -287,7 +452,7 @@ function buildUI(dateLabels){
   main.innerHTML=`
     <div class="card-grid">
     <div class="card" id="irCard">
-      <h2>☀☀☀☀☀☀☀☀☀☀☀☀☀☀</h2>
+      <h2>Daylight</h2>
       <div class="richmond-grid">
         <div class="stat-box"><span class="label">Sunrise</span><span class="value" id="sunriseVal">--</span><span class="sub" id="sunriseSub"></span></div>
         <div class="stat-box"><span class="label">Sunset</span><span class="value" id="sunsetVal">--</span><span class="sub" id="sunsetSub"></span></div>
@@ -321,6 +486,36 @@ function buildUI(dateLabels){
 // ── Charts ──
 let uvChart, tideChart, windChart;
 
+// Keep charts working when the optional CDN library is unavailable.
+if(typeof Chart!=='function'){
+  const SVG_NS='http://www.w3.org/2000/svg';
+  const svgEl=(tag,attrs={})=>{const el=document.createElementNS(SVG_NS,tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));return el};
+  class NativeChart{
+    constructor(canvas,config){this.canvas=canvas;this.config=config;this.data=config.data;this.canvas.style.display='none';this.svg=svgEl('svg',{class:'native-chart',role:'img','aria-label':config.type+' chart'});canvas.parentElement.appendChild(this.svg);this.update()}
+    update(){
+      const svg=this.svg,w=Math.max(this.canvas.parentElement.clientWidth||320,180),h=180;
+      svg.setAttribute('viewBox','0 0 '+w+' '+h);svg.replaceChildren();
+      const left=34,right=8,top=10,bottom=26,pw=w-left-right,ph=h-top-bottom;
+      const labels=this.data.labels||[],scales=this.config.options?.scales||{};
+      const yScale=scales.y||{};const yMin=Number.isFinite(yScale.min)?yScale.min:0;
+      let yMax=Number.isFinite(yScale.max)?yScale.max:Math.max(1,...(this.data.datasets||[]).flatMap(d=>d.data||[]).filter(Number.isFinite));
+      if(yMax<=yMin)yMax=yMin+1;
+      const grid='#ead3b4',text='#9b7359';
+      for(let i=0;i<=4;i++){const y=top+ph*i/4;svg.appendChild(svgEl('line',{x1:left,y1:y,x2:left+pw,y2:y,stroke:grid,'stroke-width':1,'stroke-dasharray':'2 4'}));const t=svgEl('text',{x:left-6,y:y+3,'text-anchor':'end',fill:text,'font-size':9});t.textContent=(yMax-(yMax-yMin)*i/4).toFixed(0);svg.appendChild(t)}
+      labels.forEach((label,i)=>{if(i%Math.max(1,Math.ceil(labels.length/7)))return;const x=left+(labels.length<2?pw/2:pw*i/(labels.length-1));const t=svgEl('text',{x,y:h-7,'text-anchor':'middle',fill:text,'font-size':9});t.textContent=label;svg.appendChild(t)});
+      (this.data.datasets||[]).forEach((dataset,di)=>{
+        const values=dataset.data||[];const isBar=this.config.type==='bar';const color=Array.isArray(dataset.backgroundColor)?(dataset.backgroundColor[0]||'#e85d32'):(dataset.borderColor||dataset.backgroundColor||'#e85d32');
+        if(isBar){const barW=Math.max(3,pw/Math.max(values.length,1)*.55);values.forEach((value,i)=>{if(!Number.isFinite(value))return;const x=left+(labels.length<2?pw/2:pw*i/(labels.length-1))-barW/2,y=top+ph*(yMax-value)/(yMax-yMin);svg.appendChild(svgEl('rect',{x,y,width:barW,height:Math.max(1,top+ph-y),fill:Array.isArray(dataset.backgroundColor)?(dataset.backgroundColor[i]||color):color,opacity:.72,rx:2}))});return}
+        const axis=dataset.yAxisID==='yTemp'?(scales.yTemp||{}):yScale;const min=Number.isFinite(axis.min)?axis.min:yMin;const max=Number.isFinite(axis.max)?axis.max:yMax;const points=values.map((value,i)=>{if(!Number.isFinite(value))return null;const x=left+(labels.length<2?pw/2:pw*i/(labels.length-1));const y=top+ph*(max-value)/(max-min);return x+','+y}).filter(Boolean).join(' ');
+        if(points){svg.appendChild(svgEl('polyline',{points,fill:'none',stroke:color,'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round'}));}
+      });
+    }
+  }
+  window.Chart=NativeChart;
+}
+
+const ChartImpl=typeof Chart==='function'?Chart:NativeChart;
+
 // UV threshold plugin
 const uvThreshold={
   id:'uvThreshold',
@@ -351,7 +546,7 @@ const tideZeroLine={
     const y=scales.y.getPixelForValue(0);
     if(y<ca.top||y>ca.bottom)return;
     ctx.save();
-    ctx.strokeStyle='#c2a060';
+    ctx.strokeStyle='#7dbdcc';
     ctx.lineWidth=3;
     ctx.beginPath();ctx.moveTo(ca.left,y);ctx.lineTo(ca.right,y);ctx.stroke();
     ctx.restore();
@@ -361,25 +556,52 @@ const tideZeroLine={
 function initUVChart(){
   const ctx=document.getElementById('uvChart');
   if(!ctx)return;
-  uvChart=new Chart(ctx,{
+  uvChart=new ChartImpl(ctx,{
     type:'line',
-    data:{labels:[],datasets:[{
-      label:'UV Index',
-      data:[],
-      borderColor:'#f59e0b',
-      backgroundColor:'rgba(245,158,11,0.12)',
-      fill:true,
-      tension:0.3,
-      pointRadius:3,
-      pointHoverRadius:5,
-      pointBackgroundColor:'#f59e0b',
-    }]},
+    data:{labels:[],datasets:[
+      {
+        label:'UV Index',
+        data:[],
+        borderColor:'#e85d32',
+        backgroundColor:'rgba(232,93,50,0.16)',
+        fill:true,
+        tension:0.3,
+        pointRadius:3,
+        pointHoverRadius:5,
+        pointBackgroundColor:ctx=>(ctx.parsed?.y??0)>10?'#a44b3e':'#e85d32',
+        segment:{borderColor:ctx=>((ctx.p0?.parsed?.y??0)>10||(ctx.p1?.parsed?.y??0)>10)?'#a44b3e':'#e85d32'},
+        yAxisID:'y',
+      },
+      {
+        label:'Temperature',
+        data:[],
+        borderColor:'#7898a8',
+        backgroundColor:'rgba(120,152,168,0.06)',
+        fill:false,
+        tension:0.3,
+        borderDash:[5,3],
+        pointRadius:1.5,
+        pointHoverRadius:3,
+        pointBackgroundColor:'#7898a8',
+        pointBorderColor:'#7898a8',
+        segment:{borderColor:'#7898a8'},
+        yAxisID:'yTemp',
+      }
+    ]},
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
+        label:ctx=>{
+          const label=ctx.dataset.label||'';
+          const val=ctx.parsed.y;
+          if(ctx.dataset.yAxisID==='yTemp')return label+': '+val.toFixed(1)+'°F';
+          return label+': '+val.toFixed(1);
+        }
+      }}},
       scales:{
-        x:{grid:{display:false},ticks:{color:'#475569',font:{size:10},maxRotation:0}},
-        y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#475569',font:{size:10},stepSize:2}},
+        x:{grid:{display:false},ticks:{color:'#9b7359',font:{size:10},maxRotation:0}},
+        y:{min:0,max:10,grid:{color:'rgba(155,115,89,0.24)'},ticks:{color:'#9b7359',font:{size:10},stepSize:2}},
+        yTemp:{position:'right',min:50,max:90,grid:{display:false},ticks:{color:'#7898a8',font:{size:10},stepSize:5,callback:v=>v+'°'}},
       },
     },
     plugins:[uvThreshold],
@@ -389,25 +611,25 @@ function initUVChart(){
 function initTideChart(){
   const ctx=document.getElementById('tideChart');
   if(!ctx)return;
-  tideChart=new Chart(ctx,{
+  tideChart=new ChartImpl(ctx,{
     type:'line',
     data:{labels:[],datasets:[{
       label:'Tide Height',
       data:[],
-      borderColor:'#60a5fa',
-      backgroundColor:'rgba(96,165,250,0.1)',
+      borderColor:'#0b6f93',
+      backgroundColor:'rgba(11,111,147,0.16)',
       fill:true,
       tension:0.4,
       pointRadius:2,
       pointHoverRadius:5,
-      pointBackgroundColor:'#60a5fa',
+        pointBackgroundColor:'#0b6f93',
     }]},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+'ft'}}},
       scales:{
-        x:{grid:{display:false},ticks:{color:'#677589',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
-        y:{min:-2,max:9,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10},stepSize:1,callback:v=>v+'ft'}},
+        x:{grid:{display:false},ticks:{color:'#4d7d8c',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{min:-2,max:9,grid:{color:'rgba(77,125,140,0.24)'},ticks:{color:'#4d7d8c',font:{size:10},stepSize:1,callback:v=>v+'ft'}},
       },
     },
     plugins:[tideZeroLine],
@@ -417,7 +639,7 @@ function initTideChart(){
 function initWindChart(){
   const ctx=document.getElementById('windChart');
   if(!ctx)return;
-  windChart=new Chart(ctx,{
+  windChart=new ChartImpl(ctx,{
     type:'bar',
     data:{labels:[],datasets:[{
       label:'Wind (mph)',
@@ -435,8 +657,8 @@ function initWindChart(){
         }
       }}},
       scales:{
-        x:{grid:{display:false},ticks:{color:'#677589',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
-        y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#677589',font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:'#4d7d8c',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{beginAtZero:true,grid:{color:'rgba(77,125,140,0.24)'},ticks:{color:'#4d7d8c',font:{size:10}}},
       },
     },
   });
@@ -444,18 +666,44 @@ function initWindChart(){
 
 // ── Render ──
 function renderDay(idx){
-  updateSun(idx);
-  updateUV(idx);
+  const isDetail=!!state.selectedRegion;
+  let regionData=state.irData;
+  let swimData=state.bbData;
+  let swimLat=37.7946,swimLon=-122.4829;
+  let regionLabel='Inner Richmond',swimLabel='Baker Beach';
+
+  if(isDetail){
+    const loc=LOCATIONS.find(l=>l.id===state.selectedRegion);
+    const spot=SWIM_SPOTS[state.selectedRegion];
+    const cache=state.detailCache[state.selectedRegion];
+    if(loc&&spot&&cache){
+      regionData=cache.regionData;
+      swimData=cache.swimData;
+      swimLat=spot.lat;swimLon=spot.lon;
+      regionLabel=loc.name;
+      swimLabel=spot.name;
+    }
+  }
+
+  // Update headers
+  if(!isDetail)document.querySelector('#irCard h2').textContent='Daylight';
+  document.querySelector('#irCard h2').textContent=isDetail?regionLabel:'\u2600\u2600\u2600\u2600\u2600\u2600\u2600\u2600\u2600\u2600\u2600\u2600\u2600\u2600';
+  if(!isDetail)document.querySelector('#irCard h2').textContent='Daylight';
+  document.querySelector('#bbCard h2').textContent=isDetail?swimLabel+' \u2014 Swim Conditions':'Baker Swim Conditions';
+
+  updateSun(idx,regionData);
+  updateUV(idx,regionData);
   updateTideTimes(idx);
   updateTideChart(idx);
-  updateWindChart(idx);
-  updateWaterTemp(idx);
+  updateWindChart(idx,swimData);
+  updateWaterTemp(idx,swimLat,swimLon);
   updateRegions(idx);
+  document.title=isDetail?regionLabel+' \u2014 WeatherDash':'WeatherDash';
   document.getElementById('updated').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
 }
 
-function updateSun(idx){
-  const d=state.irData;
+function updateSun(idx,d){
+  if(!d)d=state.irData;
   if(!d||!d.daily)return;
   const sr=d.daily.sunrise[idx],ss=d.daily.sunset[idx];
   document.getElementById('sunriseVal').textContent=sr?fmtTime(sr):'--';
@@ -473,25 +721,27 @@ function updateSun(idx){
   document.getElementById('uvMaxVal').textContent=d.daily.uv_index_max?d.daily.uv_index_max[idx].toFixed(1):'--';
 }
 
-function updateUV(idx){
-  const d=state.irData;
-  if(!d||!d.hourly||!uvChart)return;
+function updateUV(idx,d){
+  if(!d)d=state.irData;
+  if(!d||!d.hourly)return;
   const start=idx*24,end=start+24;
   const times=d.hourly.time.slice(start,end);
   const uv=d.hourly.uv_index.slice(start,end);
+  const temp=d.hourly.temperature_2m?d.hourly.temperature_2m.slice(start,end):[];
 
-  // Filter to daytime hours (6a-9p) for cleaner chart
   const dayIdx=[];
   const dayTimes=[];
   const dayUV=[];
+  const dayTemp=[];
   times.forEach((t,i)=>{
     const p=parseTime(t);
-    if(p&&p.h>=5&&p.h<=21){dayIdx.push(i);dayTimes.push(fmtHour(t));dayUV.push(uv[i])}
+    if(p&&p.h>=5&&p.h<=21){
+      dayIdx.push(i);
+      dayTimes.push(fmtHour(t));
+      dayUV.push(uv[i]);
+      dayTemp.push(temp.length>i?temp[i]:null);
+    }
   });
-
-  uvChart.data.labels=dayTimes;
-  uvChart.data.datasets[0].data=dayUV;
-  uvChart.update();
 
   const morningSafe=uv.findIndex(v=>v>=2);
   const eveningSafe=uv.length-1-[...uv].reverse().findIndex(v=>v>=2);
@@ -500,6 +750,12 @@ function updateUV(idx){
   if(morningSafe>0&&eveningSafe<uv.length-1)safeText+='\n';
   if(eveningSafe<uv.length-1)safeText+='After '+fmtTime(times[eveningSafe+1]);
   document.getElementById('uvBelowVal').textContent=safeText||'All day above 2';
+
+  if(!uvChart)return;
+  uvChart.data.labels=dayTimes;
+  uvChart.data.datasets[0].data=dayUV;
+  uvChart.data.datasets[1].data=dayTemp;
+  uvChart.update();
 }
 
 function updateTideTimes(idx){
@@ -513,10 +769,12 @@ function updateTideTimes(idx){
   let html='';
   dayHL.forEach(p=>{
     const cls=p.type==='H'?'high':'low';
-    const icon=p.type==='H'?'⬆':'⬇';
+    const icon=p.type==='H'
+      ? '<svg class="tide-arrow" viewBox="0 0 12 16" aria-hidden="true"><path d="M6 14V2M2 6l4-4 4 4"/></svg>'
+      : '<svg class="tide-arrow" viewBox="0 0 12 16" aria-hidden="true"><path d="M6 2v12M2 10l4 4 4-4"/></svg>';
     html+=`<div class="tide-item ${cls}"><div class="tide-type">${icon} ${p.type==='H'?'HIGH':'LOW'}</div><div class="tide-time">${p.t.slice(-5)}</div><div class="tide-height">${p.v} ft</div></div>`;
   });
-  document.getElementById('tideTimes').innerHTML=html||'<div style="color:#64748b;font-size:0.8rem;text-align:center;padding:8px">No tide data</div>';
+  document.getElementById('tideTimes').innerHTML=html||'<div style="color:#9b7359;font-size:0.8rem;text-align:center;padding:8px">No tide data</div>';
 }
 
 function updateTideChart(idx){
@@ -532,8 +790,8 @@ function updateTideChart(idx){
   tideChart.update();
 }
 
-function updateWindChart(idx){
-  const d=state.bbData;
+function updateWindChart(idx,d){
+  if(!d)d=state.bbData;
   if(!d||!d.hourly||!windChart)return;
   const start=idx*24,end=start+24;
   const times=d.hourly.time.slice(start,end);
@@ -555,37 +813,36 @@ function updateWindChart(idx){
   windChart.data.datasets[0].data=fSpd;
   windChart.data.datasets[0]._directions=fDir;
   windChart.data.datasets[0].backgroundColor=fSpd.map(s=>{
-    if(s<5)return 'rgba(96,165,250,0.3)';
-    if(s<12)return 'rgba(96,165,250,0.55)';
-    if(s<20)return 'rgba(96,165,250,0.75)';
-    return 'rgba(239,68,68,0.7)';
+    if(s<5)return '#8fd3df';
+    if(s<12)return '#36a9c0';
+    if(s<20)return '#0b6f93';
+    return '#064b70';
   });
   windChart.update();
 }
 
-function updateWaterTemp(idx){
+function updateWaterTemp(idx,lat,lon){
   const el=document.getElementById('waterTemp');
   if(idx!==0){el.innerHTML='';return}
-  el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>...</strong>';
-  fetch('https://marine-api.open-meteo.com/v1/marine?latitude=37.79&longitude=-122.48&hourly=sea_surface_temperature&forecast_days=1&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit')
+  el.innerHTML='<span style="color:#9b7359">Water temp: </span><strong>...</strong>';
+  fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+lat+'&longitude='+lon+'&hourly=sea_surface_temperature&forecast_days=1&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit')
     .then(r=>r.json()).then(d=>{
       if(d&&d.hourly&&d.hourly.sea_surface_temperature){
         const temps=d.hourly.sea_surface_temperature.filter(t=>t!==null);
         if(temps.length>0){
           const avg=Math.round(temps.reduce((a,b)=>a+b,0)/temps.length);
-          el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>'+avg+'°F</strong>';
+          el.innerHTML='<span style="color:#9b7359">Water temp: </span><strong>'+avg+'°F</strong>';
           return;
         }
       }
-      el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>-- °F</strong>';
-    }).catch(()=>{el.innerHTML='<span style="color:#94a3b8">Water temp: </span><strong>-- °F</strong>'});
+      el.innerHTML='<span style="color:#9b7359">Water temp: </span><strong>-- °F</strong>';
+    }).catch(()=>{el.innerHTML='<span style="color:#9b7359">Water temp: </span><strong>-- °F</strong>'});
 }
 
 function updateRegions(idx){
   const container=document.getElementById('regionContainer');
   if(!container)return;
 
-  // Group regions
   const groups={};
   LOCATIONS.forEach(l=>{
     if(!groups[l.group])groups[l.group]=[];
@@ -606,15 +863,57 @@ function updateRegions(idx){
         const wi=wc!==null?wmoInfo(wc):{t:'Unknown',c:''};
         const tempStr=hi!==null&&lo!==null?Math.round(hi)+'°/'+Math.round(lo)+'°':hi!==null?Math.round(hi)+'°':'--';
         const prStr=pr!==null?pr.toFixed(1):'--';
-        html+=`<div class="region-item ${wi.c}"><span class="name">${l.short||l.name}</span><span class="temps">${tempStr}</span><span class="precip">${prStr}″</span></div>`;
+        html+=`<div class="region-item ${wi.c}" data-id="${l.id}"><span class="name">${l.short||l.name}</span><span class="temps">${tempStr}</span><span class="precip">${prStr}″</span></div>`;
       } else {
-        html+=`<div class="region-item"><span class="name">${l.short||l.name}</span><span class="temps">--</span><span class="precip">--</span></div>`;
+        html+=`<div class="region-item" data-id="${l.id}"><span class="name">${l.short||l.name}</span><span class="temps">--</span><span class="precip">--</span></div>`;
       }
     });
     html+=`</div></div>`;
   });
   container.innerHTML=html;
 }
+
+// ── Navigation ──
+async function loadRegionDetail(regionId){
+  const spot=SWIM_SPOTS[regionId];
+  if(!spot||state.detailCache[regionId])return;
+  const loc=LOCATIONS.find(l=>l.id===regionId);
+  if(!loc)return;
+  const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
+  const [regionDetail,swimDetail]=await Promise.all([
+    fetchOM(loc.lat,loc.lon,common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m'),
+    fetchOM(spot.lat,spot.lon,common+'&hourly=wind_speed_10m,wind_direction_10m'),
+  ]);
+  state.detailCache[regionId]={regionData:regionDetail,swimData:swimDetail};
+}
+
+// Region click
+document.addEventListener('click',e=>{
+  const item=e.target.closest('.region-item');
+  if(item&&item.dataset.id){
+    const id=item.dataset.id;
+    history.pushState(null,'','/'+id);
+    state.selectedRegion=id;
+    renderDay(state.activeDay);
+    loadRegionDetail(id).then(()=>renderDay(state.activeDay));
+  }
+});
+
+// Browser back/forward
+window.addEventListener('popstate',()=>{
+  const path=window.location.pathname.replace(/^\//,'');
+  if(path){
+    const match=LOCATIONS.find(l=>l.id===path);
+    if(match){
+      state.selectedRegion=match.id;
+      renderDay(state.activeDay);
+      loadRegionDetail(match.id).then(()=>renderDay(state.activeDay));
+      return;
+    }
+  }
+  state.selectedRegion=null;
+  renderDay(state.activeDay);
+});
 
 // ── Start ──
 init();
