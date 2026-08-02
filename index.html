@@ -64,7 +64,7 @@ header .updated{font-size:0.75rem;color:#a2aab6;margin-left:auto}
 .region-group:first-child{margin-top:0}
 .region-group .group-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#cad2dd;margin-bottom:6px;padding:0 4px}
 .region-row{display:flex;flex-wrap:wrap;gap:6px}
-.region-item{flex:1 1 100%;border-radius:2px;padding:12px 14px;display:flex;align-items:center;gap:10px;background-size:cover;background-position:center;background-repeat:no-repeat;min-height:60px}
+.region-item{flex:1 1 100%;border-radius:2px;padding:12px 14px;display:flex;align-items:center;gap:0px;background-size:cover;background-position:center;background-repeat:no-repeat;min-height:60px}
 .region-item .name{font-size:0.85rem;font-weight:500;color:#e2e8f0;min-width:0}
 .region-item .temps{font-size:0.85rem;font-weight:600;color:#e2e8f0;white-space:nowrap}
 .region-item .precip{font-size:0.75rem;color:#003fbe;margin-left:auto;white-space:nowrap}
@@ -865,7 +865,7 @@ function updateRegions(idx){
         const wi=wc!==null?wmoInfo(wc):{t:'Unknown',c:''};
         const tempStr=hi!==null&&lo!==null?Math.round(hi)+'°/'+Math.round(lo)+'°':hi!==null?Math.round(hi)+'°':'--';
         const prStr=pr!==null?pr.toFixed(1):'--';
-        html+=`<div class="region-item ${wi.c}" data-id="${l.id}"><span class="name">${l.short||l.name}</span><span class="temps">${tempStr}</span><span class="precip">${prStr}″</span></div>`;
+        html+=`<div class="region-item ${wi.c}" data-id="${l.id}"><span class="name">${l.short||l.name} </span><span class="temps">${tempStr}</span><span class="precip">${prStr}″</span></div>`;
       } else {
         html+=`<div class="region-item" data-id="${l.id}"><span class="name">${l.short||l.name}</span><span class="temps">--</span><span class="precip">--</span></div>`;
       }
