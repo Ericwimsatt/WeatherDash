@@ -329,12 +329,27 @@ function findHighLow(predictions){
 }
 
 // ── Helpers ──
+const UV_SAFE=2;
 function degToDir(d){return DIRS[Math.round(d/22.5)%16]}
 function parseTime(s){const m=s.match(/T(\d{2}):(\d{2})/);return m?{h:+m[1],m:+m[2]}:null}
 function parseDate(s){const m=s.match(/^(\d{4}-\d{2}-\d{2})/);return m?m[1]:''}
 function fmtTime(s){const p=parseTime(s);if(!p)return'--';const a=p.h>=12?'p':'a';const h=p.h%12||12;return h+':'+String(p.m).padStart(2,'0')+a}
 function fmtHour(s){const p=parseTime(s);if(!p)return'';const a=p.h>=12?'p':'a';return(p.h%12||12)+a}
 function dayLabel(dateStr,i){const d=new Date(dateStr+'T12:00-07:00');const opts={weekday:'short',month:'short',day:'numeric'};return i===0?'Today':i===1?'Tomorrow':d.toLocaleDateString('en-US',opts)}
+
+function uvCrossTime(t0,uv0,t1,uv1,thr){
+  const p0=parseTime(t0),p1=parseTime(t1);
+  if(!p0||!p1||uv1===uv0)return null;
+  let m0=p0.h*60+p0.m,m1=p1.h*60+p1.m;
+  if(m1<m0)m1+=1440;
+  const frac=(thr-uv0)/(uv1-uv0);
+  if(frac<0||frac>1)return null;
+  let cross=((m0+frac*(m1-m0))%1440+1440)%1440;
+  let h=Math.floor(cross/60),m=Math.round(cross%60);
+  if(m===60){m=0;h=(h+1)%24;}
+  const a=h>=12?'p':'a';
+  return(h%12||12)+':'+String(m).padStart(2,'0')+a;
+}
 
 function ymdDash(d){return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6)}
 
@@ -749,12 +764,18 @@ function updateUV(idx,d){
     }
   });
 
-  const morningSafe=uv.findIndex(v=>v>=2);
-  const eveningSafe=uv.length-1-[...uv].reverse().findIndex(v=>v>=2);
+  const morningSafe=uv.findIndex(v=>v>=UV_SAFE);
+  const eveningSafe=uv.length-1-[...uv].reverse().findIndex(v=>v>=UV_SAFE);
   let safeText='';
-  if(morningSafe>0)safeText='Before '+fmtTime(times[morningSafe-1]);
-  if(morningSafe>0&&eveningSafe<uv.length-1)safeText+='\n';
-  if(eveningSafe<uv.length-1)safeText+='After '+fmtTime(times[eveningSafe+1]);
+  if(morningSafe>0){
+    const t=uvCrossTime(times[morningSafe-1],uv[morningSafe-1],times[morningSafe],uv[morningSafe],UV_SAFE);
+    safeText='Before '+(t||fmtTime(times[morningSafe]));
+  }
+  if(morningSafe>0&&eveningSafe>=0&&eveningSafe<uv.length-1)safeText+='\n';
+  if(eveningSafe>=0&&eveningSafe<uv.length-1){
+    const t=uvCrossTime(times[eveningSafe],uv[eveningSafe],times[eveningSafe+1],uv[eveningSafe+1],UV_SAFE);
+    safeText+='After '+(t||fmtTime(times[eveningSafe+1]));
+  }
   document.getElementById('uvBelowVal').textContent=safeText||'All day above 2';
 
   if(!uvChart)return;
