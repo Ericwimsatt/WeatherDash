@@ -914,13 +914,22 @@ async function loadRegionDetail(regionId){
   state.detailCache[regionId]={regionData:regionDetail,swimData:swimDetail};
 }
 
+function scrollToPageTop(){
+  window.scrollTo({
+    top:0,
+    behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',
+  });
+}
+
 // Region click
 document.addEventListener('click',e=>{
   const item=e.target.closest('.region-item');
   if(item&&item.dataset.id){
     const id=item.dataset.id;
+    const regionChanged=state.selectedRegion!==id;
     history.pushState(null,'','/'+id);
     state.selectedRegion=id;
+    if(regionChanged)scrollToPageTop();
     renderDay(state.activeDay);
     loadRegionDetail(id).then(()=>renderDay(state.activeDay));
   }
@@ -932,7 +941,9 @@ window.addEventListener('popstate',()=>{
   if(path){
     const match=LOCATIONS.find(l=>l.id===path);
     if(match){
+      const regionChanged=state.selectedRegion!==match.id;
       state.selectedRegion=match.id;
+      if(regionChanged)scrollToPageTop();
       renderDay(state.activeDay);
       loadRegionDetail(match.id).then(()=>renderDay(state.activeDay));
       return;
