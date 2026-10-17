@@ -355,9 +355,8 @@ function uvCrossTime(t0,uv0,t1,uv1,thr){
 
 function ymdDash(d){return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6)}
 
-async function fetchOM(lat,lon,extra){
+function omParams(extra){
   const p=new URLSearchParams({
-    latitude:lat,longitude:lon,
     timezone:'America/Los_Angeles',
     temperature_unit:'fahrenheit',
     wind_speed_unit:'mph',
@@ -368,9 +367,28 @@ async function fetchOM(lat,lon,extra){
     if(i<0)return;
     p.set(decodeURIComponent(kv.slice(0,i)), decodeURIComponent(kv.slice(i+1)));
   });
+  return p;
+}
+
+async function fetchOM(lat,lon,extra){
+  const p=omParams(extra);
+  p.set('latitude',lat);
+  p.set('longitude',lon);
   const r=await fetch(OM_BASE+'?'+p.toString());
   if(!r.ok)throw new Error('OM '+r.status);
   return r.json();
+}
+
+// Batch multiple coordinates into a single Open-Meteo request.
+// Returns an array of results in the same order as the input coordinates.
+async function fetchOMMulti(lats,lons,extra){
+  const p=omParams(extra);
+  p.set('latitude',lats.join(','));
+  p.set('longitude',lons.join(','));
+  const r=await fetch(OM_BASE+'?'+p.toString());
+  if(!r.ok)throw new Error('OM '+r.status);
+  const data=await r.json();
+  return Array.isArray(data)?data:[data];
 }
 
 async function fetchTides(date,product){
@@ -383,11 +401,7 @@ async function fetchTides(date,product){
 async function init(){
   try {
     const now=new Date();
-    const ds=String(now.getFullYear())+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
-    const dt=new Date(now); dt.setDate(dt.getDate()+2);
-    const de=String(dt.getFullYear())+String(dt.getMonth()+1).padStart(2,'0')+String(dt.getDate()).padStart(2,'0');
-
-    state.dayDates=[ds,de];
+    state.dayDates=[];
     for(let i=0;i<3;i++){
       const d=new Date(now); d.setDate(d.getDate()+i);
       state.dayDates[i]=String(d.getFullYear())+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
@@ -399,28 +413,33 @@ async function init(){
       return dayLabel(y+'-'+m+'-'+dd,i);
     });
 
-    // Fetch all
     const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
     const irParams=common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m';
     const bbParams=common+'&hourly=wind_speed_10m,wind_direction_10m';
     const regParams=common+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code';
 
-    const p1=fetchOM(LOCATIONS[0].lat,LOCATIONS[0].lon,irParams); // Inner Richmond
-    const p2=fetchOM(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon,bbParams); // Baker Beach wind
-    const tidePromises=state.dayDates.map(d=>fetchTides(d,'predictions'));
-    const regPromises=LOCATIONS.map(l=>fetchOM(l.lat,l.lon,regParams));
+    // Each section loads independently; one failure no longer blocks the rest.
+    const [irRes,bbRes,tideRes,regRes]=await Promise.allSettled([
+      fetchOM(LOCATIONS[0].lat,LOCATIONS[0].lon,irParams), // Inner Richmond
+      fetchOM(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon,bbParams), // Baker Beach wind
+      Promise.all(state.dayDates.map(d=>fetchTides(d,'predictions'))),
+      fetchOMMulti(LOCATIONS.map(l=>l.lat),LOCATIONS.map(l=>l.lon),regParams),
+    ]);
 
-    const [irData,bbData,...rest]=await Promise.all([p1,p2,...tidePromises,...regPromises]);
-    const tideResults=rest.slice(0,3);
-    const regResults=rest.slice(3);
-    state.tides={predictions:tideResults.flatMap(r=>r.predictions||[])};
+    if(irRes.status==='fulfilled')state.irData=irRes.value;
+    else console.error('Daylight section failed:',irRes.reason);
 
-    state.irData=irData;
-    state.bbData=bbData;
+    if(bbRes.status==='fulfilled')state.bbData=bbRes.value;
+    else console.error('Swim section failed:',bbRes.reason);
 
-    const regMap={};
-    LOCATIONS.forEach((l,i)=>{regMap[l.id]={data:regResults[i],name:l.name,group:l.group}});
-    state.regions=regMap;
+    if(tideRes.status==='fulfilled')state.tides={predictions:tideRes.value.flatMap(r=>r.predictions||[])};
+    else console.error('Tide section failed:',tideRes.reason);
+
+    if(regRes.status==='fulfilled'){
+      const regMap={};
+      LOCATIONS.forEach((l,i)=>{regMap[l.id]={data:regRes.value[i],name:l.name,group:l.group}});
+      state.regions=regMap;
+    } else console.error('Regional section failed:',regRes.reason);
 
     // URL routing — check if a region was linked directly
     const path=window.location.pathname.replace(/^\//,'');
@@ -428,14 +447,7 @@ async function init(){
       const match=LOCATIONS.find(l=>l.id===path);
       if(match){
         state.selectedRegion=match.id;
-        const spot=SWIM_SPOTS[match.id];
-        if(spot){
-          const [regionDetail,swimDetail]=await Promise.all([
-            fetchOM(match.lat,match.lon,irParams),
-            fetchOM(spot.lat,spot.lon,bbParams),
-          ]);
-          state.detailCache[match.id]={regionData:regionDetail,swimData:swimDetail};
-        }
+        await loadRegionDetail(match.id);
       }
     }
 
@@ -688,12 +700,34 @@ function initWindChart(){
 }
 
 // ── Render ──
+// Show or clear an inline error within a single card, so a failed
+// section doesn't take down the whole dashboard.
+function setSectionError(cardId,message){
+  const card=document.getElementById(cardId);
+  if(!card)return;
+  let el=card.querySelector('.section-error');
+  if(message){
+    if(!el){
+      el=document.createElement('div');
+      el.className='error section-error';
+      el.style.padding='2px 0 10px';
+      const h2=card.querySelector('h2');
+      if(h2&&h2.parentNode===card)h2.after(el);
+      else card.prepend(el);
+    }
+    el.textContent=message;
+  } else if(el){
+    el.remove();
+  }
+}
+
 function renderDay(idx){
   const isDetail=!!state.selectedRegion;
   let regionData=state.irData;
   let swimData=state.bbData;
   let swimLat=37.7946,swimLon=-122.4829;
   let regionLabel='Inner Richmond',swimLabel='Baker Beach';
+  let detailMissing=false;
 
   if(isDetail){
     const loc=LOCATIONS.find(l=>l.id===state.selectedRegion);
@@ -705,8 +739,28 @@ function renderDay(idx){
       swimLat=spot.lat;swimLon=spot.lon;
       regionLabel=loc.name;
       swimLabel=spot.name;
+    } else {
+      detailMissing=true;
     }
   }
+
+  // Per-section error state — each card reports its own failure.
+  const daylightOk=!!regionData;
+  const swimOk=!!swimData;
+  const tidesOk=!!(state.tides&&state.tides.predictions);
+  const regionsOk=Object.keys(state.regions).length>0;
+
+  setSectionError('irCard', !daylightOk
+    ? 'Daylight data unavailable right now.'
+    : (detailMissing?'Region detail unavailable; showing Inner Richmond.':null));
+
+  const swimMsgs=[];
+  if(!swimOk)swimMsgs.push('Wind data unavailable right now.');
+  if(!tidesOk)swimMsgs.push('Tide data unavailable right now.');
+  if(detailMissing)swimMsgs.push('Region detail unavailable; showing Baker Beach.');
+  setSectionError('bbCard',swimMsgs.length?swimMsgs.join(' '):null);
+
+  setSectionError('regCard',regionsOk?null:'Regional data unavailable right now.');
 
   // Update headers
   if(!isDetail)document.querySelector('#irCard h2').textContent='Daylight';
@@ -909,11 +963,15 @@ async function loadRegionDetail(regionId){
   const loc=LOCATIONS.find(l=>l.id===regionId);
   if(!loc)return;
   const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
-  const [regionDetail,swimDetail]=await Promise.all([
-    fetchOM(loc.lat,loc.lon,common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m'),
-    fetchOM(spot.lat,spot.lon,common+'&hourly=wind_speed_10m,wind_direction_10m'),
-  ]);
-  state.detailCache[regionId]={regionData:regionDetail,swimData:swimDetail};
+  try {
+    const [regionDetail,swimDetail]=await Promise.all([
+      fetchOM(loc.lat,loc.lon,common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m'),
+      fetchOM(spot.lat,spot.lon,common+'&hourly=wind_speed_10m,wind_direction_10m'),
+    ]);
+    state.detailCache[regionId]={regionData:regionDetail,swimData:swimDetail};
+  } catch(e){
+    console.error('Region detail failed ('+regionId+'):',e);
+  }
 }
 
 function scrollToPageTop(){
