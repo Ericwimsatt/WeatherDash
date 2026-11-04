@@ -217,15 +217,27 @@ main::before{display:none}
 .card{border-radius:0;box-shadow:none}
 #irCard,#bbCard,#regCard{width:100%;padding:26px var(--content-gutter,16px) 30px}
 #irCard{position:relative;background:#fbf1df;box-shadow:0 12px 0 #e8c695}
-#irCard::before{content:"";position:absolute;top:20px;right:var(--content-gutter,16px);width:52px;height:52px;border-radius:50%;background:#ffbd58;border:2px solid #ff9b4b;pointer-events:none}
 #irCard h2,#bbCard h2,#regCard h2{max-width:1200px;margin-left:auto;margin-right:auto}
 #irCard .richmond-grid,#irCard .chart-wrap,#bbCard .tide-times,#bbCard .chart-wrap,#bbCard .water-temp,#regCard>#regionContainer{max-width:1200px;margin-left:auto;margin-right:auto}
 #bbCard{background:linear-gradient(180deg,#d8eef4 0,#eef8fb 100%);box-shadow:0 12px 0 #b6dce5;border-radius:0;padding-top:28px;padding-bottom:32px}
 #regCard{background:#fbf1df;padding-top:28px}
 #regCard{box-shadow:none}
-@media(max-width:639px){header{padding-top:20px}#irCard,#bbCard,#regCard{padding-left:16px;padding-right:16px;padding-top:22px;padding-bottom:26px}#irCard{box-shadow:0 10px 0 #e8c695}#irCard::before{width:40px;height:40px;top:14px;right:16px}#bbCard{box-shadow:0 10px 0 #b6dce5}}
+@media(max-width:639px){header{padding-top:20px}#irCard,#bbCard,#regCard{padding-left:16px;padding-right:16px;padding-top:22px;padding-bottom:26px}#irCard{box-shadow:0 10px 0 #e8c695}#bbCard{box-shadow:0 10px 0 #b6dce5}}
 #regCard{padding-left:6px;padding-right:6px}
 @media(min-width:360px){.region-item{flex:1 1 calc(50% - 3px)}}
+
+/* Rain section (Daylight card) */
+#irCard .rain-section{max-width:1200px;margin-left:auto;margin-right:auto}
+.rain-section{display:block;background:#d8eef4;border:1px solid #a8d4df;border-radius:16px;padding:12px 14px;margin-bottom:14px}
+.rain-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin-bottom:8px}
+.rain-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#0b6f93}
+.rain-total{font-size:0.95rem;font-weight:850;color:#123f54}
+.uv-low-hint{font-size:0.8rem;color:#9b7359;text-align:center;padding:8px 0 0}
+
+/* Runoff warning */
+#bbCard h2{margin-bottom:4px}
+.runoff-ok{font-size:0.72rem;color:#9b7359;margin:0 0 12px}
+.runoff-warn{margin:0 0 14px;background:#fbe0c5;border:1px solid #e85d32;border-radius:12px;padding:10px 14px;font-size:0.82rem;font-weight:750;color:#a44b3e}
 </style>
 </head>
 <body>
@@ -289,6 +301,32 @@ const SWIM_SPOTS = {
   encinitas:{name:'Moonlight Beach',lat:33.0487,lon:-117.2987},
 };
 
+// ── Swim safety: rain-runoff rules ──
+// Local rain (urban runoff) and inland rain (ag runoff / algae blooms) are
+// each checked against a recent-rainfall window. Historical hourly rain comes
+// from the Open-Meteo forecast endpoint's `past_days` parameter.
+const SWIM_SAFETY = {
+  pastDays: 5,            // how many past days of rain we fetch
+  localWindow: 2,         // local runoff window: previous 2 days
+  localThreshold: 0.25,   // inches total over the local window
+  inlandWindowStart: 2,   // inland window begins 2 days ago
+  inlandWindowDays: 4,    // inland window: days 2, 3, 4, 5 before today
+  inlandThreshold: 1.0,   // inches total over the inland window
+  inlandSingleDay: 0.5,   // inches in any single inland day
+};
+
+// Inland rain reference point. All Bay Area swim spots share the Vallejo
+// reference; Encinitas measures itself (self:true).
+const INLAND_REF = {
+  _default: { name: 'Vallejo', lat: 38.1041, lon: -122.2567 },
+  encinitas: { name: 'Encinitas', lat: 33.0370, lon: -117.2924, self: true },
+};
+function inlandRefFor(id){ return INLAND_REF[id] || INLAND_REF._default; }
+function inlandSeriesFor(id){
+  const ref = inlandRefFor(id);
+  return ref.self ? state.rainLocal[id] : state.rainInlandBay;
+}
+
 const WMO = {
   0:{t:'Clear',c:'sunny'},1:{t:'Mostly Clear',c:'sunny'},2:{t:'Partly Cloudy',c:'partly-cloudy'},
   3:{t:'Overcast',c:'cloudy'},45:{t:'Foggy',c:'cloudy'},48:{t:'Fog',c:'cloudy'},
@@ -316,6 +354,8 @@ const state = {
   tides: null,
   selectedRegion: null,
   detailCache: {},
+  rainLocal: {},        // swim spot id -> historical rain {time,precipitation}
+  rainInlandBay: null,  // Vallejo historical rain (shared inland reference)
 };
 
 function findHighLow(predictions){
@@ -397,6 +437,12 @@ async function fetchTides(date,product){
   return r.json();
 }
 
+// Historical hourly rain for the swim-safety rules. forecast_days=1 anchors
+// the newest day as "today" so the window math below stays simple.
+async function fetchRainHistory(lat,lon){
+  return fetchOM(lat,lon,'past_days=5&forecast_days=1&hourly=precipitation&precipitation_unit=inch');
+}
+
 // ── Main ──
 async function init(){
   try {
@@ -414,16 +460,18 @@ async function init(){
     });
 
     const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
-    const irParams=common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m';
+    const irParams=common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m,precipitation&precipitation_unit=inch';
     const bbParams=common+'&hourly=wind_speed_10m,wind_direction_10m';
     const regParams=common+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code';
 
     // Each section loads independently; one failure no longer blocks the rest.
-    const [irRes,bbRes,tideRes,regRes]=await Promise.allSettled([
+    const [irRes,bbRes,tideRes,regRes,localRainRes,inlandRainRes]=await Promise.allSettled([
       fetchOM(LOCATIONS[0].lat,LOCATIONS[0].lon,irParams), // Inner Richmond
       fetchOM(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon,bbParams), // Baker Beach wind
       Promise.all(state.dayDates.map(d=>fetchTides(d,'predictions'))),
       fetchOMMulti(LOCATIONS.map(l=>l.lat),LOCATIONS.map(l=>l.lon),regParams),
+      fetchRainHistory(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon), // local runoff (Baker Beach)
+      fetchRainHistory(INLAND_REF._default.lat,INLAND_REF._default.lon), // inland runoff (Vallejo)
     ]);
 
     if(irRes.status==='fulfilled')state.irData=irRes.value;
@@ -440,6 +488,12 @@ async function init(){
       LOCATIONS.forEach((l,i)=>{regMap[l.id]={data:regRes.value[i],name:l.name,group:l.group}});
       state.regions=regMap;
     } else console.error('Regional section failed:',regRes.reason);
+
+    if(localRainRes.status==='fulfilled')state.rainLocal.innerRichmond=localRainRes.value;
+    else console.error('Local rain history failed:',localRainRes.reason);
+
+    if(inlandRainRes.status==='fulfilled')state.rainInlandBay=inlandRainRes.value;
+    else console.error('Inland rain history failed:',inlandRainRes.reason);
 
     // URL routing — check if a region was linked directly
     const path=window.location.pathname.replace(/^\//,'');
@@ -488,17 +542,26 @@ function buildUI(dateLabels){
     <div class="card-grid">
     <div class="card" id="irCard">
       <h2>Daylight</h2>
+      <div class="rain-section" id="rainSection" style="display:none">
+        <div class="rain-head">
+          <span class="rain-label">Rain</span>
+          <span class="rain-total" id="rainTotal"></span>
+        </div>
+        <div class="chart-wrap"><canvas id="rainChart"></canvas></div>
+      </div>
       <div class="richmond-grid">
         <div class="stat-box"><span class="label">Sunrise</span><span class="value" id="sunriseVal">--</span><span class="sub" id="sunriseSub"></span></div>
         <div class="stat-box"><span class="label">Sunset</span><span class="value" id="sunsetVal">--</span><span class="sub" id="sunsetSub"></span></div>
         <div class="stat-box"><span class="label">Max UV</span><span class="value" id="uvMaxVal">--</span></div>
         <div class="stat-box"><span class="label">UV Safe Window</span><span class="value" id="uvBelowVal" style="font-size:0.85rem;word-break:break-word;white-space:pre-line">--</span></div>
       </div>
-      <div class="chart-wrap"><canvas id="uvChart"></canvas></div>
+      <div class="chart-wrap" id="uvChartWrap"><canvas id="uvChart"></canvas></div>
+      <div class="uv-low-hint" id="uvLowHint" style="display:none">UV Index &lt; 2 all day</div>
     </div>
 
     <div class="card" id="bbCard">
       <h2>Baker Swim Conditions</h2>
+      <div id="swimAdvisory"></div>
       <div class="tide-times" id="tideTimes"></div>
       <div class="chart-wrap"><canvas id="tideChart"></canvas></div>
       <div class="chart-wrap" style="margin-top:12px"><canvas id="windChart"></canvas></div>
@@ -516,10 +579,11 @@ function buildUI(dateLabels){
   initUVChart();
   initTideChart();
   initWindChart();
+  initRainChart();
 }
 
 // ── Charts ──
-let uvChart, tideChart, windChart;
+let uvChart, tideChart, windChart, rainChart;
 
 // Keep charts working when the optional CDN library is unavailable.
 if(typeof Chart!=='function'){
@@ -699,6 +763,30 @@ function initWindChart(){
   });
 }
 
+function initRainChart(){
+  const ctx=document.getElementById('rainChart');
+  if(!ctx)return;
+  rainChart=new ChartImpl(ctx,{
+    type:'bar',
+    data:{labels:[],datasets:[{
+      label:'Rain (in)',
+      data:[],
+      backgroundColor:'#0b6f93',
+      borderRadius:3,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
+        label:ctx=>ctx.parsed.y.toFixed(2)+'″',
+      }}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#4d7d8c',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{beginAtZero:true,grid:{color:'rgba(77,125,140,0.24)'},ticks:{color:'#4d7d8c',font:{size:10},callback:v=>v+'″'}},
+      },
+    },
+  });
+}
+
 // ── Render ──
 // Show or clear an inline error within a single card, so a failed
 // section doesn't take down the whole dashboard.
@@ -727,6 +815,7 @@ function renderDay(idx){
   let swimData=state.bbData;
   let swimLat=37.7946,swimLon=-122.4829;
   let regionLabel='Inner Richmond',swimLabel='Baker Beach';
+  let swimSpotId='innerRichmond';
   let detailMissing=false;
 
   if(isDetail){
@@ -739,6 +828,7 @@ function renderDay(idx){
       swimLat=spot.lat;swimLon=spot.lon;
       regionLabel=loc.name;
       swimLabel=spot.name;
+      swimSpotId=state.selectedRegion;
     } else {
       detailMissing=true;
     }
@@ -769,11 +859,13 @@ function renderDay(idx){
   document.querySelector('#bbCard h2').textContent=isDetail?swimLabel+' \u2014 Swim Conditions':'Baker Swim Conditions';
 
   updateSun(idx,regionData);
+  updateRain(idx,regionData);
   updateUV(idx,regionData);
   updateTideTimes(idx);
   updateTideChart(idx);
   updateWindChart(idx,swimData);
   updateWaterTemp(idx,swimLat,swimLon);
+  updateSwimAdvisory(swimSpotId);
   updateRegions(idx);
   document.title=isDetail?regionLabel+' \u2014 WeatherDash':'WeatherDash';
   document.getElementById('updated').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
@@ -820,25 +912,76 @@ function updateUV(idx,d){
     }
   });
 
-  const morningSafe=uv.findIndex(v=>v>=UV_SAFE);
-  const eveningSafe=uv.length-1-[...uv].reverse().findIndex(v=>v>=UV_SAFE);
+  const maxUV=uv.length?Math.max(...uv.map(v=>Number.isFinite(v)?v:0)):0;
   let safeText='';
-  if(morningSafe>0){
-    const t=uvCrossTime(times[morningSafe-1],uv[morningSafe-1],times[morningSafe],uv[morningSafe],UV_SAFE);
-    safeText='Before '+(t||fmtTime(times[morningSafe]));
-  }
-  if(morningSafe>0&&eveningSafe>=0&&eveningSafe<uv.length-1)safeText+='\n';
-  if(eveningSafe>=0&&eveningSafe<uv.length-1){
-    const t=uvCrossTime(times[eveningSafe],uv[eveningSafe],times[eveningSafe+1],uv[eveningSafe+1],UV_SAFE);
-    safeText+='After '+(t||fmtTime(times[eveningSafe+1]));
+  if(maxUV<UV_SAFE){
+    safeText='All day';
+  } else {
+    const morningSafe=uv.findIndex(v=>v>=UV_SAFE);
+    const eveningSafe=uv.length-1-[...uv].reverse().findIndex(v=>v>=UV_SAFE);
+    if(morningSafe>0){
+      const t=uvCrossTime(times[morningSafe-1],uv[morningSafe-1],times[morningSafe],uv[morningSafe],UV_SAFE);
+      safeText='Before '+(t||fmtTime(times[morningSafe]));
+    }
+    if(morningSafe>0&&eveningSafe>=0&&eveningSafe<uv.length-1)safeText+='\n';
+    if(eveningSafe>=0&&eveningSafe<uv.length-1){
+      const t=uvCrossTime(times[eveningSafe],uv[eveningSafe],times[eveningSafe+1],uv[eveningSafe+1],UV_SAFE);
+      safeText+='After '+(t||fmtTime(times[eveningSafe+1]));
+    }
   }
   document.getElementById('uvBelowVal').textContent=safeText||'All day above 2';
+
+  // Hide the UV chart when the sun never gets strong enough to matter.
+  const showUV=maxUV>=UV_SAFE;
+  const uvWrap=document.getElementById('uvChartWrap');
+  const uvHint=document.getElementById('uvLowHint');
+  if(uvWrap)uvWrap.style.display=showUV?'':'none';
+  if(uvHint)uvHint.style.display=showUV?'none':'';
 
   if(!uvChart)return;
   uvChart.data.labels=dayTimes;
   uvChart.data.datasets[0].data=dayUV;
   uvChart.data.datasets[1].data=dayTemp;
   uvChart.update();
+  if(showUV&&uvChart.resize)uvChart.resize();
+}
+
+function updateRain(idx,d){
+  const section=document.getElementById('rainSection');
+  if(!section)return;
+  if(!d)d=state.irData;
+  if(!d||!d.hourly||!d.hourly.precipitation){
+    section.style.display='none';
+    return;
+  }
+  const start=idx*24,end=start+24;
+  const times=d.hourly.time.slice(start,end);
+  const precip=d.hourly.precipitation.slice(start,end);
+
+  const total=precip.reduce((a,b)=>a+(Number.isFinite(b)?b:0),0);
+  if(total<0.01||!times.length){
+    section.style.display='none';
+    return;
+  }
+
+  section.style.display='';
+
+  let peakIdx=-1,peak=0;
+  precip.forEach((v,i)=>{if(Number.isFinite(v)&&v>peak){peak=v;peakIdx=i}});
+
+  const totalEl=document.getElementById('rainTotal');
+  if(totalEl){
+    let text=total.toFixed(2)+'″ total';
+    if(peakIdx>=0&&peak>0)text+=' · heaviest '+fmtHour(times[peakIdx]);
+    totalEl.textContent=text;
+  }
+
+  if(rainChart){
+    rainChart.data.labels=times.map(t=>fmtHour(t));
+    rainChart.data.datasets[0].data=precip;
+    rainChart.update();
+    if(rainChart.resize)rainChart.resize();
+  }
 }
 
 function updateTideTimes(idx){
@@ -922,6 +1065,80 @@ function updateWaterTemp(idx,lat,lon){
     }).catch(()=>{el.innerHTML='<span style="color:#9b7359">Water temp: </span><strong>-- °F</strong>'});
 }
 
+// ── Swim safety advisory ──
+// Aggregate hourly rain into calendar-day totals, then check two windows:
+// local runoff (previous 2 days) and inland runoff (2-5 days ago).
+function rainWindows(data){
+  if(!data||!data.hourly||!data.hourly.time)return null;
+  const {time,precipitation}=data.hourly;
+  const byDate={};
+  time.forEach((t,i)=>{
+    const d=t.slice(0,10);
+    const v=precipitation[i];
+    if(Number.isFinite(v))byDate[d]=(byDate[d]||0)+v;
+  });
+  const dates=Object.keys(byDate).sort();
+  const n=dates.length;
+  // forecast_days=1 => dates[n-1] is today; offset 1 = yesterday, 2 = 2 days ago…
+  const amt=off=>(off>=1&&off<=n)?(byDate[dates[n-off]]||0):0;
+  const days=[];
+  for(let off=1;off<=SWIM_SAFETY.pastDays;off++)days.push({ago:off,amount:amt(off)});
+  const pick=(start,count)=>days.filter(d=>d.ago>=start&&d.ago<start+count);
+  const local=pick(1,SWIM_SAFETY.localWindow).reduce((a,d)=>a+d.amount,0);
+  const inlandDays=pick(SWIM_SAFETY.inlandWindowStart,SWIM_SAFETY.inlandWindowDays);
+  const inland=inlandDays.reduce((a,d)=>a+d.amount,0);
+  const inlandMaxDay=inlandDays.length?Math.max(...inlandDays.map(d=>d.amount)):0;
+  return {local,inland,inlandMaxDay,days};
+}
+
+function fmtIn(v){
+  return v.toFixed(2).replace(/\.?0+$/,'')+'\u2033';
+}
+
+function describeSource(kind,total,days){
+  const rainy=days.filter(d=>d.amount>0);
+  const recent=rainy.length?rainy.reduce((a,b)=>a.ago<b.ago?a:b):null;
+  let s=fmtIn(total)+' '+kind;
+  if(recent)s+=' '+recent.ago+' day'+(recent.ago===1?'':'s')+' ago';
+  return s;
+}
+
+function updateSwimAdvisory(spotId){
+  const el=document.getElementById('swimAdvisory');
+  if(!el)return;
+  const localWin=rainWindows(state.rainLocal[spotId]);
+  const inlandWin=rainWindows(inlandSeriesFor(spotId));
+
+  if(!localWin&&!inlandWin){el.className='';el.textContent='';return;}
+
+  const hasLocal=!!localWin,hasInland=!!inlandWin;
+  const localTotal=localWin?localWin.local:0;
+  const inlandTotal=inlandWin?inlandWin.inland:0;
+  const inlandMax=inlandWin?inlandWin.inlandMaxDay:0;
+
+  const localTriggered=hasLocal&&localTotal>=SWIM_SAFETY.localThreshold;
+  const inlandTriggered=hasInland&&(inlandTotal>=SWIM_SAFETY.inlandThreshold||inlandMax>=SWIM_SAFETY.inlandSingleDay);
+
+  if(!localTriggered&&!inlandTriggered){
+    el.className='runoff-ok';
+    el.textContent='no runoff warning';
+    return;
+  }
+
+  const parts=[];
+  if(localTriggered){
+    const localDays=localWin.days.filter(d=>d.ago<=SWIM_SAFETY.localWindow);
+    parts.push(describeSource('local',localTotal,localDays));
+  }
+  if(inlandTriggered){
+    const start=SWIM_SAFETY.inlandWindowStart;
+    const inlandDays=inlandWin.days.filter(d=>d.ago>=start&&d.ago<start+SWIM_SAFETY.inlandWindowDays);
+    parts.push(describeSource('inland',inlandTotal,inlandDays));
+  }
+  el.className='runoff-warn';
+  el.textContent='Runoff warning: '+parts.join(' and ');
+}
+
 function updateRegions(idx){
   const container=document.getElementById('regionContainer');
   if(!container)return;
@@ -964,11 +1181,13 @@ async function loadRegionDetail(regionId){
   if(!loc)return;
   const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
   try {
-    const [regionDetail,swimDetail]=await Promise.all([
-      fetchOM(loc.lat,loc.lon,common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m'),
+    const [regionDetail,swimDetail,localRain]=await Promise.all([
+      fetchOM(loc.lat,loc.lon,common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m,precipitation&precipitation_unit=inch'),
       fetchOM(spot.lat,spot.lon,common+'&hourly=wind_speed_10m,wind_direction_10m'),
+      fetchRainHistory(spot.lat,spot.lon),
     ]);
     state.detailCache[regionId]={regionData:regionDetail,swimData:swimDetail};
+    if(localRain)state.rainLocal[regionId]=localRain;
   } catch(e){
     console.error('Region detail failed ('+regionId+'):',e);
   }
