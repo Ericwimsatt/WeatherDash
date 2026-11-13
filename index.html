@@ -243,7 +243,7 @@ main::before{display:none}
 .runoff-section{max-width:1200px;margin-left:auto;margin-right:auto;background:#fdf6ec;border:1px solid #ead3b4;border-radius:16px;padding:12px 14px;margin-bottom:14px}
 .runoff-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:4px 12px;margin-bottom:8px}
 .runoff-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#a44b3e}
-.runoff-totals{text-align:right}
+.runoff-totals{text-align:left}
 .runoff-total{font-size:0.95rem;font-weight:850;color:#2d2018}
 .runoff-fcst{font-size:0.78rem;color:#9b7359;font-weight:600;margin-top:2px}
 .runoff-total .local,.runoff-fcst .local{color:#0b6f93}
@@ -616,7 +616,7 @@ function buildUI(dateLabels){
         <div class="chart-wrap"><canvas id="runoffChart"></canvas></div>
         <div class="runoff-legend">
           <span class="lbl"><span class="sw sw-bar"></span> Daily rain</span>
-          <span class="lbl"><span class="sw sw-line"></span> Rolling total · <span class="local">local 2-day</span> / <span class="inland">inland (runoff) 4-day</span></span>
+          <span class="lbl"><span class="sw sw-line"></span> Rolling total · <span class="local">local 2-day</span> / <span class="inland">Inland (Runoff) 4-day</span></span>
           <span class="lbl"><span class="sw sw-cut"></span> Cutoff</span>
         </div>
       </div>
@@ -722,7 +722,7 @@ const runoffOverlay={
     ctx.textBaseline='bottom';
     const cuts=[
       {v:SWIM_SAFETY.localThreshold,c:'#0b6f93',label:'local '+fmtIn(SWIM_SAFETY.localThreshold)},
-      {v:SWIM_SAFETY.inlandThreshold,c:'#e85d32',label:'inland (runoff) '+fmtIn(SWIM_SAFETY.inlandThreshold)},
+      {v:SWIM_SAFETY.inlandThreshold,c:'#e85d32',label:'Inland (Runoff) '+fmtIn(SWIM_SAFETY.inlandThreshold)},
     ];
     cuts.forEach(cut=>{
       const y=scales.y.getPixelForValue(cut.v);
@@ -902,9 +902,9 @@ function initRunoffChart(){
     type:'bar',
     data:{labels:[],datasets:[
       {type:'bar',label:'Local',data:[],backgroundColor:'rgba(11,111,147,0.5)',borderColor:'#0b6f93',borderWidth:1,borderRadius:3,yAxisID:'y',order:1},
-      {type:'bar',label:'Inland (runoff)',data:[],backgroundColor:'rgba(232,93,50,0.5)',borderColor:'#e85d32',borderWidth:1,borderRadius:3,yAxisID:'y',order:1},
+      {type:'bar',label:'Inland (Runoff)',data:[],backgroundColor:'rgba(232,93,50,0.5)',borderColor:'#e85d32',borderWidth:1,borderRadius:3,yAxisID:'y',order:1},
       {type:'line',label:'Local '+SWIM_SAFETY.localWindow+'-day',data:[],borderColor:'#0b6f93',backgroundColor:'rgba(11,111,147,0.12)',fill:true,tension:0.3,pointRadius:2.5,pointHoverRadius:4,pointBackgroundColor:'#0b6f93',borderWidth:2,yAxisID:'y',order:2},
-      {type:'line',label:'Inland (runoff) '+SWIM_SAFETY.inlandWindowDays+'-day',data:[],borderColor:'#e85d32',backgroundColor:'rgba(232,93,50,0.12)',fill:true,tension:0.3,pointRadius:2.5,pointHoverRadius:4,pointBackgroundColor:'#e85d32',borderWidth:2,yAxisID:'y',order:2},
+      {type:'line',label:'Inland (Runoff) '+SWIM_SAFETY.inlandWindowDays+'-day',data:[],borderColor:'#e85d32',backgroundColor:'rgba(232,93,50,0.12)',fill:true,tension:0.3,pointRadius:2.5,pointHoverRadius:4,pointBackgroundColor:'#e85d32',borderWidth:2,yAxisID:'y',order:2},
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
@@ -1275,7 +1275,7 @@ function updateSwimAdvisory(spotId){
   if(info.inlandTriggered){
     const start=SWIM_SAFETY.inlandWindowStart;
     const inlandDays=info.inlandWin.days.filter(d=>d.ago>=start&&d.ago<start+SWIM_SAFETY.inlandWindowDays);
-    parts.push(describeSource('inland (runoff)',info.inlandTotal,inlandDays));
+    parts.push(describeSource('Inland (Runoff)',info.inlandTotal,inlandDays));
   }
   el.className='runoff-warn';
   el.textContent='Runoff warning: '+parts.join(' and ');
@@ -1373,13 +1373,13 @@ function updateRunoff(spotId){
 
   const totalEl=document.getElementById('runoffTotal');
   if(totalEl){
-    totalEl.innerHTML='<span class="local">Local '+fmtIn(localPast)+'</span>, <span class="inland">inland (runoff) '+fmtIn(inlandPast)+'</span>';
+    totalEl.innerHTML='<span class="local">Local '+fmtIn(localPast)+'</span> · <span class="inland">Inland (Runoff) '+fmtIn(inlandPast)+'</span>';
   }
   const fcstEl=document.getElementById('runoffFcst');
   if(fcstEl){
     if(localFc+inlandFc>0.01){
       fcstEl.style.display='';
-      fcstEl.innerHTML='Forecast <span class="local">+'+fmtIn(localFc)+'</span> local, <span class="inland">+'+fmtIn(inlandFc)+'</span> inland (runoff)';
+      fcstEl.innerHTML='Forecast <span class="local">+'+fmtIn(localFc)+'</span> local · <span class="inland">+'+fmtIn(inlandFc)+'</span> Inland (Runoff)';
     } else {
       fcstEl.style.display='none';
     }
