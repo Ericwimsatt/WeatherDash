@@ -238,6 +238,24 @@ main::before{display:none}
 #bbCard h2{margin-bottom:4px}
 .runoff-ok{font-size:0.72rem;color:#9b7359;margin:0 0 12px}
 .runoff-warn{margin:0 0 14px;background:#fbe0c5;border:1px solid #e85d32;border-radius:12px;padding:10px 14px;font-size:0.82rem;font-weight:750;color:#a44b3e}
+
+/* Runoff chart */
+.runoff-section{max-width:1200px;margin-left:auto;margin-right:auto;background:#fbe0c5;border:1px solid #e85d32;border-radius:16px;padding:12px 14px;margin-bottom:14px}
+.runoff-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:4px 12px;margin-bottom:8px}
+.runoff-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#a44b3e}
+.runoff-totals{text-align:right}
+.runoff-total{font-size:0.95rem;font-weight:850;color:#2d2018}
+.runoff-fcst{font-size:0.78rem;color:#9b7359;font-weight:600;margin-top:2px}
+.runoff-total .local,.runoff-fcst .local{color:#e85d32}
+.runoff-total .inland,.runoff-fcst .inland{color:#0b6f93}
+.runoff-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:0.72rem;color:#9b7359}
+.runoff-legend .lbl{display:inline-flex;align-items:center;gap:5px}
+.runoff-legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;background:#e85d32}
+.runoff-legend .sw.sw-bar{background:linear-gradient(90deg,#e85d32 0 50%,#0b6f93 50% 100%)}
+.runoff-legend .sw.sw-line{height:3px;border-radius:0;background:linear-gradient(90deg,#e85d32 0 50%,#0b6f93 50% 100%)}
+.runoff-legend .sw.sw-cut{height:2px;border-radius:0;background:repeating-linear-gradient(90deg,#a44b3e 0 3px,transparent 3px 6px)}
+#bbCard .runoff-section .chart-wrap{display:block;width:100%;height:240px;min-height:240px}
+#bbCard .runoff-section .chart-wrap canvas{height:240px!important;max-height:240px}
 </style>
 </head>
 <body>
@@ -326,6 +344,10 @@ function inlandSeriesFor(id){
   const ref = inlandRefFor(id);
   return ref.self ? state.rainLocal[id] : state.rainInlandBay;
 }
+function inlandChartSeriesFor(id){
+  const ref = inlandRefFor(id);
+  return ref.self ? state.rainLocalFc[id] : state.rainInlandFc;
+}
 
 const WMO = {
   0:{t:'Clear',c:'sunny'},1:{t:'Mostly Clear',c:'sunny'},2:{t:'Partly Cloudy',c:'partly-cloudy'},
@@ -356,6 +378,8 @@ const state = {
   detailCache: {},
   rainLocal: {},        // swim spot id -> historical rain {time,precipitation}
   rainInlandBay: null,  // Vallejo historical rain (shared inland reference)
+  rainLocalFc: {},      // swim spot id -> historical+forecast rain (runoff chart)
+  rainInlandFc: null,   // Vallejo historical+forecast rain (runoff chart)
 };
 
 function findHighLow(predictions){
@@ -443,6 +467,12 @@ async function fetchRainHistory(lat,lon){
   return fetchOM(lat,lon,'past_days=5&forecast_days=1&hourly=precipitation&precipitation_unit=inch');
 }
 
+// Historical + forecast hourly rain for the runoff chart (past 5 days through
+// the 3-day forecast). Kept separate from the advisory's historical-only series.
+async function fetchRainChartSeries(lat,lon){
+  return fetchOM(lat,lon,'past_days=5&forecast_days=3&hourly=precipitation&precipitation_unit=inch');
+}
+
 // ── Main ──
 async function init(){
   try {
@@ -465,13 +495,15 @@ async function init(){
     const regParams=common+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code';
 
     // Each section loads independently; one failure no longer blocks the rest.
-    const [irRes,bbRes,tideRes,regRes,localRainRes,inlandRainRes]=await Promise.allSettled([
+    const [irRes,bbRes,tideRes,regRes,localRainRes,inlandRainRes,localFcRes,inlandFcRes]=await Promise.allSettled([
       fetchOM(LOCATIONS[0].lat,LOCATIONS[0].lon,irParams), // Inner Richmond
       fetchOM(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon,bbParams), // Baker Beach wind
       Promise.all(state.dayDates.map(d=>fetchTides(d,'predictions'))),
       fetchOMMulti(LOCATIONS.map(l=>l.lat),LOCATIONS.map(l=>l.lon),regParams),
       fetchRainHistory(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon), // local runoff (Baker Beach)
       fetchRainHistory(INLAND_REF._default.lat,INLAND_REF._default.lon), // inland runoff (Vallejo)
+      fetchRainChartSeries(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon), // runoff chart (Baker Beach)
+      fetchRainChartSeries(INLAND_REF._default.lat,INLAND_REF._default.lon), // runoff chart (Vallejo)
     ]);
 
     if(irRes.status==='fulfilled')state.irData=irRes.value;
@@ -494,6 +526,12 @@ async function init(){
 
     if(inlandRainRes.status==='fulfilled')state.rainInlandBay=inlandRainRes.value;
     else console.error('Inland rain history failed:',inlandRainRes.reason);
+
+    if(localFcRes.status==='fulfilled')state.rainLocalFc.innerRichmond=localFcRes.value;
+    else console.error('Local runoff chart failed:',localFcRes.reason);
+
+    if(inlandFcRes.status==='fulfilled')state.rainInlandFc=inlandFcRes.value;
+    else console.error('Inland runoff chart failed:',inlandFcRes.reason);
 
     // URL routing — check if a region was linked directly
     const path=window.location.pathname.replace(/^\//,'');
@@ -562,6 +600,21 @@ function buildUI(dateLabels){
     <div class="card" id="bbCard">
       <h2>Baker Swim Conditions</h2>
       <div id="swimAdvisory"></div>
+      <div class="runoff-section" id="runoffSection" style="display:none">
+        <div class="runoff-head">
+          <span class="runoff-label">Runoff</span>
+          <div class="runoff-totals">
+            <div class="runoff-total" id="runoffTotal"></div>
+            <div class="runoff-fcst" id="runoffFcst"></div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="runoffChart"></canvas></div>
+        <div class="runoff-legend">
+          <span class="lbl"><span class="sw sw-bar"></span> Daily rain</span>
+          <span class="lbl"><span class="sw sw-line"></span> Rolling total · <span class="local">local 2-day</span> / <span class="inland">inland 4-day</span></span>
+          <span class="lbl"><span class="sw sw-cut"></span> Cutoff</span>
+        </div>
+      </div>
       <div class="tide-times" id="tideTimes"></div>
       <div class="chart-wrap"><canvas id="tideChart"></canvas></div>
       <div class="chart-wrap" style="margin-top:12px"><canvas id="windChart"></canvas></div>
@@ -580,17 +633,18 @@ function buildUI(dateLabels){
   initTideChart();
   initWindChart();
   initRainChart();
+  initRunoffChart();
 }
 
 // ── Charts ──
-let uvChart, tideChart, windChart, rainChart;
+let uvChart, tideChart, windChart, rainChart, runoffChart;
 
 // Keep charts working when the optional CDN library is unavailable.
 if(typeof Chart!=='function'){
   const SVG_NS='http://www.w3.org/2000/svg';
   const svgEl=(tag,attrs={})=>{const el=document.createElementNS(SVG_NS,tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));return el};
   class NativeChart{
-    constructor(canvas,config){this.canvas=canvas;this.config=config;this.data=config.data;this.canvas.style.display='none';this.svg=svgEl('svg',{class:'native-chart',role:'img','aria-label':config.type+' chart'});canvas.parentElement.appendChild(this.svg);this.update()}
+    constructor(canvas,config){this.canvas=canvas;this.config=config;this.data=config.data;this.options=config.options;this.canvas.style.display='none';this.svg=svgEl('svg',{class:'native-chart',role:'img','aria-label':config.type+' chart'});canvas.parentElement.appendChild(this.svg);this.update()}
     update(){
       const svg=this.svg,w=Math.max(this.canvas.parentElement.clientWidth||320,180),h=180;
       svg.setAttribute('viewBox','0 0 '+w+' '+h);svg.replaceChildren();
@@ -603,7 +657,7 @@ if(typeof Chart!=='function'){
       for(let i=0;i<=4;i++){const y=top+ph*i/4;svg.appendChild(svgEl('line',{x1:left,y1:y,x2:left+pw,y2:y,stroke:grid,'stroke-width':1,'stroke-dasharray':'2 4'}));const t=svgEl('text',{x:left-6,y:y+3,'text-anchor':'end',fill:text,'font-size':9});t.textContent=(yMax-(yMax-yMin)*i/4).toFixed(0);svg.appendChild(t)}
       labels.forEach((label,i)=>{if(i%Math.max(1,Math.ceil(labels.length/7)))return;const x=left+(labels.length<2?pw/2:pw*i/(labels.length-1));const t=svgEl('text',{x,y:h-7,'text-anchor':'middle',fill:text,'font-size':9});t.textContent=label;svg.appendChild(t)});
       (this.data.datasets||[]).forEach((dataset,di)=>{
-        const values=dataset.data||[];const isBar=this.config.type==='bar';const color=Array.isArray(dataset.backgroundColor)?(dataset.backgroundColor[0]||'#e85d32'):(dataset.borderColor||dataset.backgroundColor||'#e85d32');
+        const values=dataset.data||[];const isBar=(dataset.type||this.config.type)==='bar';const color=Array.isArray(dataset.backgroundColor)?(dataset.backgroundColor[0]||'#e85d32'):(dataset.borderColor||dataset.backgroundColor||'#e85d32');
         if(isBar){const barW=Math.max(3,pw/Math.max(values.length,1)*.55);values.forEach((value,i)=>{if(!Number.isFinite(value))return;const x=left+(labels.length<2?pw/2:pw*i/(labels.length-1))-barW/2,y=top+ph*(yMax-value)/(yMax-yMin);svg.appendChild(svgEl('rect',{x,y,width:barW,height:Math.max(1,top+ph-y),fill:Array.isArray(dataset.backgroundColor)?(dataset.backgroundColor[i]||color):color,opacity:.72,rx:2}))});return}
         const axis=dataset.yAxisID==='yTemp'?(scales.yTemp||{}):yScale;const min=Number.isFinite(axis.min)?axis.min:yMin;const max=Number.isFinite(axis.max)?axis.max:yMax;const points=values.map((value,i)=>{if(!Number.isFinite(value))return null;const x=left+(labels.length<2?pw/2:pw*i/(labels.length-1));const y=top+ph*(max-value)/(max-min);return x+','+y}).filter(Boolean).join(' ');
         if(points){svg.appendChild(svgEl('polyline',{points,fill:'none',stroke:color,'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round'}));}
@@ -648,6 +702,70 @@ const tideZeroLine={
     ctx.strokeStyle='#7dbdcc';
     ctx.lineWidth=3;
     ctx.beginPath();ctx.moveTo(ca.left,y);ctx.lineTo(ca.right,y);ctx.stroke();
+    ctx.restore();
+  }
+};
+
+const runoffOverlay={
+  id:'runoffOverlay',
+  // Subtle tint over the forecast region (after "now").
+  beforeDatasetsDraw(chart){
+    const {ctx,chartArea:ca}=chart;
+    if(!ca)return;
+    const ti=chart._todayIndex;
+    if(ti===undefined||ti===null||ti<0)return;
+    const meta=chart.getDatasetMeta(0);
+    const el=meta&&meta.data&&meta.data[ti];
+    if(!el)return;
+    const x0=el.x-el.width/2;
+    if(x0<=ca.left||x0>=ca.right)return;
+    ctx.save();
+    ctx.fillStyle='rgba(232,93,50,0.06)';
+    ctx.fillRect(x0,ca.top,ca.right-x0,ca.bottom-ca.top);
+    ctx.restore();
+  },
+  // Cutoff lines + "now" divider, drawn over the datasets.
+  afterDatasetsDraw(chart){
+    const {ctx,chartArea:ca,scales}=chart;
+    if(!scales.y||!scales.x)return;
+    ctx.save();
+    ctx.textBaseline='bottom';
+    const cuts=[
+      {v:SWIM_SAFETY.localThreshold,c:'#e85d32',label:'local '+fmtIn(SWIM_SAFETY.localThreshold)},
+      {v:SWIM_SAFETY.inlandThreshold,c:'#0b6f93',label:'inland '+fmtIn(SWIM_SAFETY.inlandThreshold)},
+    ];
+    cuts.forEach(cut=>{
+      const y=scales.y.getPixelForValue(cut.v);
+      if(y<ca.top||y>ca.bottom)return;
+      ctx.setLineDash([6,4]);
+      ctx.strokeStyle=cut.c;
+      ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(ca.left,y);ctx.lineTo(ca.right,y);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=cut.c;
+      ctx.font='bold 9px system-ui';
+      ctx.textAlign='right';
+      ctx.fillText(cut.label,ca.right-4,y-3);
+    });
+    const ti=chart._todayIndex;
+    if(ti!==undefined&&ti!==null&&ti>=0){
+      const meta=chart.getDatasetMeta(0);
+      const el=meta&&meta.data&&meta.data[ti];
+      if(el){
+        const x=el.x;
+        if(x>=ca.left&&x<=ca.right){
+          ctx.setLineDash([3,3]);
+          ctx.strokeStyle='rgba(119,121,110,0.7)';
+          ctx.lineWidth=1;
+          ctx.beginPath();ctx.moveTo(x,ca.top);ctx.lineTo(x,ca.bottom);ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle='rgba(119,121,110,0.9)';
+          ctx.font='9px system-ui';
+          ctx.textAlign='center';
+          ctx.fillText('now',x,ca.top+9);
+        }
+      }
+    }
     ctx.restore();
   }
 };
@@ -787,6 +905,31 @@ function initRainChart(){
   });
 }
 
+function initRunoffChart(){
+  const ctx=document.getElementById('runoffChart');
+  if(!ctx)return;
+  runoffChart=new ChartImpl(ctx,{
+    type:'bar',
+    data:{labels:[],datasets:[
+      {type:'bar',label:'Local',data:[],backgroundColor:'rgba(232,93,50,0.5)',borderColor:'#e85d32',borderWidth:1,borderRadius:3,yAxisID:'y',order:1},
+      {type:'bar',label:'Inland',data:[],backgroundColor:'rgba(11,111,147,0.5)',borderColor:'#0b6f93',borderWidth:1,borderRadius:3,yAxisID:'y',order:1},
+      {type:'line',label:'Local '+SWIM_SAFETY.localWindow+'-day',data:[],borderColor:'#e85d32',backgroundColor:'rgba(232,93,50,0.12)',fill:true,tension:0.3,pointRadius:2.5,pointHoverRadius:4,pointBackgroundColor:'#e85d32',borderWidth:2,yAxisID:'y',order:2},
+      {type:'line',label:'Inland '+SWIM_SAFETY.inlandWindowDays+'-day',data:[],borderColor:'#0b6f93',backgroundColor:'rgba(11,111,147,0.12)',fill:true,tension:0.3,pointRadius:2.5,pointHoverRadius:4,pointBackgroundColor:'#0b6f93',borderWidth:2,yAxisID:'y',order:2},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
+        label:ctx=>ctx.dataset.label+': '+fmtIn(ctx.parsed.y),
+      }}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#9b7359',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8}},
+        y:{beginAtZero:true,grid:{color:'rgba(155,115,89,0.24)'},ticks:{color:'#9b7359',font:{size:10},callback:v=>v+'″'}},
+      },
+    },
+    plugins:[runoffOverlay],
+  });
+}
+
 // ── Render ──
 // Show or clear an inline error within a single card, so a failed
 // section doesn't take down the whole dashboard.
@@ -866,6 +1009,7 @@ function renderDay(idx){
   updateWindChart(idx,swimData);
   updateWaterTemp(idx,swimLat,swimLon);
   updateSwimAdvisory(swimSpotId);
+  updateRunoff(swimSpotId);
   updateRegions(idx);
   document.title=isDetail?regionLabel+' \u2014 WeatherDash':'WeatherDash';
   document.getElementById('updated').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
@@ -1080,7 +1224,7 @@ function rainWindows(data){
   const dates=Object.keys(byDate).sort();
   const n=dates.length;
   // forecast_days=1 => dates[n-1] is today; offset 1 = yesterday, 2 = 2 days ago…
-  const amt=off=>(off>=1&&off<=n)?(byDate[dates[n-off]]||0):0;
+  const amt=off=>(off>=1&&off<n)?(byDate[dates[n-1-off]]||0):0;
   const days=[];
   for(let off=1;off<=SWIM_SAFETY.pastDays;off++)days.push({ago:off,amount:amt(off)});
   const pick=(start,count)=>days.filter(d=>d.ago>=start&&d.ago<start+count);
@@ -1139,6 +1283,120 @@ function updateSwimAdvisory(spotId){
   el.textContent='Runoff warning: '+parts.join(' and ');
 }
 
+// Aggregate hourly rain into daily totals, sorted chronologically.
+function dailyTotals(data){
+  if(!data||!data.hourly||!data.hourly.time)return null;
+  const {time,precipitation}=data.hourly;
+  const byDate={};
+  time.forEach((t,i)=>{
+    const d=t.slice(0,10);
+    const v=precipitation[i];
+    if(Number.isFinite(v))byDate[d]=(byDate[d]||0)+v;
+  });
+  return Object.keys(byDate).sort().map(d=>({date:d,total:byDate[d]}));
+}
+
+function fmtDayShort(dateStr){
+  const p=dateStr.split('-');
+  return (+p[1])+'/'+(+p[2]);
+}
+
+// Trailing N-day sum for each day, so the runoff total rises and falls as the
+// window slides over the timeline.
+function rollingWindow(daily,windowDays){
+  const out=[];
+  let sum=0;
+  for(let i=0;i<daily.length;i++){
+    sum+=daily[i];
+    if(i>=windowDays)sum-=daily[i-windowDays];
+    out.push(sum);
+  }
+  return out;
+}
+
+function updateRunoff(spotId){
+  const section=document.getElementById('runoffSection');
+  if(!section)return;
+
+  const localSeries=state.rainLocalFc[spotId];
+  const inlandSeries=inlandChartSeriesFor(spotId);
+
+  const localTotals=dailyTotals(localSeries);
+  const inlandTotals=dailyTotals(inlandSeries);
+
+  // Build a unified day axis from both series.
+  const axisSet=new Set();
+  if(localTotals)localTotals.forEach(t=>axisSet.add(t.date));
+  if(inlandTotals)inlandTotals.forEach(t=>axisSet.add(t.date));
+  const axis=[...axisSet].sort();
+
+  if(!axis.length){
+    section.style.display='none';
+    return;
+  }
+
+  const localMap={},inlandMap={};
+  if(localTotals)localTotals.forEach(t=>localMap[t.date]=t.total);
+  if(inlandTotals)inlandTotals.forEach(t=>inlandMap[t.date]=t.total);
+
+  const localDaily=axis.map(d=>localMap[d]||0);
+  const inlandDaily=axis.map(d=>inlandMap[d]||0);
+
+  // Hide only when there's essentially no rain at all — past or forecast.
+  const totalRain=localDaily.reduce((a,b)=>a+b,0)+inlandDaily.reduce((a,b)=>a+b,0);
+  if(totalRain<0.01){
+    section.style.display='none';
+    return;
+  }
+  section.style.display='';
+
+  // Rolling-window totals (the runoff windows): local = trailing 2 days,
+  // inland = trailing 4 days. Sliding day-by-day makes these rise and fall.
+  const localCum=rollingWindow(localDaily,SWIM_SAFETY.localWindow);
+  const inlandCum=rollingWindow(inlandDaily,SWIM_SAFETY.inlandWindowDays);
+
+  const todayStr=ymdDash(state.dayDates[0]);
+  const todayIndex=axis.indexOf(todayStr);
+
+  // Split into "so far" (through today) vs "expected" (future forecast).
+  let localPast=0,inlandPast=0,localFc=0,inlandFc=0;
+  axis.forEach((d,i)=>{
+    if(d>todayStr){localFc+=localDaily[i];inlandFc+=inlandDaily[i];}
+    else {localPast+=localDaily[i];inlandPast+=inlandDaily[i];}
+  });
+
+  const totalEl=document.getElementById('runoffTotal');
+  if(totalEl){
+    totalEl.innerHTML='<span class="local">Local '+fmtIn(localPast)+'</span> · <span class="inland">Inland '+fmtIn(inlandPast)+'</span>';
+  }
+  const fcstEl=document.getElementById('runoffFcst');
+  if(fcstEl){
+    if(localFc+inlandFc>0.01){
+      fcstEl.style.display='';
+      fcstEl.innerHTML='Expected <span class="local">+'+fmtIn(localFc)+'</span> local · <span class="inland">+'+fmtIn(inlandFc)+'</span> inland';
+    } else {
+      fcstEl.style.display='none';
+    }
+  }
+
+  if(!runoffChart)return;
+  runoffChart.data.labels=axis.map(fmtDayShort);
+  runoffChart.data.datasets[0].data=localDaily;
+  runoffChart.data.datasets[1].data=inlandDaily;
+  runoffChart.data.datasets[2].data=localCum;
+  runoffChart.data.datasets[3].data=inlandCum;
+  runoffChart._todayIndex=todayIndex;
+  const maxVal=Math.max(
+    Math.max(0,...localCum),
+    Math.max(0,...inlandCum),
+    SWIM_SAFETY.localThreshold,
+    SWIM_SAFETY.inlandThreshold
+  );
+  runoffChart.options.scales.y.max=maxVal*1.15;
+  runoffChart.update();
+  if(runoffChart.resize)runoffChart.resize();
+}
+
 function updateRegions(idx){
   const container=document.getElementById('regionContainer');
   if(!container)return;
@@ -1181,13 +1439,15 @@ async function loadRegionDetail(regionId){
   if(!loc)return;
   const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
   try {
-    const [regionDetail,swimDetail,localRain]=await Promise.all([
+    const [regionDetail,swimDetail,localRain,localFc]=await Promise.all([
       fetchOM(loc.lat,loc.lon,common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m,precipitation&precipitation_unit=inch'),
       fetchOM(spot.lat,spot.lon,common+'&hourly=wind_speed_10m,wind_direction_10m'),
       fetchRainHistory(spot.lat,spot.lon),
+      fetchRainChartSeries(spot.lat,spot.lon),
     ]);
     state.detailCache[regionId]={regionData:regionDetail,swimData:swimDetail};
     if(localRain)state.rainLocal[regionId]=localRain;
+    if(localFc)state.rainLocalFc[regionId]=localFc;
   } catch(e){
     console.error('Region detail failed ('+regionId+'):',e);
   }
