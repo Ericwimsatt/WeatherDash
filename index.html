@@ -240,7 +240,7 @@ main::before{display:none}
 .runoff-warn{margin:0 0 14px;background:#fbe0c5;border:1px solid #e85d32;border-radius:12px;padding:10px 14px;font-size:0.82rem;font-weight:750;color:#a44b3e}
 
 /* Runoff chart */
-.runoff-section{max-width:1200px;margin-left:auto;margin-right:auto;background:#fbe0c5;border:1px solid #e85d32;border-radius:16px;padding:12px 14px;margin-bottom:14px}
+.runoff-section{max-width:1200px;margin-left:auto;margin-right:auto;background:#fdf6ec;border:1px solid #ead3b4;border-radius:16px;padding:12px 14px;margin-bottom:14px}
 .runoff-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:4px 12px;margin-bottom:8px}
 .runoff-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#a44b3e}
 .runoff-totals{text-align:right}
@@ -256,6 +256,9 @@ main::before{display:none}
 .runoff-legend .sw.sw-cut{height:2px;border-radius:0;background:repeating-linear-gradient(90deg,#a44b3e 0 3px,transparent 3px 6px)}
 #bbCard .runoff-section .chart-wrap{display:block;width:100%;height:240px;min-height:240px}
 #bbCard .runoff-section .chart-wrap canvas{height:240px!important;max-height:240px}
+
+/* Tides header */
+#bbCard .tide-label{max-width:1200px;margin-left:auto;margin-right:auto;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#0b6f93;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -380,6 +383,7 @@ const state = {
   rainInlandBay: null,  // Vallejo historical rain (shared inland reference)
   rainLocalFc: {},      // swim spot id -> historical+forecast rain (runoff chart)
   rainInlandFc: null,   // Vallejo historical+forecast rain (runoff chart)
+  runoffGraphVisible: false, // whether the runoff chart is currently showing
 };
 
 function findHighLow(predictions){
@@ -467,10 +471,11 @@ async function fetchRainHistory(lat,lon){
   return fetchOM(lat,lon,'past_days=5&forecast_days=1&hourly=precipitation&precipitation_unit=inch');
 }
 
-// Historical + forecast hourly rain for the runoff chart (past 5 days through
-// the 3-day forecast). Kept separate from the advisory's historical-only series.
+// Historical + forecast hourly rain for the runoff chart: 1 day in the past
+// through 3 days in the future (5 days total). Kept separate from the
+// advisory's historical-only series.
 async function fetchRainChartSeries(lat,lon){
-  return fetchOM(lat,lon,'past_days=5&forecast_days=3&hourly=precipitation&precipitation_unit=inch');
+  return fetchOM(lat,lon,'past_days=1&forecast_days=4&hourly=precipitation&precipitation_unit=inch');
 }
 
 // ── Main ──
@@ -602,7 +607,7 @@ function buildUI(dateLabels){
       <div id="swimAdvisory"></div>
       <div class="runoff-section" id="runoffSection" style="display:none">
         <div class="runoff-head">
-          <span class="runoff-label">Runoff</span>
+          <span class="runoff-label" id="runoffLabel">Runoff</span>
           <div class="runoff-totals">
             <div class="runoff-total" id="runoffTotal"></div>
             <div class="runoff-fcst" id="runoffFcst"></div>
@@ -615,6 +620,7 @@ function buildUI(dateLabels){
           <span class="lbl"><span class="sw sw-cut"></span> Cutoff</span>
         </div>
       </div>
+      <div class="tide-label">Tides</div>
       <div class="tide-times" id="tideTimes"></div>
       <div class="chart-wrap"><canvas id="tideChart"></canvas></div>
       <div class="chart-wrap" style="margin-top:12px"><canvas id="windChart"></canvas></div>
@@ -1008,8 +1014,8 @@ function renderDay(idx){
   updateTideChart(idx);
   updateWindChart(idx,swimData);
   updateWaterTemp(idx,swimLat,swimLon);
-  updateSwimAdvisory(swimSpotId);
   updateRunoff(swimSpotId);
+  updateSwimAdvisory(swimSpotId);
   updateRegions(idx);
   document.title=isDetail?regionLabel+' \u2014 WeatherDash':'WeatherDash';
   document.getElementById('updated').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
@@ -1247,37 +1253,43 @@ function describeSource(kind,total,days){
   return s;
 }
 
-function updateSwimAdvisory(spotId){
-  const el=document.getElementById('swimAdvisory');
-  if(!el)return;
+// Compute the runoff-warning state for a swim spot (shared by the advisory
+// text and the runoff chart header).
+function runoffWarningInfo(spotId){
   const localWin=rainWindows(state.rainLocal[spotId]);
   const inlandWin=rainWindows(inlandSeriesFor(spotId));
-
-  if(!localWin&&!inlandWin){el.className='';el.textContent='';return;}
-
-  const hasLocal=!!localWin,hasInland=!!inlandWin;
+  if(!localWin&&!inlandWin)return null;
   const localTotal=localWin?localWin.local:0;
   const inlandTotal=inlandWin?inlandWin.inland:0;
   const inlandMax=inlandWin?inlandWin.inlandMaxDay:0;
+  const localTriggered=!!localWin&&localTotal>=SWIM_SAFETY.localThreshold;
+  const inlandTriggered=!!inlandWin&&(inlandTotal>=SWIM_SAFETY.inlandThreshold||inlandMax>=SWIM_SAFETY.inlandSingleDay);
+  return {localWin,inlandWin,localTotal,inlandTotal,inlandMax,localTriggered,inlandTriggered,triggered:localTriggered||inlandTriggered};
+}
 
-  const localTriggered=hasLocal&&localTotal>=SWIM_SAFETY.localThreshold;
-  const inlandTriggered=hasInland&&(inlandTotal>=SWIM_SAFETY.inlandThreshold||inlandMax>=SWIM_SAFETY.inlandSingleDay);
+function updateSwimAdvisory(spotId){
+  const el=document.getElementById('swimAdvisory');
+  if(!el)return;
+  const info=runoffWarningInfo(spotId);
+  if(!info){el.className='';el.textContent='';return;}
 
-  if(!localTriggered&&!inlandTriggered){
+  if(!info.triggered){
+    // When the graph is already showing, skip the redundant "all clear" note.
+    if(state.runoffGraphVisible){el.className='';el.textContent='';return;}
     el.className='runoff-ok';
     el.textContent='no runoff warning';
     return;
   }
 
   const parts=[];
-  if(localTriggered){
-    const localDays=localWin.days.filter(d=>d.ago<=SWIM_SAFETY.localWindow);
-    parts.push(describeSource('local',localTotal,localDays));
+  if(info.localTriggered){
+    const localDays=info.localWin.days.filter(d=>d.ago<=SWIM_SAFETY.localWindow);
+    parts.push(describeSource('local',info.localTotal,localDays));
   }
-  if(inlandTriggered){
+  if(info.inlandTriggered){
     const start=SWIM_SAFETY.inlandWindowStart;
-    const inlandDays=inlandWin.days.filter(d=>d.ago>=start&&d.ago<start+SWIM_SAFETY.inlandWindowDays);
-    parts.push(describeSource('runoff source',inlandTotal,inlandDays));
+    const inlandDays=info.inlandWin.days.filter(d=>d.ago>=start&&d.ago<start+SWIM_SAFETY.inlandWindowDays);
+    parts.push(describeSource('runoff source',info.inlandTotal,inlandDays));
   }
   el.className='runoff-warn';
   el.textContent='Runoff warning: '+parts.join(' and ');
@@ -1318,6 +1330,9 @@ function updateRunoff(spotId){
   const section=document.getElementById('runoffSection');
   if(!section)return;
 
+  const warnInfo=runoffWarningInfo(spotId);
+  const hasWarning=!!(warnInfo&&warnInfo.triggered);
+
   const localSeries=state.rainLocalFc[spotId];
   const inlandSeries=inlandChartSeriesFor(spotId);
 
@@ -1332,6 +1347,7 @@ function updateRunoff(spotId){
 
   if(!axis.length){
     section.style.display='none';
+    state.runoffGraphVisible=false;
     return;
   }
 
@@ -1346,9 +1362,13 @@ function updateRunoff(spotId){
   const totalRain=localDaily.reduce((a,b)=>a+b,0)+inlandDaily.reduce((a,b)=>a+b,0);
   if(totalRain<0.01){
     section.style.display='none';
+    state.runoffGraphVisible=false;
     return;
   }
   section.style.display='';
+  state.runoffGraphVisible=true;
+  const labelEl=document.getElementById('runoffLabel');
+  if(labelEl)labelEl.textContent=hasWarning?'Runoff danger':'Runoff forecast';
 
   // Rolling-window totals (the runoff windows): local = trailing 2 days,
   // inland = trailing 4 days. Sliding day-by-day makes these rise and fall.
