@@ -1271,9 +1271,8 @@ function updateSwimAdvisory(spotId){
   const el=document.getElementById('swimAdvisory');
   if(!el)return;
   const info=runoffWarningInfo(spotId);
-  const hasWarning=!!(info&&info.triggered);
   const tideLabel=document.getElementById('tideLabel');
-  if(tideLabel)tideLabel.style.display=hasWarning?'':'none';
+  if(tideLabel)tideLabel.style.display=state.runoffGraphVisible?'':'none';
   if(!info){el.className='';el.textContent='';return;}
 
   if(!info.triggered){
