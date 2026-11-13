@@ -237,7 +237,7 @@ main::before{display:none}
 /* Runoff warning */
 #bbCard h2{margin-bottom:4px}
 .runoff-ok{font-size:0.72rem;color:#9b7359;margin:0 0 12px}
-.runoff-warn{margin:0 0 14px;background:#fbe0c5;border:1px solid #e85d32;border-radius:12px;padding:10px 14px;font-size:0.82rem;font-weight:750;color:#a44b3e}
+.runoff-warn{margin:0 0 14px;background:#fdf6ec;border:1px solid #ead3b4;border-radius:12px;padding:10px 14px;font-size:0.82rem;font-weight:750;color:#a44b3e}
 
 /* Runoff chart */
 .runoff-section{max-width:1200px;margin-left:auto;margin-right:auto;background:#fdf6ec;border:1px solid #ead3b4;border-radius:16px;padding:12px 14px;margin-bottom:14px}
@@ -620,7 +620,7 @@ function buildUI(dateLabels){
           <span class="lbl"><span class="sw sw-cut"></span> Cutoff</span>
         </div>
       </div>
-      <div class="tide-label">Tides</div>
+      <div class="tide-label" id="tideLabel" style="display:none">Tides</div>
       <div class="tide-times" id="tideTimes"></div>
       <div class="chart-wrap"><canvas id="tideChart"></canvas></div>
       <div class="chart-wrap" style="margin-top:12px"><canvas id="windChart"></canvas></div>
@@ -1271,6 +1271,9 @@ function updateSwimAdvisory(spotId){
   const el=document.getElementById('swimAdvisory');
   if(!el)return;
   const info=runoffWarningInfo(spotId);
+  const hasWarning=!!(info&&info.triggered);
+  const tideLabel=document.getElementById('tideLabel');
+  if(tideLabel)tideLabel.style.display=hasWarning?'':'none';
   if(!info){el.className='';el.textContent='';return;}
 
   if(!info.triggered){
