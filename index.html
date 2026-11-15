@@ -232,6 +232,9 @@ main::before{display:none}
 .rain-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin-bottom:8px}
 .rain-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#0b6f93}
 .rain-total{font-size:0.95rem;font-weight:850;color:#123f54}
+.rain-head-right{display:inline-flex;align-items:baseline;gap:10px}
+.rain-radar{font-size:0.78rem;font-weight:800;color:#0b6f93;text-decoration:none;border-bottom:1px solid rgba(11,111,147,0.4);white-space:nowrap}
+.rain-radar:hover{color:#e85d32;border-color:#e85d32}
 .uv-low-hint{font-size:0.8rem;color:#9b7359;text-align:center;padding:8px 0 0}
 
 /* Runoff warning */
@@ -423,6 +426,19 @@ function uvCrossTime(t0,uv0,t1,uv1,thr){
 
 function ymdDash(d){return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6)}
 
+// ── Radar deep link ──
+// Opens RainViewer's live radar centered on the active region. RainViewer's
+// map is MapLibre-based and reads its position from the #zoom/lat/lng hash.
+const RADAR_ZOOM = 9;
+function radarUrl(lat, lon){
+  return 'https://www.rainviewer.com/weather-radar-map-live.html#' + RADAR_ZOOM + '/' + lat.toFixed(4) + '/' + lon.toFixed(4);
+}
+function activeRegionCoords(){
+  const id = state.selectedRegion || 'innerRichmond';
+  const loc = LOCATIONS.find(l => l.id === id) || LOCATIONS[0];
+  return { lat: loc.lat, lon: loc.lon };
+}
+
 function omParams(extra){
   const p=new URLSearchParams({
     timezone:'America/Los_Angeles',
@@ -438,14 +454,15 @@ function omParams(extra){
   return p;
 }
 
-async function fetchOM(lat,lon,extra){
-  const p=omParams(extra);
-  p.set('latitude',lat);
-  p.set('longitude',lon);
-  const r=await fetch(OM_BASE+'?'+p.toString());
-  if(!r.ok)throw new Error('OM '+r.status);
-  return r.json();
-}
+// Open-Meteo forecast variables. We request one superset for every forecast
+// call so that all sections (daylight, swim wind, regional temps) can be
+// fetched in a single batched request instead of several.
+const OM_FORECAST_HOURLY = 'uv_index,temperature_2m,precipitation,wind_speed_10m,wind_direction_10m';
+const OM_FORECAST_DAILY = 'sunrise,sunset,uv_index_max,temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code';
+const OM_FORECAST_EXTRA = 'hourly=' + OM_FORECAST_HOURLY + '&daily=' + OM_FORECAST_DAILY + '&precipitation_unit=inch';
+
+const OM_RAIN_HISTORY_EXTRA = 'past_days=5&forecast_days=1&hourly=precipitation&precipitation_unit=inch';
+const OM_RAIN_CHART_EXTRA = 'past_days=1&forecast_days=4&hourly=precipitation&precipitation_unit=inch';
 
 // Batch multiple coordinates into a single Open-Meteo request.
 // Returns an array of results in the same order as the input coordinates.
@@ -467,15 +484,15 @@ async function fetchTides(date,product){
 
 // Historical hourly rain for the swim-safety rules. forecast_days=1 anchors
 // the newest day as "today" so the window math below stays simple.
-async function fetchRainHistory(lat,lon){
-  return fetchOM(lat,lon,'past_days=5&forecast_days=1&hourly=precipitation&precipitation_unit=inch');
+function fetchRainHistory(lats,lons){
+  return fetchOMMulti(lats,lons,OM_RAIN_HISTORY_EXTRA);
 }
 
 // Historical + forecast hourly rain for the runoff chart: 1 day in the past
 // through 3 days in the future (5 days total). Kept separate from the
 // advisory's historical-only series.
-async function fetchRainChartSeries(lat,lon){
-  return fetchOM(lat,lon,'past_days=1&forecast_days=4&hourly=precipitation&precipitation_unit=inch');
+function fetchRainChartSeries(lats,lons){
+  return fetchOMMulti(lats,lons,OM_RAIN_CHART_EXTRA);
 }
 
 // ── Main ──
@@ -494,49 +511,44 @@ async function init(){
       return dayLabel(y+'-'+m+'-'+dd,i);
     });
 
-    const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
-    const irParams=common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m,precipitation&precipitation_unit=inch';
-    const bbParams=common+'&hourly=wind_speed_10m,wind_direction_10m';
-    const regParams=common+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code';
+    // Batch all Open-Meteo forecast calls into three requests:
+    //   1) one multi-location forecast for every region + the swim spot,
+    //   2) one multi-location rain-history call (local + inland), and
+    //   3) one multi-location rain-chart call (local + inland).
+    const swimSpot=SWIM_SPOTS.innerRichmond;
+    const forecastLats=LOCATIONS.map(l=>l.lat).concat(swimSpot.lat);
+    const forecastLons=LOCATIONS.map(l=>l.lon).concat(swimSpot.lon);
+    const rainLats=[swimSpot.lat,INLAND_REF._default.lat];
+    const rainLons=[swimSpot.lon,INLAND_REF._default.lon];
 
-    // Each section loads independently; one failure no longer blocks the rest.
-    const [irRes,bbRes,tideRes,regRes,localRainRes,inlandRainRes,localFcRes,inlandFcRes]=await Promise.allSettled([
-      fetchOM(LOCATIONS[0].lat,LOCATIONS[0].lon,irParams), // Inner Richmond
-      fetchOM(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon,bbParams), // Baker Beach wind
+    const [forecastRes,tideRes,rainHistoryRes,rainChartRes]=await Promise.allSettled([
+      fetchOMMulti(forecastLats,forecastLons,OM_FORECAST_EXTRA),
       Promise.all(state.dayDates.map(d=>fetchTides(d,'predictions'))),
-      fetchOMMulti(LOCATIONS.map(l=>l.lat),LOCATIONS.map(l=>l.lon),regParams),
-      fetchRainHistory(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon), // local runoff (Baker Beach)
-      fetchRainHistory(INLAND_REF._default.lat,INLAND_REF._default.lon), // inland runoff (Vallejo)
-      fetchRainChartSeries(SWIM_SPOTS.innerRichmond.lat,SWIM_SPOTS.innerRichmond.lon), // runoff chart (Baker Beach)
-      fetchRainChartSeries(INLAND_REF._default.lat,INLAND_REF._default.lon), // runoff chart (Vallejo)
+      fetchRainHistory(rainLats,rainLons), // local runoff (Baker Beach) + inland (Vallejo)
+      fetchRainChartSeries(rainLats,rainLons), // runoff chart, same two points
     ]);
 
-    if(irRes.status==='fulfilled')state.irData=irRes.value;
-    else console.error('Daylight section failed:',irRes.reason);
-
-    if(bbRes.status==='fulfilled')state.bbData=bbRes.value;
-    else console.error('Swim section failed:',bbRes.reason);
+    if(forecastRes.status==='fulfilled'){
+      const fc=forecastRes.value;
+      state.irData=fc[0];                  // Inner Richmond = LOCATIONS[0]
+      state.bbData=fc[fc.length-1];        // Baker Beach (swim spot, appended last)
+      const regMap={};
+      LOCATIONS.forEach((l,i)=>{regMap[l.id]={data:fc[i],name:l.name,group:l.group}});
+      state.regions=regMap;
+    } else console.error('Forecast section failed:',forecastRes.reason);
 
     if(tideRes.status==='fulfilled')state.tides={predictions:tideRes.value.flatMap(r=>r.predictions||[])};
     else console.error('Tide section failed:',tideRes.reason);
 
-    if(regRes.status==='fulfilled'){
-      const regMap={};
-      LOCATIONS.forEach((l,i)=>{regMap[l.id]={data:regRes.value[i],name:l.name,group:l.group}});
-      state.regions=regMap;
-    } else console.error('Regional section failed:',regRes.reason);
+    if(rainHistoryRes.status==='fulfilled'){
+      state.rainLocal.innerRichmond=rainHistoryRes.value[0];
+      state.rainInlandBay=rainHistoryRes.value[1];
+    } else console.error('Rain history failed:',rainHistoryRes.reason);
 
-    if(localRainRes.status==='fulfilled')state.rainLocal.innerRichmond=localRainRes.value;
-    else console.error('Local rain history failed:',localRainRes.reason);
-
-    if(inlandRainRes.status==='fulfilled')state.rainInlandBay=inlandRainRes.value;
-    else console.error('Inland rain history failed:',inlandRainRes.reason);
-
-    if(localFcRes.status==='fulfilled')state.rainLocalFc.innerRichmond=localFcRes.value;
-    else console.error('Local runoff chart failed:',localFcRes.reason);
-
-    if(inlandFcRes.status==='fulfilled')state.rainInlandFc=inlandFcRes.value;
-    else console.error('Inland runoff chart failed:',inlandFcRes.reason);
+    if(rainChartRes.status==='fulfilled'){
+      state.rainLocalFc.innerRichmond=rainChartRes.value[0];
+      state.rainInlandFc=rainChartRes.value[1];
+    } else console.error('Rain chart failed:',rainChartRes.reason);
 
     // URL routing — check if a region was linked directly
     const path=window.location.pathname.replace(/^\//,'');
@@ -588,7 +600,10 @@ function buildUI(dateLabels){
       <div class="rain-section" id="rainSection" style="display:none">
         <div class="rain-head">
           <span class="rain-label">Rain</span>
-          <span class="rain-total" id="rainTotal"></span>
+          <span class="rain-head-right">
+            <a class="rain-radar" id="rainRadar" target="_blank" rel="noopener noreferrer">Radar &#8599;</a>
+            <span class="rain-total" id="rainTotal"></span>
+          </span>
         </div>
         <div class="chart-wrap"><canvas id="rainChart"></canvas></div>
       </div>
@@ -1100,6 +1115,10 @@ function updateRain(idx,d){
 
   section.style.display='';
 
+  const c = activeRegionCoords();
+  const radarEl = document.getElementById('rainRadar');
+  if(radarEl) radarEl.href = radarUrl(c.lat, c.lon);
+
   let peakIdx=-1,peak=0;
   precip.forEach((v,i)=>{if(Number.isFinite(v)&&v>peak){peak=v;peakIdx=i}});
 
@@ -1443,17 +1462,15 @@ async function loadRegionDetail(regionId){
   if(!spot||state.detailCache[regionId])return;
   const loc=LOCATIONS.find(l=>l.id===regionId);
   if(!loc)return;
-  const common='forecast_days=3&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph';
   try {
-    const [regionDetail,swimDetail,localRain,localFc]=await Promise.all([
-      fetchOM(loc.lat,loc.lon,common+'&daily=sunrise,sunset,uv_index_max&hourly=uv_index,temperature_2m,precipitation&precipitation_unit=inch'),
-      fetchOM(spot.lat,spot.lon,common+'&hourly=wind_speed_10m,wind_direction_10m'),
-      fetchRainHistory(spot.lat,spot.lon),
-      fetchRainChartSeries(spot.lat,spot.lon),
+    const [forecastDetail,localRain,localFc]=await Promise.all([
+      fetchOMMulti([loc.lat,spot.lat],[loc.lon,spot.lon],OM_FORECAST_EXTRA),
+      fetchRainHistory([spot.lat],[spot.lon]),
+      fetchRainChartSeries([spot.lat],[spot.lon]),
     ]);
-    state.detailCache[regionId]={regionData:regionDetail,swimData:swimDetail};
-    if(localRain)state.rainLocal[regionId]=localRain;
-    if(localFc)state.rainLocalFc[regionId]=localFc;
+    state.detailCache[regionId]={regionData:forecastDetail[0],swimData:forecastDetail[1]};
+    if(localRain&&localRain[0])state.rainLocal[regionId]=localRain[0];
+    if(localFc&&localFc[0])state.rainLocalFc[regionId]=localFc[0];
   } catch(e){
     console.error('Region detail failed ('+regionId+'):',e);
   }
