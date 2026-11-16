@@ -427,11 +427,11 @@ function uvCrossTime(t0,uv0,t1,uv1,thr){
 function ymdDash(d){return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6)}
 
 // ── Radar deep link ──
-// Opens RainViewer's live radar centered on the active region. RainViewer's
-// map is MapLibre-based and reads its position from the #zoom/lat/lng hash.
+// Opens Windy's live weather-radar layer centered on the active region.
+// Windy deep links use ?overlay,lat,lon,zoom (lat/lon must carry a decimal).
 const RADAR_ZOOM = 9;
 function radarUrl(lat, lon){
-  return 'https://www.rainviewer.com/weather-radar-map-live.html#' + RADAR_ZOOM + '/' + lat.toFixed(4) + '/' + lon.toFixed(4);
+  return 'https://www.windy.com/-Weather-radar-radar?radar,' + lat.toFixed(3) + ',' + lon.toFixed(3) + ',' + RADAR_ZOOM;
 }
 function activeRegionCoords(){
   const id = state.selectedRegion || 'innerRichmond';
