@@ -29,6 +29,8 @@ import {
   shiftDate,
   displayTime,
   displayHour,
+  HOUR,
+  pst,
 } from "../shared/time.ts";
 const number = (v: number | null | undefined, digits = 0) =>
   typeof v === "number" && Number.isFinite(v) ? v.toFixed(digits) : "—";
@@ -88,18 +90,29 @@ function Summary({
   pending,
   sub,
   inlineSub = false,
+  multilineOnMobile = false,
 }: {
   title: string;
   value: string;
   pending: boolean;
   sub?: string;
   inlineSub?: boolean;
+  multilineOnMobile?: boolean;
 }) {
   return (
     <div className="stat-box">
       <span className="label">{title}</span>
       <span className={inlineSub ? "value sunset-value" : "value"}>
-        <Value value={value} pending={pending} />
+        {multilineOnMobile && value.includes(" · ") ? (
+          value.split(" · ").map((part, index) => (
+            <span className="mobile-value-line" key={part}>
+              {index > 0 && <span className="value-separator"> · </span>}
+              {part}
+            </span>
+          ))
+        ) : (
+          <Value value={value} pending={pending} />
+        )}
         {sub && inlineSub && <span className="sub">{sub}</span>}
       </span>
       {sub && !inlineSub && <span className="sub">{sub}</span>}
@@ -142,16 +155,15 @@ function Daylight({
     (r) =>
       Number(r.hour.slice(11, 13)) >= 5 && Number(r.hour.slice(11, 13)) <= 21,
   );
-  const rainDates = rainfallDates();
-  const rainDays = rainDates.map((day) =>
-    rainfallTotal(bundle, midnight(day), midnight(shiftDate(day, 1))),
+  const rainHours = hours.map(({ hour }) =>
+    rainfallTotal(bundle, hour, pst(Date.parse(hour) + HOUR)),
   );
   const dailyTotal = rainfallTotal(
     bundle,
     midnight(date),
     midnight(shiftDate(date, 1)),
   );
-  const hasRain = rainDays.some((day) => (day.total ?? 0) > 0);
+  const hasRain = (dailyTotal.total ?? 0) > 0;
   const uvWindow = uvWindowLabel(visible);
   const length =
     sun?.sunrise_pst && sun?.sunset_pst
@@ -169,11 +181,11 @@ function Daylight({
       {hasRain && (
         <div className="rain-section">
           <div className="rain-head">
-            <h3>Rain</h3>
+            <h3>Rainfall total</h3>
             <div className="rain-head-right">
               <span className="rain-total">
                 {dailyTotal.total != null && !dailyTotal.complete ? "≥" : ""}
-                {number(dailyTotal.total, 2)}″ total
+                {number(dailyTotal.total, 2)}″
               </span>
               <a
                 className="rain-radar"
@@ -186,12 +198,12 @@ function Daylight({
             </div>
           </div>
           <Chart
-            label="Daily rain from yesterday through three days ahead"
-            labels={rainDates.map((day) => day.slice(5))}
+            label="Hourly rainfall for the selected day"
+            labels={hours.map((row) => displayHour(row.hour))}
             datasets={[
               line(
                 "Rain (in)",
-                rainDays.map((day) => day.total),
+                rainHours.map((hour) => hour.total),
                 "#0b6f93",
                 { type: "bar" as const, backgroundColor: "#0b6f93" },
               ),
@@ -219,7 +231,12 @@ function Daylight({
           }
         />
         <Summary title="Max UV" value={number(uv?.max, 1)} pending={pending} />
-        <Summary title="UV below 2" value={uvWindow} pending={pending} />
+        <Summary
+          title="UV below 2"
+          value={uvWindow}
+          pending={pending}
+          multilineOnMobile
+        />
       </div>
       <Status result={query.data} pending={pending} />
       {uv ? (

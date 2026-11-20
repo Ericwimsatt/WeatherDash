@@ -625,6 +625,7 @@ header .updated {
 .day-tabs button {
   border: 0;
   border-radius: 100px;
+  font-size: 1rem;
   background: #fff7e9aa;
   color: #9b7359;
   padding: 11px 8px;
@@ -956,7 +957,7 @@ main::before {
   color: #0b6f93;
 }
 .rain-total {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 850;
   color: #123f54;
 }
@@ -966,7 +967,7 @@ main::before {
   gap: 10px;
 }
 .rain-radar {
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #0b6f93;
   text-decoration: none;
@@ -1370,6 +1371,12 @@ footer a {
   }
   .richmond-grid .stat-box .value {
     font-size: 1.05rem;
+  }
+  .mobile-value-line {
+    display: block;
+  }
+  .mobile-value-line .value-separator {
+    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
