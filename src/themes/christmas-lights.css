@@ -1,0 +1,47 @@
+/* Selected production palette. Default Sunline tokens remain the reference. */
+:root[data-palette="christmas-lights"] {
+  --color-page: #fff9ed;
+  --color-ink: #164c3b;
+  --color-muted: #66784c;
+  --color-muted-strong: #406344;
+  --color-header-start: #fff1a6;
+  --color-header-end: #ffe285;
+  --color-surface: #fffdf4;
+  --color-surface-inset: #e1f1d5;
+  --color-surface-control: #fff1c1;
+  --color-accent: #d22f3b;
+  --color-on-accent: #fff8ec;
+  --color-section-shadow: #e3ce8b;
+  --color-border-warm: #e3ce8b;
+  --color-ochre: #dd8b16;
+  --color-water-divider: #a6d8e7;
+  --color-water-ink: #164d78;
+  --color-water-surface: #dcf2f7;
+  --color-water-end: #f1fbf8;
+  --color-water-border: #a6d8e7;
+  --color-ocean: #2277c3;
+  --color-ocean-secondary: #2277c3;
+  --color-water-muted-strong: #406b8f;
+  --color-water-link: #2277c3;
+  --color-surface-warning: #fffdf4;
+  --color-warning: #ac412b;
+  --color-skeleton: #e1f1d5;
+  --color-skeleton-highlight: #fff1c1;
+  --color-water-skeleton: #a6d8e7;
+  --color-water-skeleton-highlight: #dcf2f7;
+  --color-photo-fallback: #785a40;
+  --color-table-rule: #e3ce8b;
+  --color-chart-warm: #dd8b16;
+  --color-chart-temperature: #9560bd;
+  --color-tooltip-border: #e3ce8b;
+  --color-chart-today: #406344;
+  --color-canvas-fallback-ink: #406344;
+  --color-photo-scrim-rgb: 35, 61, 55;
+  --color-on-photo-muted: #fff1d9;
+  --color-photo-ink: #fff8eb;
+  --color-photo-text-shadow: rgba(20,32,28,.62);
+}
+:root[data-palette="christmas-lights"]{
+  --color-surface-control-translucent:rgb(from var(--color-surface-control) r g b / 0.6666666666667);
+  --color-link-underline:rgb(from var(--color-ocean) r g b / .4);
+}

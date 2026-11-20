@@ -1,3 +1,4 @@
+import { colorToken, colorWithAlpha } from "./color-tokens.ts";
 import { useEffect, useState } from "octane";
 import { Chart } from "./components/Chart.tsx";
 import { LOCATIONS, SWIM_SPOTS, INLAND, type Location } from "./config.ts";
@@ -204,8 +205,8 @@ function Daylight({
               line(
                 "Rain (in)",
                 rainHours.map((hour) => hour.total),
-                "#0b6f93",
-                { type: "bar" as const, backgroundColor: "#0b6f93" },
+                colorToken("ocean"),
+                { type: "bar" as const, backgroundColor: colorToken("ocean") },
               ),
             ]}
             type="bar"
@@ -247,14 +248,14 @@ function Daylight({
             line(
               "UV index",
               visible.map((r) => r.uv_index),
-              "#c74c25",
+              colorToken("chart-warm"),
             ),
             line(
               "Temperature (°F)",
               visible.map(
                 (r) => hours.find((h) => h.hour === r.hour)?.temperature_f,
               ),
-              "#527b8f",
+              colorToken("chart-temperature"),
               {
                 yAxisID: "temperature",
                 borderDash: [5, 3],
@@ -265,7 +266,7 @@ function Daylight({
           minimum={0}
           maximum={10}
           temperatureAxis
-          thresholds={[{ value: 2, label: "UV 2", color: "#a44b3e" }]}
+          thresholds={[{ value: 2, label: "UV 2", color: colorToken("warning") }]}
         />
       ) : (
         <div className="chart-placeholder">
@@ -354,26 +355,26 @@ function Swim({
             line(
               "Local",
               localRain.map((r) => r.total),
-              "#0b6f93",
-              { type: "bar" as const, backgroundColor: "#0b6f93" },
+              colorToken("ocean"),
+              { type: "bar" as const, backgroundColor: colorToken("ocean") },
             ),
             line(
               "Inland",
               inlandRain.map((r) => r.total),
-              "#c74c25",
-              { type: "bar" as const, backgroundColor: "#c74c25", order: 1 },
+              colorToken("chart-warm"),
+              { type: "bar" as const, backgroundColor: colorToken("chart-warm"), order: 1 },
             ),
             line(
               "Local 2-day",
               localTotals.map((r) => r.total),
-              "#0b6f93",
-              { type: "line" as const, order: 2, backgroundColor: "#0b6f9333" },
+              colorToken("ocean"),
+              { type: "line" as const, order: 2, backgroundColor: colorWithAlpha("ocean", .2) },
             ),
             line(
               "Inland 4-day",
               inlandTotals.map((r) => r.total),
-              "#c74c25",
-              { type: "line" as const, order: 2, backgroundColor: "#c74c2533" },
+              colorToken("chart-warm"),
+              { type: "line" as const, order: 2, backgroundColor: colorWithAlpha("chart-warm", .2) },
             ),
           ]}
           type="bar"
@@ -384,11 +385,11 @@ function Swim({
           thresholds={[
             {
               value: RUNOFF_LIMITS.local,
-              color: "#0b6f93",
+              color: colorToken("ocean"),
             },
             {
               value: RUNOFF_LIMITS.inland,
-              color: "#c74c25",
+              color: colorToken("chart-warm"),
             },
           ]}
         />
@@ -424,8 +425,8 @@ function Swim({
                 line(
                   "Height (ft)",
                   tide.map((r) => r.height_ft),
-                  "#0b6f93",
-                  { fill: "start" as const, backgroundColor: "#0b6f9333" },
+                  colorToken("ocean"),
+                  { fill: "start" as const, backgroundColor: colorWithAlpha("ocean", .2) },
                 ),
               ]}
               yTitle="feet"
@@ -446,8 +447,8 @@ function Swim({
                 line(
                   "Wind (mph)",
                   wind.map((r) => r.wind_speed_mph),
-                  "#0b6f93",
-                  { type: "bar" as const, backgroundColor: "#0b6f93" },
+                  colorToken("ocean"),
+                  { type: "bar" as const, backgroundColor: colorToken("ocean") },
                 ),
               ]}
               type="bar"

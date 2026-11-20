@@ -1,3 +1,4 @@
+import { colorToken, colorWithAlpha } from "../color-tokens.ts";
 import { useEffect, useRef } from "octane";
 import ChartJS from "chart.js/auto";
 import type { ChartDataset, ChartType, Plugin } from "chart.js";
@@ -35,7 +36,7 @@ export function Chart(props: Props) {
         ctx.textBaseline = "bottom";
         if (todayIndex.current != null && todayIndex.current >= 0) {
           const x = scales.x.getPixelForValue(todayIndex.current);
-          ctx.strokeStyle = "#77796e";
+          ctx.strokeStyle = colorToken("chart-today");
           ctx.lineWidth = 1.5;
           ctx.setLineDash([4, 4]);
           ctx.beginPath();
@@ -58,7 +59,7 @@ export function Chart(props: Props) {
           if (!threshold.label) continue;
           const label = threshold.label;
           const width = ctx.measureText(label).width;
-          ctx.fillStyle = "#fff8eb";
+          ctx.fillStyle = colorToken("surface");
           ctx.fillRect(chartArea.right - width - 10, y - 17, width + 10, 15);
           ctx.fillStyle = threshold.color;
           ctx.fillText(label, chartArea.right - 4, y - 4);
@@ -78,14 +79,14 @@ export function Chart(props: Props) {
         plugins: {
           legend: {
             display: false,
-            labels: { color: "#684a35", boxWidth: 12 },
+            labels: { color: colorToken("muted-strong"), boxWidth: 12 },
           },
           tooltip: {
-            backgroundColor: "#fff8eb",
-            titleColor: "#2d2018",
-            bodyColor: "#2d2018",
-            footerColor: "#684a35",
-            borderColor: "#b68d67",
+            backgroundColor: colorToken("surface"),
+            titleColor: colorToken("ink"),
+            bodyColor: colorToken("ink"),
+            footerColor: colorToken("muted-strong"),
+            borderColor: colorToken("tooltip-border"),
             borderWidth: 1,
             padding: 10,
             cornerRadius: 8,
@@ -111,7 +112,7 @@ export function Chart(props: Props) {
               : {}),
             grid: { display: false },
             ticks: {
-              color: "#684a35",
+              color: colorToken("muted-strong"),
               maxTicksLimit: 8,
               maxRotation: 0,
               ...(props.edgePadding
@@ -140,10 +141,10 @@ export function Chart(props: Props) {
             title: {
               display: !!props.yTitle,
               text: props.yTitle,
-              color: "#684a35",
+              color: colorToken("muted-strong"),
             },
-            ticks: { color: "#684a35" },
-            grid: { color: "rgba(155,115,89,.18)" },
+            ticks: { color: colorToken("muted-strong") },
+            grid: { color: colorWithAlpha("muted", .18) },
           },
           ...(props.temperatureAxis
             ? {
@@ -152,7 +153,7 @@ export function Chart(props: Props) {
                   position: "right" as const,
                   grid: { drawOnChartArea: false },
                   ticks: {
-                    color: "#527b8f",
+                    color: colorToken("chart-temperature"),
                     callback: (value: string | number) => `${value}°F`,
                   },
                 },
