@@ -1,0 +1,1404 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #322e2e;
+  color: #e2e8f0;
+  min-height: 100vh;
+  padding: 0 12px 48px;
+}
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Header */
+header {
+  padding: 16px 0 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  position: sticky;
+  z-index: 10;
+}
+header h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #f1f5f9;
+}
+header .updated {
+  font-size: 0.75rem;
+  color: #a2aab6;
+  margin-left: auto;
+}
+
+/* Day tabs */
+.day-tabs {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+.day-tabs button {
+  flex: 1;
+  padding: 10px 6px;
+  border: 1px solid #687a97;
+  border-radius: 10px;
+  background: #65656540;
+  color: #c7d1e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.day-tabs button small {
+  display: block;
+  font-weight: 400;
+  font-size: 0.7rem;
+  color: #93a1b6;
+  margin-top: 1px;
+}
+.day-tabs button.active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  color: #bad9fd;
+}
+.day-tabs button.active small {
+  color: #60a5fa;
+}
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  gap: 12px;
+}
+.card {
+  border: 1px solid #687a97;
+  border-radius: 4px;
+  padding: 16px;
+}
+.card h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+@media (min-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .card-grid .full {
+    grid-column: 1/-1;
+  }
+}
+
+/* Inner Richmond grid */
+.richmond-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.richmond-grid .stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 12px;
+}
+.richmond-grid .stat-box .label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+.richmond-grid .stat-box .value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.richmond-grid .stat-box .sub {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Chart containers */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  margin-top: 4px;
+}
+.chart-wrap canvas {
+  width: 100% !important;
+  max-height: 180px;
+}
+
+/* Tide times */
+.tide-times {
+  display: flex;
+  gap: 12px;
+  margin: 8px 0 12px;
+}
+.tide-times .tide-item {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.tide-times .tide-item .tide-type {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.tide-times .tide-item.high .tide-type {
+  color: #60a5fa;
+}
+.tide-times .tide-item.low .tide-type {
+  color: #f59e0b;
+}
+.tide-times .tide-item .tide-time {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.tide-times .tide-item .tide-height {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+.water-temp {
+  text-align: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #b0bcc8;
+}
+.water-temp strong {
+  color: #e2e8f0;
+  font-size: 1rem;
+}
+
+/* Regions */
+.region-group {
+  margin-top: 12px;
+}
+.region-group:first-child {
+  margin-top: 0;
+}
+.region-group .group-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #cad2dd;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+.region-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.region-item {
+  flex: 1 1 100%;
+  border-radius: 2px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 60px;
+}
+.region-item .name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  min-width: 0;
+}
+.region-item .temps {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+.region-item .precip {
+  font-size: 0.75rem;
+  color: #003fbe;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.region-item.sunny {
+  background-image:
+    linear-gradient(rgba(11, 17, 32, 0.2), rgba(11, 17, 32, 0.5)),
+    url("/images/sunny.jpg");
+}
+.region-item.cloudy {
+  background-image:
+    linear-gradient(rgba(11, 17, 32, 0.2), rgba(11, 17, 32, 0.4)),
+    url("/images/cloudy.jpg");
+}
+.region-item.partly-cloudy {
+  background-image:
+    linear-gradient(rgba(11, 17, 32, 0.2), rgba(11, 17, 32, 0.5)),
+    url("/images/partly-cloudy.jpg");
+}
+.region-item.rainy {
+  background-image:
+    linear-gradient(rgba(11, 17, 32, 0.2), rgba(11, 17, 32, 0.5)),
+    url("/images/rainy.jpg");
+}
+.region-item.snowy {
+  background-image:
+    linear-gradient(rgba(11, 17, 32, 0.2), rgba(11, 17, 32, 0.5)),
+    url("/images/snowy.jpg");
+}
+.region-item.thunder {
+  background-image:
+    linear-gradient(rgba(11, 17, 32, 0.2), rgba(11, 17, 32, 0.5)),
+    url("/images/thunder.jpg");
+}
+.region-item.hail {
+  background-image:
+    linear-gradient(rgba(11, 17, 32, 0.2), rgba(11, 17, 32, 0.5)),
+    url("/images/hail.jpg");
+}
+
+/* Region click */
+.region-item {
+  cursor: pointer;
+}
+
+/* Detail nav */
+.detail-nav {
+  margin-bottom: 12px;
+}
+.back-btn {
+  background: none;
+  border: 1px solid #687a97;
+  border-radius: 8px;
+  color: #c7d1e1;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: #3b82f6;
+  color: #bad9fd;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 40px 16px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+.loading .spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #1e293b;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error */
+.error {
+  color: #fca5a5;
+  font-size: 0.8rem;
+  padding: 4px 0;
+}
+
+/* Desktop */
+@media (min-width: 640px) {
+  .region-item {
+    flex: 1 1 calc(50% - 3px);
+  }
+}
+@media (min-width: 768px) {
+  body {
+    padding: 0 24px 48px;
+  }
+  .region-item {
+    flex: 1 1 calc(25% - 5px);
+  }
+}
+@media (min-width: 1024px) {
+  body {
+    padding: 0 48px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .region-item {
+    flex: 1 1 calc(20% - 5px);
+  }
+}
+
+/* Field Notes theme: visual treatment only; layout and content structure stay intact. */
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: transparent;
+  color: #23251f;
+}
+main {
+  background-image: linear-gradient(
+    rgba(49, 91, 66, 0.07) 1px,
+    transparent 1px
+  );
+  background-size: 100% 34px;
+}
+header {
+  background: transparent;
+}
+header h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  color: #23251f;
+}
+header .updated {
+  color: #77796e;
+}
+.day-tabs button {
+  border-color: #c9c6b8;
+  border-radius: 0;
+  background: rgba(248, 245, 237, 0.68);
+  color: #77796e;
+}
+.day-tabs button small {
+  color: #9a9b8f;
+}
+.day-tabs button.active {
+  border-color: #315b42;
+  background: #d8e1d4;
+  color: #315b42;
+}
+.day-tabs button.active small {
+  color: #315b42;
+}
+.card {
+  border-color: #7b806e;
+  border-radius: 0;
+  background: rgba(248, 245, 237, 0.74);
+}
+.chart-wrap {
+  height: 180px;
+  min-height: 180px;
+}
+.chart-wrap canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 180px !important;
+  max-height: 180px;
+}
+.native-chart {
+  display: block;
+  width: 100%;
+  height: 180px;
+}
+.card h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #23251f;
+  font-weight: 700;
+}
+.richmond-grid .stat-box {
+  background: #e6e4d8;
+  border-radius: 0;
+}
+.richmond-grid .stat-box .label {
+  color: #77796e;
+}
+.richmond-grid .stat-box .value {
+  color: #23251f;
+}
+.richmond-grid .stat-box .sub {
+  color: #77796e;
+}
+.tide-times .tide-item {
+  background: #e6e4d8;
+  border-radius: 0;
+}
+.tide-times .tide-item.high .tide-type {
+  color: #315b42;
+}
+.tide-times .tide-item.low .tide-type {
+  color: #a56d2d;
+}
+.tide-times .tide-item .tide-time {
+  color: #23251f;
+}
+.tide-times .tide-item .tide-height {
+  color: #77796e;
+}
+.water-temp {
+  background: #e6e4d8;
+  border-radius: 0;
+  color: #77796e;
+}
+.water-temp strong {
+  color: #23251f;
+}
+.region-group .group-title {
+  color: #77796e;
+}
+.region-item {
+  border: 1px solid rgba(35, 37, 31, 0.2);
+  border-radius: 0;
+}
+.region-item .name,
+.region-item .temps {
+  color: #f8f5ed;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+.region-item .precip {
+  color: #e6f0e8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+.region-item.sunny {
+  background-image:
+    linear-gradient(rgba(35, 37, 31, 0.16), rgba(35, 37, 31, 0.58)),
+    url("/images/sunny.jpg");
+}
+.region-item.cloudy {
+  background-image:
+    linear-gradient(rgba(35, 37, 31, 0.16), rgba(35, 37, 31, 0.58)),
+    url("/images/cloudy.jpg");
+}
+.region-item.partly-cloudy {
+  background-image:
+    linear-gradient(rgba(35, 37, 31, 0.16), rgba(35, 37, 31, 0.58)),
+    url("/images/partly-cloudy.jpg");
+}
+.region-item.rainy {
+  background-image:
+    linear-gradient(rgba(35, 37, 31, 0.16), rgba(35, 37, 31, 0.62)),
+    url("/images/rainy.jpg");
+}
+.region-item.snowy {
+  background-image:
+    linear-gradient(rgba(35, 37, 31, 0.16), rgba(35, 37, 31, 0.58)),
+    url("/images/snowy.jpg");
+}
+.region-item.thunder {
+  background-image:
+    linear-gradient(rgba(35, 37, 31, 0.16), rgba(35, 37, 31, 0.62)),
+    url("/images/thunder.jpg");
+}
+.region-item.hail {
+  background-image:
+    linear-gradient(rgba(35, 37, 31, 0.16), rgba(35, 37, 31, 0.62)),
+    url("/images/hail.jpg");
+}
+.back-btn {
+  border-color: #c9c6b8;
+  border-radius: 0;
+  color: #315b42;
+}
+.back-btn:hover {
+  background: #d8e1d4;
+  border-color: #315b42;
+  color: #23251f;
+}
+.loading {
+  color: #77796e;
+}
+.loading .spinner {
+  border-color: #e6e4d8;
+  border-top-color: #315b42;
+}
+.error {
+  color: #9a4f45;
+}
+
+/* Field Notes data accents: stronger ink, restrained ocean/ochre signals. */
+.tide-times .tide-item {
+  border: 1px solid #b8b9aa;
+}
+.tide-times .tide-item.high .tide-type {
+  color: #245237;
+}
+.tide-times .tide-item.low .tide-type {
+  color: #8b551d;
+}
+.tide-arrow {
+  width: 12px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: -3px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.chart-wrap canvas {
+  color: #555b52;
+}
+
+/* Sunline theme: warm, optimistic, and glanceable while preserving the dashboard's content hierarchy. */
+:root {
+  color-scheme: light;
+}
+body {
+  font-family:
+    ui-rounded,
+    "Avenir Next",
+    Avenir,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: linear-gradient(160deg, #f7dfb6 0, #fbf1df 410px);
+  color: #2d2018;
+}
+main {
+  position: relative;
+  background: none;
+}
+main::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #ffbd58;
+  border: 2px solid #ff9b4b;
+  pointer-events: none;
+}
+header {
+  position: relative;
+  padding-top: 24px;
+}
+header h1 {
+  font-family: inherit;
+  font-size: 1.55rem;
+  font-weight: 900;
+  letter-spacing: -0.065em;
+  color: #2d2018;
+}
+header .updated {
+  color: #9b7359;
+}
+.day-tabs {
+  gap: 7px;
+  margin-top: 12px;
+}
+.day-tabs button {
+  border: 0;
+  border-radius: 100px;
+  background: #fff7e9aa;
+  color: #9b7359;
+  padding: 11px 8px;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px #ead3b4;
+}
+.day-tabs button small {
+  color: #9b7359;
+}
+.day-tabs button.active {
+  border: 0;
+  background: #e85d32;
+  color: #fff;
+  box-shadow: none;
+}
+.day-tabs button.active small {
+  color: #fff;
+  opacity: 0.78;
+}
+.card-grid {
+  gap: 22px;
+}
+.card {
+  border: 0;
+  border-radius: 24px;
+  background: #fff8eb;
+  box-shadow: 0 10px 0 #e8c695;
+  padding: 18px;
+}
+.card h2 {
+  font-family: inherit;
+  color: #2d2018;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+.richmond-grid {
+  gap: 10px;
+}
+.richmond-grid .stat-box {
+  background: #f5e5c8;
+  border-radius: 16px;
+  padding: 14px;
+}
+.richmond-grid .stat-box .label {
+  color: #9b7359;
+}
+.richmond-grid .stat-box .value {
+  color: #2d2018;
+  font-weight: 850;
+}
+.richmond-grid .stat-box .sub {
+  color: #9b7359;
+}
+.tide-times {
+  gap: 8px;
+}
+.tide-times .tide-item {
+  background: #f5e5c8;
+  border: 0;
+  border-radius: 16px;
+  padding: 12px 8px;
+}
+.tide-times .tide-item.high .tide-type {
+  color: #e85d32;
+}
+.tide-times .tide-item.low .tide-type {
+  color: #b96a36;
+}
+.tide-times .tide-item .tide-time {
+  color: #2d2018;
+}
+.tide-times .tide-item .tide-height {
+  color: #9b7359;
+}
+.tide-arrow {
+  stroke-width: 2.2;
+}
+.water-temp {
+  background: #f5e5c8;
+  border-radius: 16px;
+  color: #9b7359;
+}
+.water-temp strong {
+  color: #2d2018;
+}
+#bbCard {
+  grid-column: 1/-1;
+  background: linear-gradient(
+    180deg,
+    rgba(216, 238, 244, 0.72),
+    rgba(238, 248, 251, 0.34)
+  );
+  box-shadow: none;
+  border-radius: 0;
+  padding: 22px 0 26px;
+  border-top: 1px solid #b6dce5;
+  border-bottom: 1px solid #b6dce5;
+}
+#bbCard h2 {
+  color: #123f54;
+}
+#bbCard .tide-times .tide-item {
+  background: #d8eef4;
+  border: 1px solid #a8d4df;
+}
+#bbCard .tide-times .tide-item.high .tide-type {
+  color: #0b6f93;
+}
+#bbCard .tide-times .tide-item.low .tide-type {
+  color: #168ca5;
+}
+#bbCard .tide-times .tide-item .tide-time {
+  color: #123f54;
+}
+#bbCard .tide-times .tide-item .tide-height {
+  color: #4d7d8c;
+}
+#bbCard .water-temp {
+  background: #d8eef4;
+  color: #4d7d8c;
+}
+#bbCard .water-temp strong {
+  color: #123f54;
+}
+#bbCard .chart-wrap canvas {
+  accent-color: #0b6f93;
+}
+#bbCard .chart-wrap {
+  display: inline-block;
+  width: calc(50% - 9px);
+  vertical-align: top;
+}
+#bbCard .chart-wrap + .chart-wrap {
+  margin-left: 14px !important;
+  margin-top: 12px;
+}
+.region-group .group-title {
+  color: #9b7359;
+  font-weight: 850;
+}
+.region-item {
+  border: 0;
+  border-radius: 16px;
+  min-height: 54px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 0 #e8c695;
+}
+.region-item .name,
+.region-item .temps {
+  color: #fff8eb;
+  text-shadow: 0 1px 2px rgba(45, 32, 24, 0.62);
+}
+.region-item .precip {
+  color: #fff1d9;
+  text-shadow: 0 1px 2px rgba(45, 32, 24, 0.62);
+}
+.back-btn {
+  border: 0;
+  border-radius: 100px;
+  background: #fff7e9;
+  color: #e85d32;
+  box-shadow: inset 0 0 0 1px #ead3b4;
+  padding: 10px 17px;
+  font-weight: 850;
+}
+.back-btn:hover {
+  background: #e85d32;
+  border-color: #e85d32;
+  color: #fff;
+}
+.loading {
+  color: #9b7359;
+}
+.loading .spinner {
+  border-color: #f5e5c8;
+  border-top-color: #e85d32;
+}
+.error {
+  color: #a44b3e;
+}
+@media (max-width: 639px) {
+  main::before {
+    top: 4px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+  }
+  .card {
+    box-shadow: 0 7px 0 #e8c695;
+  }
+  #bbCard {
+    padding: 18px 0 22px;
+  }
+  #bbCard .chart-wrap {
+    display: block;
+    width: 100%;
+  }
+  #bbCard .chart-wrap + .chart-wrap {
+    margin-left: 0 !important;
+  }
+  .region-item {
+    min-height: 50px;
+    padding: 9px 12px;
+  }
+}
+
+/* Sunline section system: full-bleed bands replace the three outer cards. */
+body {
+  --content-gutter: max(16px, calc((100vw - 1200px) / 2));
+  padding: 0 0 48px;
+  max-width: none;
+  background: #fbf1df;
+}
+header {
+  padding: 24px var(--content-gutter, 16px) 14px;
+  background: linear-gradient(160deg, #f7dfb6 0, #f6d7a5 100%);
+}
+header::after {
+  display: none;
+}
+main::before {
+  display: none;
+}
+.card-grid {
+  display: block;
+}
+.card {
+  border-radius: 0;
+  box-shadow: none;
+}
+#irCard,
+#bbCard,
+#regCard {
+  width: 100%;
+  padding: 26px var(--content-gutter, 16px) 30px;
+}
+#irCard {
+  position: relative;
+  background: #fbf1df;
+  box-shadow: 0 12px 0 #e8c695;
+}
+#irCard h2,
+#bbCard h2,
+#regCard h2 {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#irCard .richmond-grid,
+#irCard .chart-wrap,
+#bbCard .tide-times,
+#bbCard .chart-wrap,
+#bbCard .water-temp,
+#regCard > #regionContainer {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#bbCard {
+  background: linear-gradient(180deg, #d8eef4 0, #eef8fb 100%);
+  box-shadow: 0 12px 0 #b6dce5;
+  border-radius: 0;
+  padding-top: 28px;
+  padding-bottom: 32px;
+}
+#regCard {
+  background: #fbf1df;
+  padding-top: 28px;
+}
+#regCard {
+  box-shadow: none;
+}
+@media (max-width: 639px) {
+  header {
+    padding-top: 20px;
+  }
+  #irCard,
+  #bbCard,
+  #regCard {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 22px;
+    padding-bottom: 26px;
+  }
+  #irCard {
+    box-shadow: 0 10px 0 #e8c695;
+  }
+  #bbCard {
+    box-shadow: 0 10px 0 #b6dce5;
+  }
+}
+#regCard {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+@media (min-width: 360px) {
+  .region-item {
+    flex: 1 1 calc(50% - 3px);
+  }
+}
+
+/* Rain section (Daylight card) */
+#irCard .rain-section {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.rain-section {
+  display: block;
+  background: #d8eef4;
+  border: 1px solid #a8d4df;
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.rain-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+}
+.rain-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: #0b6f93;
+}
+.rain-total {
+  font-size: 0.95rem;
+  font-weight: 850;
+  color: #123f54;
+}
+.rain-head-right {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.rain-radar {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #0b6f93;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(11, 111, 147, 0.4);
+  white-space: nowrap;
+}
+.rain-radar:hover {
+  color: #e85d32;
+  border-color: #e85d32;
+}
+.uv-low-hint {
+  font-size: 0.8rem;
+  color: #9b7359;
+  text-align: center;
+  padding: 8px 0 0;
+}
+
+/* Runoff warning */
+#bbCard h2 {
+  margin-bottom: 4px;
+}
+.runoff-ok {
+  font-size: 0.72rem;
+  color: #9b7359;
+  margin: 0 0 12px;
+}
+.runoff-warn {
+  margin: 0 0 14px;
+  background: #fdf6ec;
+  border: 1px solid #ead3b4;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  font-weight: 750;
+  color: #a44b3e;
+}
+
+/* Runoff chart */
+.runoff-section {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #fdf6ec;
+  border: 1px solid #ead3b4;
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.runoff-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+}
+.runoff-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: #a44b3e;
+}
+.runoff-totals {
+  text-align: left;
+}
+.runoff-total {
+  font-size: 0.95rem;
+  font-weight: 850;
+  color: #2d2018;
+}
+.runoff-fcst {
+  font-size: 0.78rem;
+  color: #9b7359;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.runoff-total .local,
+.runoff-fcst .local {
+  color: #0b6f93;
+}
+.runoff-total .inland,
+.runoff-fcst .inland {
+  color: #e85d32;
+}
+.runoff-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  color: #9b7359;
+}
+.runoff-legend .lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.runoff-legend .sw {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: #e85d32;
+}
+.runoff-legend .sw.sw-bar {
+  background: linear-gradient(90deg, #0b6f93 0 50%, #e85d32 50% 100%);
+}
+.runoff-legend .sw.sw-line {
+  height: 3px;
+  border-radius: 0;
+  background: linear-gradient(90deg, #0b6f93 0 50%, #e85d32 50% 100%);
+}
+.runoff-legend .sw.sw-cut {
+  height: 2px;
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #a44b3e 0 3px,
+    transparent 3px 6px
+  );
+}
+#bbCard .runoff-section .chart-wrap {
+  display: block;
+  width: 100%;
+  height: 240px;
+  min-height: 240px;
+}
+#bbCard .runoff-section .chart-wrap canvas {
+  height: 240px !important;
+  max-height: 240px;
+}
+
+/* Tides header */
+#bbCard .tide-label {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: #0b6f93;
+  margin-bottom: 8px;
+}
+
+/* Component states retain the incumbent Sunline dashboard. */
+header h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+header .updated {
+  color: #684a35;
+}
+:focus-visible {
+  outline: 3px solid #0b6f93;
+  outline-offset: 4px;
+}
+::selection {
+  background: #d8eef4;
+  color: #123f54;
+}
+.day-tabs button small,
+.day-tabs button {
+  color: #684a35;
+}
+.day-tabs button.active,
+.day-tabs button.active small {
+  color: #fff;
+}
+.day-tabs button:hover:not(.active) {
+  background: #f5e5c8;
+}
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 12px;
+}
+.header-actions a {
+  text-decoration: none;
+}
+.source-note {
+  color: #684a35;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 8px 0 12px;
+  max-width: 90ch;
+}
+.source-note p + p {
+  margin-top: 4px;
+}
+.richmond-grid .stat-box .label,
+.richmond-grid .stat-box .sub {
+  color: #684a35;
+}
+.richmond-grid .stat-box .value {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.richmond-grid .stat-box .sub {
+  display: block;
+}
+.runoff-ok {
+  color: #684a35;
+  line-height: 1.5;
+}
+.runoff-warn {
+  line-height: 1.5;
+}
+.skeleton {
+  display: inline-block;
+  min-width: 4.5rem;
+  height: 1em;
+  border-radius: 5px;
+  background: #dec9aa;
+  vertical-align: middle;
+}
+.skeleton-wide {
+  width: 100%;
+  height: 120px;
+  min-width: 0;
+  background: #e7d8bf;
+}
+.chart-placeholder {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #684a35;
+  font-size: 0.85rem;
+  padding: 18px;
+}
+.chart-placeholder.compact {
+  height: 60px;
+}
+.chart-heading {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 16px;
+}
+.chart-heading span {
+  font-size: 0.75rem;
+  color: #684a35;
+}
+h3 {
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+.chart-wrap {
+  max-width: 100%;
+  min-width: 0;
+}
+.temperature-strip {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 14px 0;
+  font-size: 0.85rem;
+  color: #684a35;
+}
+.temperature-strip strong {
+  color: #2d2018;
+}
+.rain-summary {
+  display: flex;
+  gap: 6px 20px;
+  flex-wrap: wrap;
+  color: #123f54;
+  font-size: 0.85rem;
+}
+.rain-radar {
+  color: #07536e;
+}
+.swim-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  max-width: 1200px;
+  margin: 14px auto;
+}
+.swim-charts > div {
+  min-width: 0;
+}
+#bbCard .swim-charts .chart-wrap {
+  display: block;
+  width: 100%;
+  margin-left: 0 !important;
+}
+#bbCard .tide-label {
+  display: block;
+  font-size: 0.9rem;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-top: 18px;
+  color: #123f54;
+}
+#bbCard .source-note {
+  color: #305d6c;
+}
+#bbCard .runoff-section .chart-wrap {
+  height: 180px;
+  min-height: 180px;
+}
+#bbCard .runoff-section .chart-wrap canvas {
+  height: 180px !important;
+  max-height: 180px;
+}
+.tide-times {
+  flex-wrap: wrap;
+}
+#bbCard .tide-times .tide-item .tide-height,
+#bbCard .water-temp {
+  color: #305d6c;
+}
+#bbCard .chart-placeholder {
+  color: #305d6c;
+}
+#bbCard .skeleton {
+  background: #a8cbd5;
+}
+#bbCard .skeleton-wide {
+  background: #bddbe3;
+}
+#regCard {
+  padding-left: var(--content-gutter, 16px);
+  padding-right: var(--content-gutter, 16px);
+}
+.region-item {
+  text-decoration: none;
+  gap: 8px;
+  background-color: #785a40;
+}
+.region-item:hover {
+  filter: brightness(1.08);
+}
+.region-item .name {
+  flex: 1;
+}
+.region-item .temps {
+  font-variant-numeric: tabular-nums;
+}
+.region-item .precip {
+  margin-left: auto;
+}
+.region-group .group-title {
+  color: #684a35;
+}
+.region-row {
+  gap: 10px;
+}
+.data-table {
+  margin-top: 14px;
+  color: #684a35;
+  font-size: 0.85rem;
+}
+.data-table summary {
+  padding: 10px 0;
+  cursor: pointer;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+th,
+td {
+  padding: 8px;
+  border-bottom: 1px solid #dcc6a8;
+  white-space: nowrap;
+  font-weight: 400;
+}
+thead th {
+  font-weight: 700;
+}
+footer {
+  padding: 28px var(--content-gutter, 16px) 0;
+  color: #684a35;
+  font-size: 0.8rem;
+}
+footer a {
+  color: #07536e;
+  text-underline-offset: 3px;
+}
+@media (max-width: 639px) {
+  .swim-charts {
+    grid-template-columns: 1fr;
+  }
+  .day-tabs button {
+    min-height: 48px;
+  }
+  .richmond-grid .stat-box .value {
+    font-size: 1.05rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+#bbCard .runoff-section .chart-wrap {
+  height: 240px;
+  min-height: 240px;
+}
+#bbCard .runoff-section .chart-wrap canvas {
+  height: 240px !important;
+  max-height: 240px;
+}
+
+.richmond-grid .stat-box .sunset-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+.richmond-grid .stat-box .sunset-value .sub {
+  display: inline;
+  margin: 0;
+  font-weight: 400;
+}

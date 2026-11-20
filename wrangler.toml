@@ -1,3 +1,9 @@
 name = "weatherdash"
-pages_build_output_dir = "."
+pages_build_output_dir = "dist"
 compatibility_date = "2026-07-17"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "weatherdash"
+database_id = "d9a37b85-19d4-468f-935a-f38dbd5356d3"
+migrations_dir = "migrations"

@@ -3,10 +3,34 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler pages dev .",
-    "deploy": "wrangler pages deploy ."
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "npm run build && wrangler pages dev dist",
+    "test": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "wrangler d1 migrations apply weatherdash --local",
+    "db:migrate:remote": "wrangler d1 migrations apply weatherdash --remote",
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "functions:build": "wrangler pages functions build --outdir .wrangler/functions-build",
+    "cf:types": "wrangler types worker-configuration.d.ts --include-runtime false --env-interface CloudflareEnv"
   },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "@cloudflare/workers-types": "5.20261119.1",
+    "@octanejs/vite-plugin": "0.6.5",
+    "@tsrx/oxc": "0.24.0",
+    "@types/node": "24.19.2",
+    "typescript": "5.9.3",
+    "vite": "8.3.8",
+    "wrangler": "4.165.0"
+  },
+  "dependencies": {
+    "@octanejs/tanstack-query": "0.1.74",
+    "chart.js": "4.6.1",
+    "octane": "0.22.0",
+    "zod": "4.6.7"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.22.2"
   }
 }
