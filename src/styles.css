@@ -1402,3 +1402,16 @@ footer a {
   margin: 0;
   font-weight: 400;
 }
+
+/* Mobile: trim the runoff header and lighten stat values */
+@media (max-width: 639px) {
+  .runoff-summary {
+    display: none;
+  }
+  .richmond-grid .stat-box .value {
+    font-weight: 600;
+  }
+  .rain-total {
+    font-weight: 600;
+  }
+}

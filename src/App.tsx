@@ -32,6 +32,17 @@ import {
 } from "../shared/time.ts";
 const number = (v: number | null | undefined, digits = 0) =>
   typeof v === "number" && Number.isFinite(v) ? v.toFixed(digits) : "—";
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const update = () => setMatches(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [query]);
+  return matches;
+}
 function Skeleton({ wide = false }: { wide?: boolean }) {
   return (
     <span
@@ -287,6 +298,7 @@ function Swim({
   const warningDetails = runoffExplanation(bundle, inlandBundle);
   const localTotals = runoffTotals(bundle, runoffDates, 2);
   const inlandTotals = runoffTotals(inlandBundle, runoffDates, 4);
+  const isMobile = useMediaQuery("(max-width: 639px)");
   return (
     <section className="card" id="bbCard" aria-labelledby="swim-heading">
       <h2 id="swim-heading">{location.name} — Swim Conditions</h2>
@@ -308,13 +320,17 @@ function Swim({
       <div className="runoff-section">
         <div className="runoff-head">
           <h3>{runoff.warning ? "Runoff Warning" : "Runoff forecast"}</h3>
-          <span>
+          <span className="runoff-summary">
             Local last 2 days: {number(runoff.local.total, 2)} in · Inland last 4 days:{" "}
             {number(runoff.inland.total, 2)} in
           </span>
         </div>
         <Chart
-          label="Local and inland rain, rolling totals and runoff thresholds"
+          label={
+            isMobile
+              ? ""
+              : "Local and inland rain, rolling totals and runoff thresholds"
+          }
           tooltipUnit="in"
           labels={runoffDates.map((d) => d.slice(5))}
           datasets={[
