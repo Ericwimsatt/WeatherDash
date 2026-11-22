@@ -25,13 +25,15 @@ export function Chart(props: Props) {
   const todayIndex = useRef(props.todayIndex);
   useEffect(() => {
     if (!canvas.current) return;
+    const fontFamily = getComputedStyle(canvas.current).fontFamily;
+    ChartJS.defaults.font.family = fontFamily;
     const thresholdLines: Plugin = {
       id: "weatherThresholds",
       afterDatasetsDraw(chart) {
         const { ctx, chartArea, scales } = chart;
         if (!chartArea || !scales.y) return;
         ctx.save();
-        ctx.font = "11px system-ui";
+        ctx.font = `11px ${fontFamily}`;
         ctx.textAlign = "right";
         ctx.textBaseline = "bottom";
         if (todayIndex.current != null && todayIndex.current >= 0) {
@@ -163,6 +165,9 @@ export function Chart(props: Props) {
       },
     });
     instance.current = chart;
+    void document.fonts.ready.then(() => {
+      if (instance.current === chart) chart.update("none");
+    });
     return () => {
       chart.destroy();
       instance.current = null;
