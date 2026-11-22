@@ -1246,3 +1246,62 @@ footer a {
 :is(.temps, .value, .rain-total, .tide-time, .precip, .runoff-summary) {
   font-variant-numeric: tabular-nums;
 }
+
+/* Joined daylight readings and tide events. */
+#irCard .richmond-grid, #bbCard .tide-times {
+  --line: #adbfa4;
+  --paper: #fffef7;
+  --ink: #164c3b;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--line);
+}
+#bbCard .tide-times {
+  --line: #a0c6d3;
+  --paper: #f7fcfc;
+  --ink: #164d78;
+}
+#irCard .stat-box, #bbCard .tide-times .tide-item {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+#irCard .stat-box .label, #bbCard .tide-item .tide-type {
+  margin: 0;
+  color: var(--ink);
+  font-size: .72rem;
+  letter-spacing: .055em;
+  font-weight: 650;
+}
+#irCard .stat-box .value, #bbCard .tide-item .tide-time {
+  color: var(--ink);
+  line-height: 1.25;
+  font-size: clamp(1.15rem, 2.5vw, 1.65rem);
+}
+#irCard .stat-box .sunset-value {flex-wrap: wrap; gap: 2px 7px; white-space: normal}
+#irCard .stat-box .sub {color: var(--ink)}
+
+#bbCard .tide-times .tide-item {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+}
+#bbCard .tide-item .tide-type {
+  grid-column: 1 / -1;
+}
+@media (max-width: 540px) {
+  #bbCard .tide-times .tide-item {
+    grid-template-columns: 1fr;
+  }
+}
