@@ -425,7 +425,6 @@ function Swim({
                   { fill: "start" as const, backgroundColor: colorWithAlpha("ocean", .2) },
                 ),
               ]}
-              yTitle="feet"
             />
           ) : (
             <div className="chart-placeholder">
