@@ -93,14 +93,16 @@ export function Chart(props: Props) {
             padding: 10,
             cornerRadius: 8,
             filter: (item) => item.parsed.y != null,
-            ...(props.tooltipUnit
-              ? {
-                  callbacks: {
-                    label: (item: import("chart.js").TooltipItem<ChartType>) =>
-                      `${item.dataset.label}: ${item.formattedValue} ${props.tooltipUnit}`,
-                  },
-                }
-              : {}),
+            callbacks: {
+              label: (item: import("chart.js").TooltipItem<ChartType>) => {
+                const label = item.dataset.label || "";
+                const unitMatch = label.match(/\s*\(([^)]+)\)$/);
+                const name = unitMatch ? label.slice(0, unitMatch.index) : label;
+                const unit = props.tooltipUnit || unitMatch?.[1];
+                const displayUnit = unit === "°F" ? "°F" : unit;
+                return `${name}: ${item.formattedValue}${displayUnit || ""}`;
+              },
+            },
           },
         },
         scales: {
