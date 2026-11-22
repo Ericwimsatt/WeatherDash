@@ -174,11 +174,7 @@ function Daylight({
       : null;
   return (
     <section className="card" id="irCard" aria-labelledby="daylight-heading">
-      <h2 id="daylight-heading">
-        {location.id === "innerRichmond"
-          ? "Daylight"
-          : `${location.name} — Daylight`}
-      </h2>
+      <h3 id="daylight-heading">Daylight</h3>
       {hasRain && (
         <div className="rain-section">
           <div className="rain-head">
@@ -615,6 +611,7 @@ export function App() {
         )}
       </header>
       <main id="main">
+        <h2 className="region-heading">{region.name}</h2>
         <div className="card-grid">
           <Daylight location={region} date={date} range={range} />
           <Swim location={spot} inland={inland} date={date} range={range} />
