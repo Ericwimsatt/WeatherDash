@@ -1,15 +1,15 @@
 @import "./design-tokens.css";
 
 @font-face {
-  font-family: "Atkinson Hyperlegible Next";
-  src: url("./assets/fonts/atkinson-hyperlegible-next.woff2") format("woff2");
+  font-family: "Barlow Condensed";
+  src: url("./assets/fonts/barlow-condensed.woff2") format("woff2");
   font-style: normal;
   font-weight: 800;
   font-display: swap;
 }
 @font-face {
-  font-family: "Public Sans";
-  src: url("./assets/fonts/public-sans.woff2") format("woff2");
+  font-family: "Source Sans 3";
+  src: url("./assets/fonts/source-sans-3.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 800;
   font-display: swap;
@@ -411,8 +411,8 @@ header h1 {
   color-scheme: light;
 }
 body {
-  --font-body: "Public Sans", system-ui, sans-serif;
-  --font-heading: "Atkinson Hyperlegible Next", var(--font-body);
+  --font-body: "Source Sans 3", system-ui, sans-serif;
+  --font-heading: "Barlow Condensed", var(--font-body);
   font-family: var(--font-body);
   color: var(--color-ink);
 }
@@ -479,10 +479,10 @@ header h1 {
 .boot-section h2,
 .card > :is(h2, h3):first-child {
   font-family: var(--font-heading);
-  font-size: 1.48rem;
+  font-size: 1.75rem;
   font-weight: 800;
   line-height: 1.15;
-  letter-spacing: -0.015em;
+  letter-spacing: 0.003em;
   text-wrap: balance;
 }
 .card h2 {
