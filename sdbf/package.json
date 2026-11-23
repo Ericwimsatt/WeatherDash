@@ -1,0 +1,21 @@
+{
+  "name": "sd-beach-finder",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node worker/version-shell.mjs",
+    "test": "node --test data/*.test.mjs worker/*.test.mjs",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev --port 8792"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "vite": "8.3.8",
+    "wrangler": "4.165.0"
+  }
+}

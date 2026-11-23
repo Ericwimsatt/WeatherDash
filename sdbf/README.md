@@ -1,22 +1,34 @@
 # San Diego Beach Finder
 
-The separate branch contains the Evidence Matrix preview, rating logic, monitoring-site catalog, and database schema. The production React app and custom hostname deployment are pending.
+An independent React and Vite PWA on Cloudflare Workers at [sdbeachfinder.gingernet.net](https://sdbeachfinder.gingernet.net/). The project uses its own package, Worker, install scope, and D1 binding. WeatherDash runs from the repository root as before.
 
-Open [Evidence Matrix](preview/index.html) in a browser. Switch between the evidence table and a geographic map, then choose a listed beach or pin for its sample history and runoff details. The map and water-quality snapshot are bundled for offline preview.
+Evidence Matrix shows the water-quality rating first, followed by County postings, sample results and age, rain, and runoff. The map includes named monitoring points, towns, bays, and highways. Select or hover a beach name to open the sample and rain timelines. The build includes the geographic basemap and can reopen with saved data offline.
 
-- [System design and rating rules](docs/DESIGN.md)
-- [Layout decision record](docs/CHOICE_SET.yaml)
-- [Station catalog](data/sites.json)
-- [D1 schema](data/0001.sql)
+## Run locally
 
-## Initial import
+From this directory:
 
-The Nov 22, 2026 import populated and verified 15 sites, 15 County map postings, 341 Enterococcus results, 257 County storm-drain or outfall records, and 112 measured precipitation intervals from five NWS gauges in the separate `sd-beach-finder` D1 database. The County map reported its last update at 2:55 p.m. Pacific on Nov 21. Its snapshot showed advisories at 12 representative sites and closures at Silver Strand, Imperial Beach Pier and Border Field. The newest result found in the public station reports was collected on Nov 12, and the oldest latest result was collected on Oct 19. The source only provided partial precipitation coverage.
+```sh
+npm ci
+npm test
+npm run build
+node data/bootstrap.mjs > /tmp/sd-beach-finder-seed.sql
+npx wrangler d1 execute sd-beach-finder --local --file=/tmp/sd-beach-finder-seed.sql
+npx wrangler dev --local --port 8792
+```
 
-A follow-up check at 4:07 p.m. Pacific on Nov 22 confirmed the County’s general rain advisory from the Nov 19 storm. It covered the entire project coastline and the bays, with a tentative lift around 5 p.m. The comparison preserves that checked snapshot.
+Local Browser Run uses D1 fallback. The deployed Worker runs County public pages in Browser Run. Versioned app assets and the last successful D1 snapshot are available offline.
 
-The first import used the County's public site and station report views in a browser. A direct request to the County report endpoint returned HTTP 403. A supported production ingestion path still needs verification. The comparison uses the public map's posting classifications without inferring why a site was posted. Outfall coordinates identify potential runoff locations. They do not report whether a drain was flowing at the time.
+## Data and deploy
 
-Run the rating checks with `node --test sdbf/data/rating.test.mjs`.
+The client requests D1 and the provider refresh in parallel. Provider writes take place through the Worker. It reconciles newer verified records and accepts refresh intent from the browser. The Worker obtains all evidence from its fixed upstreams. The **Refresh evidence** button requests reconciliation. Shared D1 leases keep traffic across clients within the same source intervals.
 
-Build portable table-first and map-first HTML files with `node sdbf/preview/render.mjs <output-directory>`.
+- County postings are refreshed on demand at most every 29 minutes. A 30-minute Worker schedule also checks for updates. The Worker treats the County’s general rain notice independently of local postings.
+- County lab histories are checked every six hours. Each sample retains its station, method, unit, qualifier, and collection time.
+- NWS gauge observations are checked at most every 15 minutes. Rain values represent measured intervals, with gaps and overlapping periods accounted for.
+- NOAA, USGS, and Open-Meteo context is checked at most every 30 minutes. Tide, modeled weather and sea temperature, and river discharge are context for the detail view.
+- County storm-drain coordinates provide mapped runoff context. Current flow at each drain requires separate evidence. The USGS San Diego River gauge is labeled as river flow and the County environmental dashboard provides spill notices.
+
+The initial D1 import seeded 15 monitoring sites, 341 Enterococcus results, 15 County postings, 257 mapped outfalls, and 112 measured precipitation intervals. The current schema and idempotent seed are in [data](data). After applying a required migration to the Beach Finder database, run `npm run deploy` here. The deployed Worker binds to the existing separate database in `wrangler.jsonc`.
+
+See [rating rules and system design](docs/DESIGN.md). The original [design preview](preview/index.html) retains the dated design-review snapshot.

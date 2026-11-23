@@ -1,0 +1,47 @@
+@import "../preview/preview.css";
+
+:root { scrollbar-color:#95adba #eff5f6 }
+button:disabled { cursor:default; color:var(--muted); background:#edf3f5 }
+footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
+.view-bar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:.5rem; margin:1rem 0 .65rem }
+.view-bar .view-switch { margin:0 }
+.refresh { font-size:.82rem }
+.source-status { color:var(--muted); font-size:.82rem; margin-bottom:.6rem }
+.data-scroll tbody td:first-child { position:sticky; left:0; z-index:1; border-right:1px solid var(--line); background:var(--panel) }
+.data-scroll th[scope=row] { position:static; border-right:0 }
+.rating-column { width:19% }
+.site-column { width:22% }
+.map-visual { width:100%; min-height:34rem }
+.station { position:absolute; left:var(--x); top:var(--y); width:0; height:0 }
+.station:focus-within,.station:hover { z-index:2 }
+.station-dot,.evidence-dot { display:inline-block; width:.68rem; height:.68rem; border-radius:50%; background:var(--rating); border:1px solid #fff }
+.station-dot { position:absolute; transform:translate(-50%,-50%); box-shadow:0 0 0 1px var(--rating) }
+.station-name {
+  position:absolute; inset:auto auto auto .55rem; top:var(--offset); transform:translateY(-50%);
+  border:1px solid #abbbc1; background:#fffffff2; color:#143846; white-space:nowrap;
+  padding:.15rem .3rem; min-height:1.55rem; border-radius:.25rem; font-size:.7rem; font-weight:720; line-height:1.2;
+}
+.station-west .station-name { left:auto; right:.55rem }
+.station-name:hover { background:#e9f3f6 }
+.map-list .evidence-dot { vertical-align:baseline; margin-right:.35rem; border:0; width:.6rem; height:.6rem }
+.map-list td { min-width:36% }
+.dialog-heading { display:flex; align-items:center; justify-content:space-between; align-content:start; gap:.75rem; background:#fff }
+.dialog-heading form { margin:0; flex-shrink:0 }
+.timeline h3 { margin:0; font-size:.98rem }
+.visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap }
+.skeleton { border:1px solid var(--line); background:var(--panel); padding:.9rem; display:grid; gap:.8rem }
+.skeleton div { height:2rem; background:#e8f0f3; border-radius:.2rem }
+.skeleton div:first-of-type { width:55% }
+
+@media(max-width:52rem) {
+  .rating-column { width:7.3rem }
+  .site-column { width:8.2rem }
+  .sample-column { width:7rem }
+  .map-visual { min-height:35.5rem }
+  .station-name { font-size:.67rem; min-height:1.45rem }
+}
+@media(max-width:26rem) {
+  .map-visual { min-height:37rem }
+  .station-name { font-size:.61rem; padding-inline:.18rem }
+  .station[data-short] .station-name { max-width:7rem; white-space:normal }
+}
