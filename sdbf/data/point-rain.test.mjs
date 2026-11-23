@@ -53,3 +53,46 @@ test("all beaches have their own rain point about three miles east", () => {
     assert.ok(miles>=2.99 && miles<=3.01, site.name);
   }
 });
+
+test("inland rainfall tapers with distance and keeps a higher on-site estimate", () => {
+  const now=Date.parse("2026-11-22T20:30:00Z");
+  const start=Math.floor(now/hour)*hour-97*hour;
+  const [moonlight,cardiff] = sites.filter(site => /Moonlight|Cardiff/.test(site.name));
+  const inlandPoint = (site,rain) => {
+    const point = pointLocations([site])[1];
+    const values = Array(104).fill(0);
+    values[30] = rain;
+    return {...point,start,values,verifiedAt:new Date(now).toISOString()};
+  };
+  const moonlightPoint = inlandPoint(moonlight,1.87);
+  const cardiffPoint = inlandPoint(cardiff,.02);
+  const far = inlandPoint(sites[0],4);
+  const points = {[moonlightPoint.id]:moonlightPoint,[cardiffPoint.id]:cardiffPoint,[far.id]:far};
+  const cardiffEstimate = withPointRain(cardiff,points,now);
+  assert.ok(cardiffEstimate.inlandRain.total > 1 && cardiffEstimate.inlandRain.total < 1.25);
+  assert.equal(withPointRain(moonlight,points,now).inlandRain.total,1.87);
+  assert.equal(withPointRain(sites[0],points,now).inlandRain.total,4);
+  assert.equal(pointTotal(cardiffEstimate.inlandPoint,now-96*hour,now).total,cardiffEstimate.inlandRain.total);
+  assert.equal(cardiffPoint.values[30],.02);
+});
+
+test("nearby rainfall can fill a missing inland hour but cannot use an elapsed forecast", () => {
+  const now=Date.parse("2026-11-22T20:30:00Z");
+  const start=Math.floor(now/hour)*hour-97*hour;
+  const [moonlight,cardiff] = sites.filter(site => /Moonlight|Cardiff/.test(site.name));
+  const [moonPoint,cardPoint] = pointLocations([moonlight,cardiff]).filter(point => point.id.startsWith("inland"));
+  const moonValues = Array(104).fill(0);
+  moonValues[30] = .5;
+  moonValues[97] = 9;
+  moonValues[98] = .1;
+  const cardValues = Array(104).fill(0);
+  cardValues[30] = null;
+  const input = {
+    [moonPoint.id]:{...moonPoint,start,values:moonValues,verifiedAt:new Date(now-hour).toISOString()},
+    [cardPoint.id]:{...cardPoint,start,values:cardValues,verifiedAt:new Date(now).toISOString()},
+  };
+  const {inlandPoint,inlandRain} = withPointRain(cardiff,input,now);
+  assert.equal(inlandRain.total,.5);
+  assert.equal(inlandPoint.values[97],0);
+  assert.ok(inlandPoint.values[98] > 0);
+});

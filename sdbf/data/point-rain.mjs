@@ -4,8 +4,10 @@ export const rainLimits = { local:.2, inland:.75 };
 
 const milesInland = 3;
 const milesPerLongitudeDegreeAtEquator = 69.17;
+export const inlandSharingMiles = 5;
+const inlandKeyPrefix = "inland:3mi:";
 
-export const pointIds = site => [`local:${site.id}`, `inland:3mi:${site.id}`];
+export const pointIds = site => [`local:${site.id}`, `${inlandKeyPrefix}${site.id}`];
 
 export function pointLocations(sites) {
   return sites.flatMap(site => {
@@ -35,10 +37,50 @@ export function pointTotal(point, from, through) {
   return { total:hours ? Number(total.toFixed(3)) : null, complete:hours===expected, hours, endedAt };
 }
 
+function inlandEstimate(site, points, key, now) {
+  const own = points?.[key];
+  const center = own ?? pointLocations([site])[1];
+  const longitudeScale = milesPerLongitudeDegreeAtEquator * Math.cos(center.lat * Math.PI / 180);
+  const sources = [];
+  for (const [id,point] of Object.entries(points ?? {})) {
+    if (!id.startsWith(inlandKeyPrefix)) continue;
+    const checked = Date.parse(point.verifiedAt);
+    if (now < checked || now - checked > 3*hour) continue;
+    const distance = id === key ? 0 : Math.hypot(
+      (point.lat-center.lat)*milesPerLongitudeDegreeAtEquator,
+      (point.lon-center.lon)*longitudeScale,
+    );
+    if (distance < inlandSharingMiles) {
+      sources.push({point, distance, checked, weight:1-(distance/inlandSharingMiles)**2});
+    }
+  }
+  if (!sources.some(source => source.point !== own)) return own;
+  sources.sort((a,b) => a.distance-b.distance);
+  const start = Math.min(...sources.map(({point}) => point.start));
+  const end = Math.max(...sources.map(({point}) => point.start+(point.values.length-1)*hour));
+  const checked = Math.max(...sources.map(source => source.checked));
+
+  const values = Array.from({length:(end-start)/hour+1},(_,index) => {
+    const time = start+index*hour;
+    let nearest = null;
+    let estimate = null;
+    for (const source of sources) {
+      // Hours from an older forecast cannot become rainfall observations.
+      if (time <= now && time > source.checked) continue;
+      const rain = source.point.values[(time-source.point.start)/hour];
+      if (!Number.isFinite(rain) || rain < 0) continue;
+      nearest ??= rain;
+      estimate = Math.max(estimate ?? nearest,nearest + source.weight*(rain-nearest));
+    }
+    return estimate;
+  });
+  return {...center,start,values,verifiedAt:new Date(checked).toISOString()};
+}
+
 export function withPointRain(site, points, now) {
   const [localKey,inlandKey] = pointIds(site);
   const local = points?.[localKey];
-  const inland = points?.[inlandKey];
+  const inland = inlandEstimate(site,points,inlandKey,now);
   const summarize = (point, hours) => {
     if (!point) return null;
     const checked = Date.parse(point.verifiedAt);

@@ -4,7 +4,7 @@ import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
 import { age, countyUrl, date, postingText, rainDisplay, reading, scoreFactors } from "./evidence.js";
 import { drawMap, project } from "./map.js";
 
-import { withPointRain } from "../data/point-rain.mjs";
+import { inlandSharingMiles, withPointRain } from "../data/point-rain.mjs";
 import "../preview/geography.js";
 import "../preview/snapshot.js";
 
@@ -121,7 +121,7 @@ function Detail({ site, snapshot, now, dismiss }) {
     {site.rating.notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
     <dl className="quick-evidence">
       <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} /></dd>
-      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland</small></dd>
+      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland · shares rain within {inlandSharingMiles} mi</small></dd>
       <dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />
         {evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>
       <dt>County posting</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong><small>Updated {date(site.posting?.observedAt)} Pacific</small></dd>
