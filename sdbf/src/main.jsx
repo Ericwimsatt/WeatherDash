@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
-import { age, countyUrl, date, outfallText, postingText, rainDisplay, reading } from "./evidence.js";
+import { age, countyUrl, date, outfallText, postingText, rainDisplay, reading, scoreFactors } from "./evidence.js";
 import { drawMap, project } from "./map.js";
 
 import { withPointRain } from "../data/point-rain.mjs";
@@ -30,6 +30,12 @@ function Rating({ rating }) {
   </div>;
 }
 
+function ScoreFactors({ site, now }) {
+  return <ul className="score-factors" aria-label="Contributing factors">
+    {scoreFactors(site,now).map(({score,text}) => <li key={text} className={score>=7 ? "hazard" : undefined}>{text}</li>)}
+  </ul>;
+}
+
 function Rain({site,inland=false}) {
   const display = rainDisplay(site,inland);
   return <><strong>{display.value}</strong><small>{display.note}</small></>;
@@ -43,7 +49,7 @@ function Table({ sites, now, open }) {
         <thead><tr>{["Beach", "Safety score", "Local rain · 72h", "Inland rain · 4 days", "Latest bacteria test", "County posting"].map(title => <th key={title} scope="col">{title}</th>)}</tr></thead>
         <tbody>{sites.map(site => <tr key={site.id}>
           <th scope="row"><button className="beach-link" onClick={event => open(site.id,event.currentTarget)}>{site.name}</button><small>{site.location}</small></th>
-          <td><Rating rating={site.rating} /></td>
+          <td><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /></td>
           <td><Rain site={site} /></td><td><Rain site={site} inland /></td>
           <td><Sample sample={site.sample} now={now} /></td>
           <td><strong>{postingText(site)}</strong><small>{date(site.posting?.observedAt)}</small></td>
@@ -105,7 +111,7 @@ function MapView({ sites, now, open }) {
       </figure>
       <table className="map-list"><thead><tr><th scope="col">Beach</th><th scope="col">{title}</th></tr></thead><tbody>{sites.map(site => <tr style={{"--rating":site.rating.color}} key={site.id}>
         <th scope="row"><button className="beach-link" onClick={event => activate(event, site.id)} onPointerEnter={event => hover(event, site.id)} onPointerLeave={() => clearTimeout(timer.current)} aria-haspopup="dialog">{site.name}</button></th>
-        <td><span className="evidence-dot" aria-hidden="true" />{getValue(site, now)}</td>
+        <td><span className="evidence-dot" aria-hidden="true" />{getValue(site, now)}{layer==="status" && <ScoreFactors site={site} now={now} />}</td>
       </tr>)}</tbody></table>
     </div>
   </>;
@@ -118,13 +124,10 @@ function Detail({ site, snapshot, now, dismiss }) {
   const evidence = sampleEvidence(sample);
   const weather = snapshot.context?.[site.rainGauge];
   const hazardous = field => site.rating.signals.some(signal => signal.field===field && signal.score>=5) ? "hazard" : undefined;
-  const risks = site.rating.signals.filter(signal => signal.score>=5 && signal.field!=="evidence");
 
   return <dialog ref={dialog} onClose={dismiss} aria-labelledby="detail-title">
     <header className="dialog-heading"><h2 id="detail-title">{site.name}</h2><form method="dialog"><button autoFocus>Close</button></form></header>
-    <div className="modal-score"><Rating rating={site.rating} /><strong className={site.rating.score>=5 ? "hazard" : ""}>{site.rating.reason}</strong></div>
-    {risks.length>1 && <ul className="hazard risk-list">{risks.slice(1,4).map(signal => <li key={signal.field}>{signal.reason}</li>)}</ul>}
-    {site.rating.gaps.length>0 && <p className="timeline-note">{site.rating.gaps.join(" · ")}</p>}
+    <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /></div>
     <dl className="quick-evidence">
       <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} />{site.rain?.lowerBound>0 && !site.rain.complete && <small>Gauge minimum {site.rain.lowerBound.toFixed(2)} in</small>}</dd>
       <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>{site.inlandRain?.name}</small>{site.inlandGaugeRain?.lowerBound>0 && !site.inlandGaugeRain.complete && <small>{site.inlandGaugeRain.station} gauge minimum {site.inlandGaugeRain.lowerBound.toFixed(2)} in</small>}</dd>
@@ -139,7 +142,7 @@ function Detail({ site, snapshot, now, dismiss }) {
         <dt>Sampling point</dt><dd>{site.location} · {site.monitor}</dd>
         <dt>Sample time</dt><dd>{date(sample?.collectedAt)} Pacific · {sample?.method || "Method unavailable"}</dd>
         <dt>Nearby outfall</dt><dd>{outfallText(site)}<small>{site.outfall?.name}</small></dd>
-        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}<small>Inland: {site.inlandRain?.name ?? "Unavailable"}</small></dd>
+        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}<small>Inland · {site.inlandRain?.name ?? "Unavailable"}</small><small>Weather-model estimates describe nearby grid areas. Gauges measure rain at a station.</small></dd>
         <dt>Spill reports</dt><dd><a href="https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/south-region-health-concerns/Environmental-Dashboard.html">County environmental dashboard</a></dd>
         {weather?.river && <><dt>River discharge</dt><dd>{weather.river.cfs} ft³/s · {weather.river.station}<small>{date(weather.river.observedAt)} Pacific · USGS</small></dd></>}
         {weather?.air != null && <><dt>Air temperature</dt><dd>{weather.air} °F · Open-Meteo<small>{date(weather.airAt)} Pacific{weather.wind != null && ` · Wind ${weather.wind} mph`}</small></dd></>}

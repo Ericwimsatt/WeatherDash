@@ -48,3 +48,13 @@ test("unit-specific thresholds, censored results, and ten distinct colors", () =
   assert.match(scoreLabel(5),/Sensitive/);
   assert.match(scoreLabel(10),/Dangerous/);
 });
+
+test("score explanation carries the exact rain amount and distinguishes the model from a gauge", () => {
+  const result=assess({...base,inlandRain:{complete:true,total:2.24,verifiedAt:before(1)}},now);
+  assert.equal(result.score,8);
+  assert.equal(result.signals[0].amount,2.24);
+  assert.equal(result.signals[0].modeled,true);
+  const gauge=assess({...base,inlandGaugeRain:{complete:false,lowerBound:.85,verifiedAt:before(1)}},now);
+  assert.equal(gauge.signals[0].amount,.85);
+  assert.equal(gauge.signals[0].modeled,false);
+});

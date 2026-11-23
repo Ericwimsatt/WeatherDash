@@ -74,7 +74,11 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .modal-score { display:flex; align-items:center; gap:.65rem 1rem; flex-wrap:wrap; background:#f1f6f7; padding:.6rem .7rem; border-radius:.4rem }
 .modal-score .score-number { font-size:1.55rem }
 .modal-score .score-number span { font-size:.82rem }
-.risk-list { margin:.5rem 0 0; padding-left:1.25rem }
+.score-factors { margin:.26rem 0 0; padding-left:.85rem; color:var(--muted); font-size:.73rem; line-height:1.3 }
+.score-factors li + li { margin-top:.16rem }
+.modal-score .score-factors { margin:0 }
+.map-list .score-factors { font-size:.76rem }
+@media(max-width:25rem) { .data-scroll .score-factors { font-size:.69rem } }
 .timeline-note { color:var(--muted); font-size:.83rem; margin:.45rem 0 }
 .quick-evidence { grid-template-columns:minmax(7.5rem,1fr) 1.3fr; margin:.8rem 0; align-items:baseline }
 .quick-evidence dd { border-bottom:1px solid #e3ecf0; padding-bottom:.28rem }

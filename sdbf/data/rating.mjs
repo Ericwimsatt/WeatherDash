@@ -51,7 +51,7 @@ export function assess(site, now=Date.now(), coast=null) {
   const evidence = sampleEvidence(sample);
   const signals = [];
   const gaps = [];
-  const add = (score, reason, field) => signals.push({score,reason,field});
+  const add = (score, reason, field, details) => signals.push({score,reason,field,...details});
   if (coast) add(coast.score,coast.reason,"regional");
 
   const official = { closure:10, warning:10, advisory:9, "rain advisory":9 }[posting?.status];
@@ -67,19 +67,26 @@ export function assess(site, now=Date.now(), coast=null) {
   const measured = (fresh(rain?.verifiedAt,now,3) || rainHold(rain,now)) ? rain?.lowerBound : null;
   const localFresh = fresh(coastal?.verifiedAt,now,3);
   const inlandFresh = fresh(inlandRain?.verifiedAt,now,3);
-  const localAmount = Math.max(measured ?? 0, localFresh ? coastal?.total ?? 0 : 0);
+  const localEstimate = localFresh ? coastal?.total ?? 0 : 0;
+  const localAmount = Math.max(measured ?? 0,localEstimate);
+  const localModeled = localEstimate > (measured ?? 0);
+  const localDetails = { amount:localAmount, modeled:localModeled, minimum:!(localModeled ? coastal?.complete : rain?.complete) };
   const hasLocalCoverage = fresh(rain?.verifiedAt,now,3) && rain?.complete || localFresh && coastal?.complete;
   if (!hasLocalCoverage) gaps.push("Local rain coverage incomplete");
-  if (localAmount >= .5) add(rainHold(rain,now) ? 10 : 9,"Heavy local rain in the past 72 hours","local");
-  else if (localAmount >= .2) add(rainHold(rain,now) ? 9 : 8,"Local rain in the past 72 hours","local");
-  else if (localAmount >= .05) add(4,"Light local rain in the past 72 hours","local");
+  if (localAmount >= .5) add(rainHold(rain,now) ? 10 : 9,"Heavy local rain in the past 72 hours","local",localDetails);
+  else if (localAmount >= .2) add(rainHold(rain,now) ? 9 : 8,"Local rain in the past 72 hours","local",localDetails);
+  else if (localAmount >= .05) add(4,"Light local rain in the past 72 hours","local",localDetails);
 
   const inlandGaugeFresh = fresh(inlandGaugeRain?.verifiedAt,now,3);
   if (!(inlandFresh && inlandRain?.complete || inlandGaugeFresh && inlandGaugeRain?.complete)) gaps.push("Inland rain coverage incomplete");
-  const inlandAmount = Math.max(inlandFresh ? inlandRain?.total ?? 0 : 0,inlandGaugeFresh ? inlandGaugeRain?.lowerBound ?? 0 : 0);
-  if (inlandAmount >= 1.25) add(8,"Heavy inland rain in the past four days","inland");
-  else if (inlandAmount >= .75) add(6,"Elevated inland rain in the past four days","inland");
-  else if (inlandAmount >= .35) add(4,"Recent inland rain","inland");
+  const inlandEstimate = inlandFresh ? inlandRain?.total ?? 0 : 0;
+  const inlandMeasured = inlandGaugeFresh ? inlandGaugeRain?.lowerBound ?? 0 : 0;
+  const inlandAmount = Math.max(inlandEstimate,inlandMeasured);
+  const inlandModeled = inlandEstimate > inlandMeasured;
+  const inlandDetails = { amount:inlandAmount, modeled:inlandModeled, minimum:!(inlandModeled ? inlandRain?.complete : inlandGaugeRain?.complete) };
+  if (inlandAmount >= 1.25) add(8,"Heavy inland rain in the past four days","inland",inlandDetails);
+  else if (inlandAmount >= .75) add(6,"Elevated inland rain in the past four days","inland",inlandDetails);
+  else if (inlandAmount >= .35) add(4,"Recent inland rain","inland",inlandDetails);
 
   const hasRecentSample = fresh(sample?.collectedAt,now,48);
   if (evidence?.above && fresh(sample.collectedAt,now,168)) {

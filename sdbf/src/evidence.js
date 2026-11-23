@@ -31,7 +31,7 @@ export function rainDisplay(site, inland = false) {
     return { value:number(gauge.lowerBound), note:`${station} gauge` };
   }
   if (Number.isFinite(point?.total) && (gauge?.lowerBound ?? 0) <= point.total) {
-    return { value:(point.complete ? "" : "≥") + number(point.total), note:point.complete ? "Grid estimate" : "Partial grid estimate" };
+    return { value:(point.complete ? "" : "≥") + number(point.total), note:point.complete ? "Weather-model estimate" : "Partial model estimate" };
   }
   if (gauge?.lowerBound > 0) return { value:"≥"+number(gauge.lowerBound), note:`${station} gauge minimum` };
   return { value:"Unavailable", note:"Rain coverage incomplete" };
@@ -43,4 +43,29 @@ export function outfallText(site) {
 
 export function postingText(site) {
   return { advisory:"Advisory", closure:"Closure", warning:"Warning", open:"Open", "rain advisory":"Rain advisory" }[site.posting?.status] ?? "Unverified";
+}
+
+
+const sampleGap = "No comparable below-limit test in the past 48 hours";
+
+export function scoreFactors(site, now) {
+  const { rating } = site;
+  const factors = rating.signals.flatMap(signal => {
+    if (signal.field === "evidence" && rating.gaps.length) {
+      return rating.gaps.map(gap => {
+        const timestamp = Date.parse(site.sample?.collectedAt);
+        const old = Number.isFinite(timestamp) && now-timestamp > 48*3600000;
+        return { score:signal.score, text:gap === sampleGap && old ? `Bacteria test ${age(site.sample.collectedAt,now)}` : gap };
+      });
+    }
+    if (Number.isFinite(signal.amount)) {
+      const window = signal.field === "local" ? "72h" : "4 days";
+      return [{ score:signal.score, text:`${signal.minimum ? "≥" : ""}${signal.amount.toFixed(2)} in ${signal.modeled ? "modeled" : "measured"} ${signal.field} rain · ${window}` }];
+    }
+    if (signal.field === "runoff" && signal.reason === "Monitoring point is near a mapped outfall") {
+      return [{ score:signal.score, text:`Outfall ${site.outfall.meters} m from station` }];
+    }
+    return [{ score:signal.score, text:signal.reason }];
+  });
+  return factors;
 }
