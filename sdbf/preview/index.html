@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>San Diego Beach Finder · Layout comparison</title>
+<link rel="stylesheet" href="preview.css">
+<header class="study">
+  <h1>San Diego Beach Finder</h1>
+  <p>Four layout options. Each uses the same palette and monitoring snapshot.</p>
+  <div class="toolbar" aria-label="Comparison controls">
+    <button id="shortlist">Shortlist only</button>
+    <button id="restore">Restore all</button>
+    <span id="count" aria-live="polite"></span>
+  </div>
+</header>
+<div class="paging" aria-label="Scroll through layouts">
+  <button id="prev">← Previous</button>
+  <button id="next">Next →</button>
+</div>
+<main id="choices" aria-label="Layout options"></main>
+<dialog id="detail"><div id="detail-body"></div><form method="dialog"><button>Close details</button></form></dialog>
+<script src="snapshot.js"></script>
+<script src="preview.js"></script>
+</html>
