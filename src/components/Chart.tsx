@@ -24,6 +24,7 @@ const inches = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 4,
 });
 const compassPoints = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+const TOUCH_DRAG_MULTIPLIER = 1.75;
 
 type Props = {
   label: string;
@@ -501,14 +502,16 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       return;
     }
     const dx = event.clientX - pointer.x;
+    const isTouch = event.pointerType === "touch";
     if (!pointer.dragging) {
-      if (Math.abs(dx) < 5 || Math.abs(dx) < Math.abs(event.clientY - pointer.y)) return;
+      const dragThreshold = isTouch ? 3 : 5;
+      if (Math.abs(dx) < dragThreshold || Math.abs(dx) < Math.abs(event.clientY - pointer.y)) return;
       pointer.dragging = true;
       hover = undefined;
       element.classList.add("dragging");
       scheduleDraw();
     }
-    moveByPixels(-dx);
+    moveByPixels(-dx * (isTouch ? TOUCH_DRAG_MULTIPLIER : 1));
     pointer.x = event.clientX;
   }
 
