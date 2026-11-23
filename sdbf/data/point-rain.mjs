@@ -2,30 +2,20 @@ export const hour = 3600000;
 export const rainPeriods = { local:72, inland:96 };
 export const rainLimits = { local:.2, inland:.75 };
 
-// Inland points represent the nearby drainage corridor, sampled at a point rather than averaged over a watershed.
-const inland = {
-  "San Luis Rey Valley":[33.241,-117.276], "Carlsbad inland":[33.137,-117.256],
-  "Batiquitos inland":[33.091,-117.236], "Encinitas inland":[33.048,-117.228],
-  "San Elijo watershed":[33.020,-117.204], "San Dieguito Valley":[32.985,-117.205],
-  "Peñasquitos watershed":[32.944,-117.171], "Rose Canyon":[32.850,-117.196],
-  "Mission Valley":[32.765,-117.182], "Chula Vista inland":[32.618,-117.083],
-  "Tijuana River Valley inland":[32.558,-117.047],
-};
-const assignments = {
-  588:"San Luis Rey Valley",388:"Carlsbad inland",401:"Batiquitos inland",381:"Encinitas inland",
-  706:"San Elijo watershed",373:"San Dieguito Valley",418:"Peñasquitos watershed",
-  365:"Rose Canyon",351:"Rose Canyon",646:"Mission Valley",644:"Mission Valley",
-  325:"Chula Vista inland",461:"Chula Vista inland",322:"Tijuana River Valley inland",455:"Tijuana River Valley inland",
-};
-const inlandGauges = { "Rose Canyon":"KMYF", "Mission Valley":"KMYF", "Chula Vista inland":"KSDM", "Tijuana River Valley inland":"KSDM" };
-export const inlandGaugeFor = site => inlandGauges[assignments[site.id]];
-export const pointIds = site => [`local:${site.id}`,`inland:${assignments[site.id]}`];
+const milesInland = 3;
+const milesPerLongitudeDegreeAtEquator = 69.17;
+
+export const pointIds = site => [`local:${site.id}`, `inland:3mi:${site.id}`];
 
 export function pointLocations(sites) {
-  return [
-    ...sites.map(site => ({ id:pointIds(site)[0], name:`${site.name} coast`, lat:site.lat, lon:site.lon })),
-    ...Object.entries(inland).map(([name,[lat,lon]]) => ({ id:`inland:${name}`, name, lat, lon })),
-  ];
+  return sites.flatMap(site => {
+    const [local, inland] = pointIds(site);
+    const milesPerDegree = milesPerLongitudeDegreeAtEquator * Math.cos(site.lat * Math.PI / 180);
+    return [
+      { id:local, name:`${site.name} coast`, lat:site.lat, lon:site.lon },
+      { id:inland, name:`3 mi inland of ${site.name}`, lat:site.lat, lon:site.lon + milesInland / milesPerDegree },
+    ];
+  });
 }
 
 export function pointTotal(point, from, through) {

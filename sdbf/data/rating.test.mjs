@@ -49,12 +49,18 @@ test("unit-specific thresholds, censored results, and ten distinct colors", () =
   assert.match(scoreLabel(10),/Dangerous/);
 });
 
-test("score explanation carries the exact rain amount and distinguishes the model from a gauge", () => {
-  const result=assess({...base,inlandRain:{complete:true,total:2.24,verifiedAt:before(1)}},now);
-  assert.equal(result.score,8);
-  assert.equal(result.signals[0].amount,2.24);
-  assert.equal(result.signals[0].modeled,true);
-  const gauge=assess({...base,inlandGaugeRain:{complete:false,lowerBound:.85,verifiedAt:before(1)}},now);
-  assert.equal(gauge.signals[0].amount,.85);
-  assert.equal(gauge.signals[0].modeled,false);
+test("mapped outfall proximity never changes the score and inland rain affects every beach", () => {
+  const inlandRain = {complete:true,total:2.24,verifiedAt:before(1)};
+  const near = assess({...base,outfall:{meters:2},inlandRain},now);
+  const far = assess({...base,outfall:{meters:980},inlandRain},now);
+  const unmapped = assess({...base,inlandRain},now);
+  assert.deepEqual(near,far);
+  assert.deepEqual(near,unmapped);
+  assert.equal(near.score,8);
+  assert.equal(near.signals[0].amount,2.24);
+  assert.equal(assess({...base,outfall:{meters:2}},now).score,1);
+});
+
+test("off-point inland gauges cannot override the three-mile rainfall", () => {
+  assert.equal(assess({...base,inlandGaugeRain:{complete:true,lowerBound:4,verifiedAt:before(1)}},now).score,1);
 });

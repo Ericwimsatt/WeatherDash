@@ -1,8 +1,6 @@
 import sites from "../data/sites.json" with { type:"json" };
-import { inlandGaugeFor } from "../data/point-rain.mjs";
 const hour = 3600000;
 const gauges = [...new Set(sites.map(site => site.rainGauge))];
-const allRainGauges = [...new Set([...gauges,...sites.map(inlandGaugeFor).filter(Boolean)])];
 
 export async function json(url) {
   const response = await fetch(url, {
@@ -83,8 +81,8 @@ async function readGauge(gauge, now) {
 }
 
 export async function loadRain(now) {
-  const results = await Promise.allSettled(allRainGauges.map(gauge => readGauge(gauge, now)));
-  const ready = Object.fromEntries(results.flatMap((result,index) => result.status === "fulfilled" ? [[allRainGauges[index],result.value]] : []));
+  const results = await Promise.allSettled(gauges.map(gauge => readGauge(gauge, now)));
+  const ready = Object.fromEntries(results.flatMap((result,index) => result.status === "fulfilled" ? [[gauges[index],result.value]] : []));
   if (!Object.keys(ready).length) throw Error("No NWS gauge returned observations");
   return ready;
 }

@@ -25,9 +25,9 @@ The client requests D1 and the provider refresh in parallel. Provider writes tak
 
 - County postings are refreshed on demand at most every 29 minutes. A 30-minute Worker schedule also checks for updates. The Worker treats the County’s general rain notice independently of local postings.
 - County lab histories are checked every six hours. Each sample retains its station, method, unit, qualifier, and collection time.
-- NWS gauge observations are checked at most every 15 minutes. Measured intervals account for gaps and overlaps. Open-Meteo coastal and inland grid estimates are checked at most every 29 minutes and labeled separately from gauge measurements.
+- NWS gauge observations are checked at most every 15 minutes. Measured intervals account for gaps and overlaps. Open-Meteo coastal and inland coordinate series are checked at most every 29 minutes. Each inland point is about three miles east of its beach.
 - NOAA, USGS, and Open-Meteo context is checked at most every 30 minutes. Tide, modeled weather and sea temperature, and river discharge are context for the detail view.
-- County storm-drain coordinates provide mapped runoff context. Current flow at each drain requires separate evidence. The USGS San Diego River gauge is labeled as river flow and the County environmental dashboard provides spill notices.
+- Runoff scoring uses rainfall for every beach. The USGS San Diego River gauge provides river-flow context and the County environmental dashboard provides spill notices.
 
 The initial D1 import seeded 15 monitoring sites, 341 Enterococcus results, 15 County postings, 257 mapped outfalls, and 112 measured precipitation intervals. The current schema and idempotent seed are in [data](data). After applying a required migration to the Beach Finder database, run `npm run deploy` here. The deployed Worker binds to the existing separate database in `wrangler.jsonc`.
 

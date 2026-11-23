@@ -63,7 +63,7 @@ export default function RunoffChart({site,now}) {
 
   if (!site.localPoint && !site.inlandPoint) return <p className="timeline-note">Coordinate rainfall chart unavailable. Gauge evidence appears above.</p>;
   return <section className="runoff-chart"><h3>Runoff rain chart</h3>
-    <p>Grid estimates in inches. Bars show daily rain and lines show rolling totals. Shading starts today and includes forecast hours.</p>
+    <p>Rainfall in inches. Bars show daily rain and lines show rolling totals. Shading starts today and includes forecast hours.</p>
     <div className="runoff-plot"><canvas ref={canvas} role="img" aria-label="Local and inland daily rain bars and three- and four-day rolling rain totals" /></div>
   </section>;
 }

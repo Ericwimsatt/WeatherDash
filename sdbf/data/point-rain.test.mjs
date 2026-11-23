@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import sites from "./sites.json" with {type:"json"};
-import {hour,pointIds,pointTotal,withPointRain} from "./point-rain.mjs";
+import {hour,pointIds,pointLocations,pointTotal,withPointRain} from "./point-rain.mjs";
 
 test("coordinate accumulation uses preceding-hour values and preserves missing data", () => {
   const start=Date.parse("2026-11-21T00:00:00Z");
@@ -38,4 +38,18 @@ test("a stored forecast that has since elapsed stays outside the safety calculat
   assert.equal(data.coastal.total,0);
   assert.equal(data.coastal.complete,false);
   assert.equal(data.coastal.qualifying,undefined);
+});
+
+
+test("all beaches have their own rain point about three miles east", () => {
+  const points = pointLocations(sites);
+  assert.equal(new Set(points.map(point => point.id)).size,2*sites.length);
+  for (const site of sites) {
+    const point = points.find(item => item.id===pointIds(site)[1]);
+    const east = point.lon-site.lon;
+    const halfAngle = east*Math.PI/360;
+    const miles = 2*3958.76*Math.asin(Math.cos(site.lat*Math.PI/180)*Math.sin(halfAngle));
+    assert.equal(point.lat,site.lat);
+    assert.ok(miles>=2.99 && miles<=3.01, site.name);
+  }
 });

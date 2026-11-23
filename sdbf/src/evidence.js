@@ -24,21 +24,16 @@ export function reading(sample) {
 
 export function rainDisplay(site, inland = false) {
   const point = inland ? site.inlandRain : site.coastal;
-  const gauge = inland ? site.inlandGaugeRain : site.rain;
-  const station = gauge?.station ?? site.rainGauge;
+  const gauge = inland ? null : site.rain;
   const number = value => `${value.toFixed(2)} in`;
   if (gauge?.complete && Number.isFinite(gauge.lowerBound) && (!point?.complete || gauge.lowerBound >= point.total)) {
-    return { value:number(gauge.lowerBound), note:`${station} gauge` };
+    return { value:number(gauge.lowerBound) };
   }
   if (Number.isFinite(point?.total) && (gauge?.lowerBound ?? 0) <= point.total) {
-    return { value:(point.complete ? "" : "≥") + number(point.total), note:point.complete ? "Weather-model estimate" : "Partial model estimate" };
+    return { value:(point.complete ? "" : "≥") + number(point.total), note:point.complete ? undefined : "Incomplete coverage" };
   }
-  if (gauge?.lowerBound > 0) return { value:"≥"+number(gauge.lowerBound), note:`${station} gauge minimum` };
+  if (gauge?.lowerBound > 0) return { value:"≥"+number(gauge.lowerBound), note:"Incomplete coverage" };
   return { value:"Unavailable", note:"Rain coverage incomplete" };
-}
-
-export function outfallText(site) {
-  return site.outfall ? `${site.outfall.meters.toLocaleString("en-US")} m to outfall` : "Unverified";
 }
 
 export function postingText(site) {
@@ -60,10 +55,7 @@ export function scoreFactors(site, now) {
     }
     if (Number.isFinite(signal.amount)) {
       const window = signal.field === "local" ? "72h" : "4 days";
-      return [{ score:signal.score, text:`${signal.minimum ? "≥" : ""}${signal.amount.toFixed(2)} in ${signal.modeled ? "modeled" : "measured"} ${signal.field} rain · ${window}` }];
-    }
-    if (signal.field === "runoff" && signal.reason === "Monitoring point is near a mapped outfall") {
-      return [{ score:signal.score, text:`Outfall ${site.outfall.meters} m from station` }];
+      return [{ score:signal.score, text:`${signal.minimum ? "≥" : ""}${signal.amount.toFixed(2)} in ${signal.field} rain · ${window}` }];
     }
     return [{ score:signal.score, text:signal.reason }];
   });

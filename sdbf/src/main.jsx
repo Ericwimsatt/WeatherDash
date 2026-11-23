@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
-import { age, countyUrl, date, outfallText, postingText, rainDisplay, reading, scoreFactors } from "./evidence.js";
+import { age, countyUrl, date, postingText, rainDisplay, reading, scoreFactors } from "./evidence.js";
 import { drawMap, project } from "./map.js";
 
 import { withPointRain } from "../data/point-rain.mjs";
@@ -38,7 +38,7 @@ function ScoreFactors({ site, now }) {
 
 function Rain({site,inland=false}) {
   const display = rainDisplay(site,inland);
-  return <><strong>{display.value}</strong><small>{display.note}</small></>;
+  return <><strong>{display.value}</strong>{display.note && <small>{display.note}</small>}</>;
 }
 
 function Table({ sites, now, open }) {
@@ -130,7 +130,7 @@ function Detail({ site, snapshot, now, dismiss }) {
     <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /></div>
     <dl className="quick-evidence">
       <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} />{site.rain?.lowerBound>0 && !site.rain.complete && <small>Gauge minimum {site.rain.lowerBound.toFixed(2)} in</small>}</dd>
-      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>{site.inlandRain?.name}</small>{site.inlandGaugeRain?.lowerBound>0 && !site.inlandGaugeRain.complete && <small>{site.inlandGaugeRain.station} gauge minimum {site.inlandGaugeRain.lowerBound.toFixed(2)} in</small>}</dd>
+      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland</small></dd>
       <dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />
         {evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>
       <dt>County posting</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong><small>Updated {date(site.posting?.observedAt)} Pacific</small></dd>
@@ -141,8 +141,7 @@ function Detail({ site, snapshot, now, dismiss }) {
       <dl>
         <dt>Sampling point</dt><dd>{site.location} · {site.monitor}</dd>
         <dt>Sample time</dt><dd>{date(sample?.collectedAt)} Pacific · {sample?.method || "Method unavailable"}</dd>
-        <dt>Nearby outfall</dt><dd>{outfallText(site)}<small>{site.outfall?.name}</small></dd>
-        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}<small>Inland · {site.inlandRain?.name ?? "Unavailable"}</small><small>Weather-model estimates describe nearby grid areas. Gauges measure rain at a station.</small></dd>
+        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}<small>Inland · {site.inlandRain?.name ?? "Unavailable"}</small></dd>
         <dt>Spill reports</dt><dd><a href="https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/south-region-health-concerns/Environmental-Dashboard.html">County environmental dashboard</a></dd>
         {weather?.river && <><dt>River discharge</dt><dd>{weather.river.cfs} ft³/s · {weather.river.station}<small>{date(weather.river.observedAt)} Pacific · USGS</small></dd></>}
         {weather?.air != null && <><dt>Air temperature</dt><dd>{weather.air} °F · Open-Meteo<small>{date(weather.airAt)} Pacific{weather.wind != null && ` · Wind ${weather.wind} mph`}</small></dd></>}
