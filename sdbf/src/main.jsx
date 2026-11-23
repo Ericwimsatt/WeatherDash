@@ -11,13 +11,7 @@ import "../preview/snapshot.js";
 const RunoffChart = lazy(() => import("./runoff.jsx"));
 const geography = window.beachGeography;
 const initial = window.beachSnapshot;
-const layers = [
-  ["status", "Safety score", site => `${site.rating.score}/10 · ${site.rating.label}`],
-  ["county", "County posting", postingText],
-  ["sample", "Latest bacteria test", (site, now) => site.sample ? `${reading(site.sample)} · ${age(site.sample.collectedAt, now)}` : "Sample unavailable"],
-  ["rain", "Local rain · 72h", site => rainDisplay(site).value],
-  ["inland", "Inland rain · 4 days", site => rainDisplay(site,true).value],
-];
+const mapScore = site => `${site.rating.score}/10 · ${site.rating.label}`;
 
 function Sample({ sample, now }) {
   return <><strong>{reading(sample)}</strong>{sample && <small>{sample.units} · {age(sample.collectedAt, now)}</small>}</>;
@@ -65,8 +59,6 @@ const closeLabels = new Map([[646,-8],[644,6],[455,5]]);
 function MapView({ sites, now, open }) {
   const canvas = useRef(null);
   const timer = useRef(null);
-  const [layer, setLayer] = useState("status");
-  const [, title, getValue] = layers.find(item => item[0] === layer);
   useEffect(() => {
     const target = canvas.current;
     const observer = new ResizeObserver(() => drawMap(target, geography));
@@ -84,7 +76,6 @@ function MapView({ sites, now, open }) {
     open(id, event.currentTarget);
   }
   return <>
-    <div className="map-controls"><label>Map evidence <select value={layer} onChange={event => setLayer(event.target.value)}>{layers.map(([key,name]) => <option key={key} value={key}>{name}</option>)}</select></label></div>
     <div className="score-legend" aria-label="Safety scores from 1, lowest observed concern, to 10, dangerous">
       {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color}}>{index+1}</span>)}
       <small>Lower concern → higher risk</small>
@@ -101,7 +92,7 @@ function MapView({ sites, now, open }) {
                 aria-label={`${site.name}. Safety score ${site.rating.score} of 10. Show details.`} />
               <button className="station-name" type="button" onClick={event => activate(event, site.id)}
                 onPointerEnter={event => hover(event, site.id)} onPointerLeave={() => clearTimeout(timer.current)}
-                aria-haspopup="dialog" aria-label={`${site.name}. ${getValue(site, now)}. Show details.`}>
+                aria-haspopup="dialog" aria-label={`${site.name}. ${mapScore(site)}. Show details.`}>
                 {site.name}
               </button>
             </div>;
@@ -109,9 +100,9 @@ function MapView({ sites, now, open }) {
         </div>
         <figcaption>Geography from <a href="https://tigerweb.geo.census.gov/tigerweb/">U.S. Census TIGERweb</a></figcaption>
       </figure>
-      <table className="map-list"><thead><tr><th scope="col">Beach</th><th scope="col">{title}</th></tr></thead><tbody>{sites.map(site => <tr style={{"--rating":site.rating.color}} key={site.id}>
+      <table className="map-list"><thead><tr><th scope="col">Beach</th><th scope="col">Safety score</th></tr></thead><tbody>{sites.map(site => <tr style={{"--rating":site.rating.color}} key={site.id}>
         <th scope="row"><button className="beach-link" onClick={event => activate(event, site.id)} onPointerEnter={event => hover(event, site.id)} onPointerLeave={() => clearTimeout(timer.current)} aria-haspopup="dialog">{site.name}</button></th>
-        <td><span className="evidence-dot" aria-hidden="true" />{getValue(site, now)}{layer==="status" && <ScoreFactors site={site} now={now} />}</td>
+        <td><span className="evidence-dot" aria-hidden="true" />{mapScore(site)}<ScoreFactors site={site} now={now} /></td>
       </tr>)}</tbody></table>
     </div>
   </>;
@@ -167,15 +158,17 @@ async function requestSnapshot(endpoint, signal, method="GET") {
 
 function CoastNotice({ result, snapshot, now }) {
   const regional = snapshot.regionalRain;
-  const isActive = regional?.advisory === "active";
+  const areas = result.regionsOnRainHold;
   const estimated = regional?.estimatedLiftAt;
-  const heading = result.coastRainHold || (result.candidates.length ? `${result.candidates.length} sites with the lowest observed concern` : "No beach currently scores 1–2");
+  const candidateSummary = result.candidates.length ? `${result.candidates.length} beaches score 1–2` : "No beach currently scores 1–2";
+  const heading = result.coastRainHold || (areas.length ? "Regional rain hold" : candidateSummary);
   return <section className="coast-status" aria-label="Coastwide water quality">
     <strong>{heading}</strong>
-    {result.coastRainHold && <p>{isActive ? "The County advisory applies to all coastal beaches and bays." : "Beach Finder applies a minimum score of 7 across its monitored coast during and for 72 hours after qualifying rain."} {isActive && estimated && (
+    {result.coastRainHold && <p>The County advisory applies to all coastal beaches and bays. {estimated && (
       Date.parse(estimated) > now ? `County estimated lift ${date(estimated)} Pacific, pending confirmation.`
         : `County’s estimated lift was ${date(estimated)} Pacific. Confirmation is pending.`
     )}</p>}
+    {!result.coastRainHold && areas.length > 0 && <p>{areas.join(", ")} · minimum score of 7 after qualifying rain. {candidateSummary}.</p>}
     <p className="stamp">County checked {date(snapshot.countyCheckedAt ?? regional?.verifiedAt)} Pacific · <a href={countyUrl}>Current County postings</a></p>
   </section>;
 }
@@ -264,7 +257,7 @@ function App() {
           <button type="button" aria-pressed={view==="table"} onClick={() => setView("table")}>Table</button>
           <button type="button" aria-pressed={view==="map"} onClick={() => setView("map")}>Map</button>
         </div>
-        <button className="refresh" type="button" disabled={refreshing} onClick={() => void refresh(true)}>{refreshing ? "Checking sources…" : "Refresh evidence"}</button>
+        {view==="table" && <button className="refresh" type="button" disabled={refreshing} onClick={() => void refresh(true)}>{refreshing ? "Checking sources…" : "Refresh evidence"}</button>}
       </div>
       {status && <p className="source-status" role="status">{status}</p>}
       <section aria-label="Beach water quality evidence">

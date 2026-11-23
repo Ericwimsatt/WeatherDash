@@ -37,29 +37,28 @@ function rainHold(rain, now) {
     (!Number.isFinite(Date.parse(rain.endedAt)) || fresh(rain.endedAt, now, 72));
 }
 
-function coastSignal(regionalRain, sites, now) {
-  if (regionalRain?.advisory === "active") return { score:7, reason:"Countywide rain advisory" };
-  if (rainHold(regionalRain,now) || sites.some(site => rainHold(site.rain,now)))
-    return { score:7, reason:"Qualifying rain measured along the coast" };
-  if (sites.some(site => fresh(site.coastal?.verifiedAt,now,3) && rainHold(site.coastal,now)))
-    return { score:7, reason:"Coastwide caution after rain" };
-  return null;
+function qualifyingCoastalRain(site, now) {
+  return rainHold(site.rain,now) || (fresh(site.coastal?.verifiedAt,now,3) && rainHold(site.coastal,now));
 }
 
-export function assess(site, now=Date.now(), coast=null) {
+const countyHold = { score:7, reason:"Countywide rain advisory" };
+
+export function assess(site, now=Date.now(), regionOnHold=false) {
   const { posting, sample, rain, coastal, inlandRain, runoff, regionalRain } = site;
   const evidence = sampleEvidence(sample);
   const signals = [];
   const gaps = [];
   const notes = [];
   const add = (score, reason, field, details) => signals.push({score,reason,field,...details});
-  if (coast) add(coast.score,coast.reason,"regional");
+  if (regionalRain?.advisory === "active") add(countyHold.score,countyHold.reason,"regional");
+  else if (regionOnHold || qualifyingCoastalRain(site,now))
+    add(7,site.area ? `Rain hold · ${site.area}` : "Local rain hold","regional");
 
   const official = { closure:10, warning:10, advisory:9, "rain advisory":7 }[posting?.status];
   const countyFresh = fresh(posting?.verifiedAt,now,12);
   if (official) add(official,`${countyFresh ? "County" : "Last County posting:"} ${posting.status}`,"county");
   else if (posting?.status !== "open" || !countyFresh) gaps.push("Current County status unverified");
-  if (!coast && (regionalRain?.advisory !== "clear" || !fresh(regionalRain?.verifiedAt,now,3)))
+  if (regionalRain?.advisory !== "active" && (regionalRain?.advisory !== "clear" || !fresh(regionalRain?.verifiedAt,now,3)))
     gaps.push("Countywide rain status unverified");
 
   if (runoff?.hazard) add(10,runoff.hazard,"runoff");
@@ -112,7 +111,12 @@ export function assess(site, now=Date.now(), coast=null) {
 }
 
 export function assessCoast(sites, { regionalRain } = {}, now=Date.now()) {
-  const coast = coastSignal(regionalRain,sites,now);
-  const results = sites.map(site => ({ id:site.id, water:assess({ ...site, regionalRain },now,coast) }));
-  return { coastRainHold:coast?.reason ?? null, results, candidates:results.filter(site => site.water.score <= 2).map(site => site.id) };
+  const regions = new Set(sites.filter(site => site.area && qualifyingCoastalRain(site,now)).map(site => site.area));
+  const results = sites.map(site => ({ id:site.id, water:assess({ ...site, regionalRain },now,regions.has(site.area)) }));
+  return {
+    coastRainHold:regionalRain?.advisory === "active" ? countyHold.reason : null,
+    regionsOnRainHold:[...regions],
+    results,
+    candidates:results.filter(site => site.water.score <= 2).map(site => site.id),
+  };
 }
