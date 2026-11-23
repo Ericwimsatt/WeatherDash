@@ -31,8 +31,7 @@ function ScoreFactors({ site, now }) {
 }
 
 function Rain({site,inland=false}) {
-  const display = rainDisplay(site,inland);
-  return <><strong>{display.value}</strong>{display.note && <small>{display.note}</small>}</>;
+  return <strong>{rainDisplay(site,inland)}</strong>;
 }
 
 function Table({ sites, now, open }) {
@@ -121,7 +120,7 @@ function Detail({ site, snapshot, now, dismiss }) {
     <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /></div>
     {site.rating.notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
     <dl className="quick-evidence">
-      <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} />{site.rain?.lowerBound>0 && !site.rain.complete && <small>Gauge minimum {site.rain.lowerBound.toFixed(2)} in</small>}</dd>
+      <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} /></dd>
       <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland</small></dd>
       <dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />
         {evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>
@@ -158,17 +157,17 @@ async function requestSnapshot(endpoint, signal, method="GET") {
 
 function CoastNotice({ result, snapshot, now }) {
   const regional = snapshot.regionalRain;
-  const areas = result.regionsOnRainHold;
+  const rainfall = result.regionalRainfall;
   const estimated = regional?.estimatedLiftAt;
   const candidateSummary = result.candidates.length ? `${result.candidates.length} beaches score 1–2` : "No beach currently scores 1–2";
-  const heading = result.coastRainHold || (areas.length ? "Regional rain hold" : candidateSummary);
+  const heading = result.coastRainHold || (rainfall.length ? "Regional rainfall" : candidateSummary);
   return <section className="coast-status" aria-label="Coastwide water quality">
     <strong>{heading}</strong>
     {result.coastRainHold && <p>The County advisory applies to all coastal beaches and bays. {estimated && (
       Date.parse(estimated) > now ? `County estimated lift ${date(estimated)} Pacific, pending confirmation.`
         : `County’s estimated lift was ${date(estimated)} Pacific. Confirmation is pending.`
     )}</p>}
-    {!result.coastRainHold && areas.length > 0 && <p>{areas.join(", ")} · minimum score of 7 after qualifying rain. {candidateSummary}.</p>}
+    {rainfall.length > 0 && <p>{result.coastRainHold && "Regional rainfall · "}{rainfall.map(([area,points]) => `${area} up to +${points}`).join(" · ")}. {candidateSummary}.</p>}
     <p className="stamp">County checked {date(snapshot.countyCheckedAt ?? regional?.verifiedAt)} Pacific · <a href={countyUrl}>Current County postings</a></p>
   </section>;
 }

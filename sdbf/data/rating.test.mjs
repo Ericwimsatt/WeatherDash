@@ -24,22 +24,26 @@ test("County and confirmed runoff hazards impose a floor even with low bacteria"
   assert.equal(score({runoff:{hazard:"Verified spill"}}),10);
 });
 
-test("a local rain hold affects its region and an official advisory applies coastwide", () => {
+test("regional rainfall adds one to three points to all beaches in the affected region", () => {
   const central = {...base,id:2,area:"Central Coast"};
-  const rain = {...base.rain,qualifying:true,endedAt:before(72),lowerBound:.2};
-  const north = {...base,id:3,rain};
+  const north = {...base,id:3,coastal:{total:.35,verifiedAt:before(1)}};
   const sites = [base,central,north];
   const regional = assessCoast(sites,{regionalRain},now);
   assert.equal(regional.coastRainHold,null);
-  assert.deepEqual(regional.regionsOnRainHold,["North County"]);
-  assert.deepEqual(regional.results.map(x=>x.water.score),[7,1,7]);
+  assert.deepEqual(regional.regionalRainfall,[["North County",3]]);
+  assert.deepEqual(regional.results.map(x=>x.water.score),[4,1,8]);
+  assert.equal(regional.results[0].water.signals[0].reason,"Regional rainfall · +3");
+  assert.equal(regional.results[2].water.signals.at(-1).reason,"Regional rainfall · +1");
+  for (const [total,points] of [[.04,0],[.05,1],[.20,2],[.35,3]]) {
+    const modeled = {...central,coastal:{total,verifiedAt:before(1)}};
+    const neighbor = {...central,id:4};
+    assert.equal(assessCoast([base,modeled,neighbor],{regionalRain},now).results[2].water.score,1+points);
+  }
+  const stale = {...north,coastal:{...north.coastal,verifiedAt:before(4)}};
+  assert.deepEqual(assessCoast([base,stale],{regionalRain},now).results.map(x=>x.water.score),[1,1]);
   const official = assessCoast(sites,{regionalRain:{advisory:"active",estimatedLiftAt:before(24)}},now);
   assert.equal(official.coastRainHold,"Countywide rain advisory");
-  assert.deepEqual(official.results.map(x=>x.water.score),[7,7,7]);
-  const modeled = {...central,coastal:{qualifying:true,endedAt:before(4),total:.3,verifiedAt:before(1)}};
-  assert.deepEqual(assessCoast([base,modeled],{regionalRain},now).results.map(x=>x.water.score),[1,7]);
-  const expired = {...north,rain:{...rain,endedAt:before(73),lowerBound:0}};
-  assert.deepEqual(assessCoast([base,expired],{regionalRain},now).results.map(x=>x.water.score),[1,1]);
+  assert.deepEqual(official.results.map(x=>x.water.score),[8,7,8]);
 });
 
 test("bacteria, inland rain, and sample age matter without an advisory", () => {
@@ -96,13 +100,15 @@ test("rain-only scores rise above a breached runoff limit and cap at eight", () 
   assert.deepEqual([.19,.20,.35,.50,4].map(amount => score({rain:local(amount)})),[4,6,7,8,8]);
   assert.deepEqual([.74,.75,1,1.25,4].map(amount => score({inlandRain:inland(amount)})),[4,6,7,8,8]);
   const wet={...base, rain:{...local(1),qualifying:true,endedAt:before(2)}, inlandRain:inland(2)};
-  assert.deepEqual(assessCoast([wet,{...base,id:2}],{regionalRain},now).results.map(site=>site.water.score),[8,7]);
+  assert.deepEqual(assessCoast([wet,{...base,id:2}],{regionalRain},now).results.map(site=>site.water.score),[8,4]);
+  const closed = {...base,id:2,posting:{status:"closure",verifiedAt:before(1)}};
+  assert.equal(assessCoast([wet,closed],{regionalRain},now).results[1].water.score,10);
   assert.equal(score({posting:{status:"rain advisory",verifiedAt:before(1)}}),7);
   assert.equal(score({posting:{status:"warning",verifiedAt:before(1)},rain:local(4)}),10);
 });
 
 
-test("incomplete rain coverage adds no penalty, and usable partial totals still count", () => {
+test("available rainfall amounts set the score", () => {
   const local = {...base.rain,complete:false,lowerBound:0};
   const inland = {...base.inlandRain,complete:false,total:.04};
   const lowRain = assess({...base,rain:local,inlandRain:inland},now);

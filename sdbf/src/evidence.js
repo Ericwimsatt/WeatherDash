@@ -25,15 +25,8 @@ export function reading(sample) {
 export function rainDisplay(site, inland = false) {
   const point = inland ? site.inlandRain : site.coastal;
   const gauge = inland ? null : site.rain;
-  const number = value => `${value.toFixed(2)} in`;
-  if (gauge?.complete && Number.isFinite(gauge.lowerBound) && (!point?.complete || gauge.lowerBound >= point.total)) {
-    return { value:number(gauge.lowerBound) };
-  }
-  if (Number.isFinite(point?.total) && (gauge?.lowerBound ?? 0) <= point.total) {
-    return { value:(point.complete ? "" : "≥") + number(point.total), note:point.complete ? undefined : "Incomplete coverage" };
-  }
-  if (gauge?.lowerBound > 0) return { value:"≥"+number(gauge.lowerBound), note:"Incomplete coverage" };
-  return { value:"Unavailable", note:"Rain coverage incomplete" };
+  const estimates = [point?.total,gauge?.lowerBound].filter(Number.isFinite);
+  return estimates.length ? `${Math.max(...estimates).toFixed(2)} in` : "Unavailable";
 }
 
 export function postingText(site) {
@@ -52,7 +45,7 @@ export function scoreFactors(site, now) {
     }
     if (Number.isFinite(signal.amount)) {
       const window = signal.field === "local" ? "72h" : "4 days";
-      return [{ score:signal.score, text:`${signal.minimum ? "≥" : ""}${signal.amount.toFixed(2)} in ${signal.field} rain · ${window}` }];
+      return [{ score:signal.score, text:`${signal.amount.toFixed(2)} in ${signal.field} rain · ${window}` }];
     }
     return [{ score:signal.score, text:signal.reason }];
   });
