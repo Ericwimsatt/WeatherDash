@@ -46,9 +46,9 @@ export function scoreFactors(site, now) {
   return rating.signals.flatMap(signal => {
     if (signal.field === "evidence" && rating.gaps.length)
       return rating.gaps.map(text => ({ score:signal.score, text }));
-    if (signal.field === "bacteria" && signal.score===2) {
+    if (signal.field === "bacteria" && signal.historical) {
       const ageText = site.sample ? age(site.sample.collectedAt,now) : "date unknown";
-      return [{ score:2, text:`Past bacteria exceedance · ${ageText}` }];
+      return [{ score:signal.score, text:`Past bacteria exceedance · ${ageText}` }];
     }
     if (Number.isFinite(signal.amount)) {
       const window = signal.field === "local" ? "72h" : "4 days";

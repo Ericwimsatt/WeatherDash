@@ -172,7 +172,7 @@ function CoastNotice({ result, snapshot, now }) {
   const heading = result.coastRainHold || (result.candidates.length ? `${result.candidates.length} sites with the lowest observed concern` : "No beach currently scores 1–2");
   return <section className="coast-status" aria-label="Coastwide water quality">
     <strong>{heading}</strong>
-    {result.coastRainHold && <p>Applies to all coastal beaches and bays. {isActive && estimated && (
+    {result.coastRainHold && <p>{isActive ? "The County advisory applies to all coastal beaches and bays." : "Beach Finder applies a minimum score of 7 across its monitored coast during and for 72 hours after qualifying rain."} {isActive && estimated && (
       Date.parse(estimated) > now ? `County estimated lift ${date(estimated)} Pacific, pending confirmation.`
         : `County’s estimated lift was ${date(estimated)} Pacific. Confirmation is pending.`
     )}</p>}

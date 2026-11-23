@@ -91,7 +91,7 @@ export function assess(site, now=Date.now(), coast=null) {
     if (fresh(sample.collectedAt,now,72)) {
       add(sample.value/evidence.threshold >= 2 || localAmount >= rainLimits.local ? 10 : 9,"Recent bacteria test at or above the limit","bacteria");
     } else {
-      add(2,"Older bacteria test at or above the limit","bacteria");
+      add(6,"Older bacteria test at or above the limit","bacteria",{historical:true});
       notes.push("The last exceedance was more than 72 hours ago.");
     }
   } else if (evidence?.below && hasRecentSample) {

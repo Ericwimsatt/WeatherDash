@@ -35,7 +35,7 @@ test("qualifying rain affects all sites and an official hold persists until a co
 test("bacteria, inland rain, and sample age matter without an advisory", () => {
   assert.equal(score({sample:{...low,value:1500}}),9);
   assert.equal(score({sample:{...low,value:3000}}),10);
-  assert.equal(score({sample:{...low,value:1500,collectedAt:before(110)}}),2);
+  assert.equal(score({sample:{...low,value:1500,collectedAt:before(110)}}),6);
   assert.equal(score({inlandRain:{complete:true,total:1.3,verifiedAt:before(1)}}),8);
   assert.equal(score({posting:{...base.posting,lastHazardEnded:before(3)}}),1);
 });
@@ -66,12 +66,13 @@ test("off-point inland gauges cannot override the three-mile rainfall", () => {
 });
 
 
-test("lab history leaves an otherwise clear beach at 1, with a floor of 2 for a stale exceedance", () => {
+test("lab history leaves an otherwise clear beach at 1, with a floor of 6 for a stale exceedance", () => {
   const oldExceedance = {...low,value:3000,collectedAt:before(400)};
   assert.equal(score({sample:{...low,value:1000}}),1);
   assert.equal(score({sample:{...low,collectedAt:before(400)}}),1);
   assert.equal(score({sample:null}),1);
-  assert.equal(score({sample:oldExceedance}),2);
+  assert.equal(score({sample:oldExceedance}),6);
+  assert.equal(score({sample:oldExceedance,inlandRain:{...base.inlandRain,total:1.25}}),8);
   assert.equal(score({sample:oldExceedance,inlandRain:{...base.inlandRain,total:.9}}),6);
   assert.equal(score({sample:oldExceedance,posting:{status:"closure",verifiedAt:before(1)}}),10);
   assert.equal(score({sample:{...oldExceedance,collectedAt:before(71)}}),10);
