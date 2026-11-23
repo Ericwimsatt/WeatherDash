@@ -70,14 +70,11 @@ export function assess(site, now=Date.now(), regionOnHold=false) {
   const localAmount = Math.max(measured ?? 0,localEstimate);
   const localModeled = localEstimate > (measured ?? 0);
   const localDetails = { amount:localAmount, minimum:!(localModeled ? coastal?.complete : rain?.complete) };
-  const hasLocalCoverage = fresh(rain?.verifiedAt,now,3) && rain?.complete || localFresh && coastal?.complete;
-  if (!hasLocalCoverage) gaps.push("Local rain coverage incomplete");
   if (localAmount >= .5) add(8,"Heavy local rain in the past 72 hours","local",localDetails);
   else if (localAmount >= .35) add(7,"Elevated local rain in the past 72 hours","local",localDetails);
   else if (localAmount >= rainLimits.local) add(6,"Local rain crossed the runoff limit","local",localDetails);
   else if (localAmount >= .05) add(4,"Light local rain in the past 72 hours","local",localDetails);
 
-  if (!(inlandFresh && inlandRain?.complete)) gaps.push("Inland rain coverage incomplete");
   const inlandAmount = inlandFresh ? inlandRain?.total ?? 0 : 0;
   const inlandDetails = { amount:inlandAmount, minimum:!inlandRain?.complete };
   if (inlandAmount >= 1.25) add(8,"Heavy inland rain in the past four days","inland",inlandDetails);

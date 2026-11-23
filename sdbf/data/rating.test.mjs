@@ -11,11 +11,11 @@ const base = { id:1, area:"North County", posting:{status:"open",verifiedAt:befo
 };
 const score = changes => assess({...base,...changes},now).score;
 
-test("lowest score requires current County and rain evidence without active risk indicators", () => {
+test("lowest score requires current County evidence without active risk indicators", () => {
   assert.equal(score({}),1);
   assert.equal(score({rain:{complete:false},coastal:{complete:true,total:0,verifiedAt:before(1)}}),1);
   assert.equal(score({sample:{...low,collectedAt:before(72)}}),1);
-  assert.equal(score({sample:null,inlandRain:null}),5);
+  assert.equal(score({sample:null,rain:null,inlandRain:null}),1);
 });
 
 test("County and confirmed runoff hazards impose a floor even with low bacteria", () => {
@@ -99,4 +99,16 @@ test("rain-only scores rise above a breached runoff limit and cap at eight", () 
   assert.deepEqual(assessCoast([wet,{...base,id:2}],{regionalRain},now).results.map(site=>site.water.score),[8,7]);
   assert.equal(score({posting:{status:"rain advisory",verifiedAt:before(1)}}),7);
   assert.equal(score({posting:{status:"warning",verifiedAt:before(1)},rain:local(4)}),10);
+});
+
+
+test("incomplete rain coverage adds no penalty, and usable partial totals still count", () => {
+  const local = {...base.rain,complete:false,lowerBound:0};
+  const inland = {...base.inlandRain,complete:false,total:.04};
+  const lowRain = assess({...base,rain:local,inlandRain:inland},now);
+  assert.equal(lowRain.score,1);
+  assert.deepEqual(lowRain.gaps,[]);
+  assert.equal(score({rain:{...local,lowerBound:.22},inlandRain:inland}),6);
+  assert.equal(score({rain:local,inlandRain:{...inland,total:1.30}}),8);
+  assert.equal(score({rain:null,inlandRain:null,posting:null}),5);
 });
