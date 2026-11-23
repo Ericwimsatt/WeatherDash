@@ -4,7 +4,12 @@ export const rainLimits = { local:.2, inland:.75 };
 
 const milesInland = 3;
 const milesPerLongitudeDegreeAtEquator = 69.17;
-const inlandSharingMiles = 5;
+// Inland rain is shared along the coast with a smooth distance falloff, not a
+// hard cutoff: a heavy reading inland of Moonlight should still register at
+// La Jolla Shores (~13.5 mi south) and Oceanside (~11 mi north). Runoff can be
+// dangerous, so sharing errs high. Weight halves near ~11.6 mi and is treated
+// as zero beyond twice the scale (~28 mi), past the far South Bay.
+const inlandShareScale = 14;
 const inlandKeyPrefix = "inland:3mi:";
 
 export const pointIds = site => [`local:${site.id}`, `${inlandKeyPrefix}${site.id}`];
@@ -50,9 +55,8 @@ function inlandEstimate(site, points, key, now) {
       (point.lat-center.lat)*milesPerLongitudeDegreeAtEquator,
       (point.lon-center.lon)*longitudeScale,
     );
-    if (distance < inlandSharingMiles) {
-      sources.push({point, distance, checked, weight:1-(distance/inlandSharingMiles)**2});
-    }
+    if (distance >= 2*inlandShareScale) continue;
+    sources.push({point, distance, checked, weight:Math.exp(-((distance/inlandShareScale)**2))});
   }
   if (!sources.some(source => source.point !== own)) return own;
   sources.sort((a,b) => a.distance-b.distance);

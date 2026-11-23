@@ -54,7 +54,7 @@ test("all beaches have their own rain point about three miles east", () => {
   }
 });
 
-test("inland rainfall tapers with distance and keeps a higher on-site estimate", () => {
+test("inland rainfall tapers with distance and errs toward the higher nearby reading", () => {
   const now=Date.parse("2026-11-22T20:30:00Z");
   const start=Math.floor(now/hour)*hour-97*hour;
   const [moonlight,cardiff] = sites.filter(site => /Moonlight|Cardiff/.test(site.name));
@@ -69,11 +69,39 @@ test("inland rainfall tapers with distance and keeps a higher on-site estimate",
   const far = inlandPoint(sites[0],4);
   const points = {[moonlightPoint.id]:moonlightPoint,[cardiffPoint.id]:cardiffPoint,[far.id]:far};
   const cardiffEstimate = withPointRain(cardiff,points,now);
-  assert.ok(cardiffEstimate.inlandRain.total > 1 && cardiffEstimate.inlandRain.total < 1.25);
-  assert.equal(withPointRain(moonlight,points,now).inlandRain.total,1.87);
+  // Cardiff sits ~3 mi from Moonlight, so it inherits most of Moonlight's 1.87″.
+  assert.ok(cardiffEstimate.inlandRain.total > 1.7 && cardiffEstimate.inlandRain.total < 1.87);
+  // Moonlight keeps its own reading and is only nudged up by the farther 4″ point.
+  assert.ok(withPointRain(moonlight,points,now).inlandRain.total > 1.87 && withPointRain(moonlight,points,now).inlandRain.total < 4);
+  // The far point's own reading stays intact.
   assert.equal(withPointRain(sites[0],points,now).inlandRain.total,4);
   assert.equal(pointTotal(cardiffEstimate.inlandPoint,now-96*hour,now).total,cardiffEstimate.inlandRain.total);
   assert.equal(cardiffPoint.values[30],.02);
+});
+
+test("heavy inland rain reaches La Jolla Shores and Oceanside with a gradient", () => {
+  const now=Date.parse("2026-11-22T20:30:00Z");
+  const start=Math.floor(now/hour)*hour-97*hour;
+  const [moonlight,laJolla,oceanside] = ["Moonlight Beach","La Jolla Shores","Oceanside Pier"]
+    .map(name => sites.find(site => site.name === name));
+  const inlandPoint = (site,rain) => {
+    const point = pointLocations([site])[1];
+    const values = Array(104).fill(0);
+    values[30] = rain;
+    return {...point,start,values,verifiedAt:new Date(now).toISOString()};
+  };
+  const moonlightPoint = inlandPoint(moonlight,1.4);
+  const laJollaPoint = inlandPoint(laJolla,0);
+  const oceansidePoint = inlandPoint(oceanside,0);
+  const points = {[moonlightPoint.id]:moonlightPoint,[laJollaPoint.id]:laJollaPoint,[oceansidePoint.id]:oceansidePoint};
+  const laJollaRain = withPointRain(laJolla,points,now).inlandRain.total;
+  const oceansideRain = withPointRain(oceanside,points,now).inlandRain.total;
+  // Moonlight's own reading is untouched.
+  assert.equal(withPointRain(moonlight,points,now).inlandRain.total,1.4);
+  // Both distant beaches see the rain, and the closer one (Oceanside) gets more.
+  assert.ok(laJollaRain > .5 && laJollaRain < .6);
+  assert.ok(oceansideRain > .7 && oceansideRain < .8);
+  assert.ok(oceansideRain > laJollaRain);
 });
 
 test("nearby rainfall can fill a missing inland hour but cannot use an elapsed forecast", () => {
