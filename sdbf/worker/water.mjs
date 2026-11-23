@@ -1,6 +1,8 @@
 import sites from "../data/sites.json" with { type:"json" };
+import { inlandGaugeFor } from "../data/point-rain.mjs";
 const hour = 3600000;
 const gauges = [...new Set(sites.map(site => site.rainGauge))];
+const allRainGauges = [...new Set([...gauges,...sites.map(inlandGaugeFor).filter(Boolean)])];
 
 export async function json(url) {
   const response = await fetch(url, {
@@ -36,8 +38,8 @@ function nonoverlapping(intervals) {
   return weighted.at(-1);
 }
 
-export function summarizeRain(intervals, verifiedAt, now=Date.now()) {
-  const start = now - 72*hour;
+export function summarizeRain(intervals, verifiedAt, now=Date.now(), hours=72) {
+  const start = now - hours*hour;
   const recent = intervals.filter(interval => Date.parse(interval.end) <= now && Date.parse(interval.end) > start);
   const ordered = recent.filter(interval => Date.parse(interval.start) >= start).sort((a,b) => a.end.localeCompare(b.end));
   let covered = start;
@@ -64,15 +66,25 @@ export function summarizeRain(intervals, verifiedAt, now=Date.now()) {
 }
 
 async function readGauge(gauge, now) {
-  const params = new URLSearchParams({ start:new Date(now-7*24*hour).toISOString(), end:new Date(now).toISOString(), limit:"500" });
-  const first = await json(`https://api.weather.gov/stations/${gauge}/observations?${params}`);
-  if (!Array.isArray(first.features) || !first.features.length) throw Error("NWS station returned no observations");
-  return checkedRain(first.features, now);
+  const endpoint = `https://api.weather.gov/stations/${gauge}/observations`;
+  const params = new URLSearchParams({ start:new Date(now-5*24*hour).toISOString(), end:new Date(now).toISOString(), limit:"500" });
+  const records = [];
+  let pageURL = endpoint+"?"+params;
+  for (let page=0; page<4 && pageURL?.startsWith(endpoint+"?"); page++) {
+    let body;
+    try { body = await json(pageURL); }
+    catch (error) { if (!records.length) throw error; break; }
+    if (!Array.isArray(body.features) || !body.features.length) break;
+    records.push(...body.features);
+    pageURL = body.pagination?.next;
+  }
+  if (!records.length) throw Error("NWS station returned no observations");
+  return checkedRain(records,now);
 }
 
 export async function loadRain(now) {
-  const results = await Promise.allSettled(gauges.map(gauge => readGauge(gauge, now)));
-  const ready = Object.fromEntries(results.flatMap((result,index) => result.status === "fulfilled" ? [[gauges[index],result.value]] : []));
+  const results = await Promise.allSettled(allRainGauges.map(gauge => readGauge(gauge, now)));
+  const ready = Object.fromEntries(results.flatMap((result,index) => result.status === "fulfilled" ? [[allRainGauges[index],result.value]] : []));
   if (!Object.keys(ready).length) throw Error("No NWS gauge returned observations");
   return ready;
 }

@@ -1,44 +1,52 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { assessCoast, sampleEvidence } from "../data/rating.mjs";
-import { age, countyUrl, coverage, date, labels, outfallText, postingText, rainText, reading } from "./evidence.js";
+import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
+import { age, countyUrl, date, outfallText, postingText, rainDisplay, reading } from "./evidence.js";
 import { drawMap, project } from "./map.js";
-import { measurementChart } from "./charts.js";
+
+import { withPointRain } from "../data/point-rain.mjs";
 import "../preview/geography.js";
 import "../preview/snapshot.js";
 
+const RunoffChart = lazy(() => import("./runoff.jsx"));
 const geography = window.beachGeography;
 const initial = window.beachSnapshot;
-const day = 86400000;
 const layers = [
-  ["status", "Water quality", site => labels[site.rating.state]],
+  ["status", "Safety score", site => `${site.rating.score}/10 · ${site.rating.label}`],
   ["county", "County posting", postingText],
   ["sample", "Latest bacteria test", (site, now) => site.sample ? `${reading(site.sample)} · ${age(site.sample.collectedAt, now)}` : "Sample unavailable"],
-  ["rain", "72h rain", rainText],
-  ["runoff", "Mapped runoff", outfallText],
+  ["rain", "Local rain · 72h", site => rainDisplay(site).value],
+  ["inland", "Inland rain · 4 days", site => rainDisplay(site,true).value],
 ];
 
 function Sample({ sample, now }) {
   return <><strong>{reading(sample)}</strong>{sample && <small>{sample.units} · {age(sample.collectedAt, now)}</small>}</>;
 }
 
-function Rating({ site }) {
-  return <><strong className="rating">{labels[site.rating.state]}</strong><small>{site.rating.reason}</small></>;
+function Rating({ rating }) {
+  return <div className={`score ${rating.score >= 7 ? "hazard" : ""}`}>
+    <strong className="score-number" style={{"--score-color":rating.color}}>{rating.score}<span>/10</span></strong>
+    <small>{rating.label}</small>
+  </div>;
+}
+
+function Rain({site,inland=false}) {
+  const display = rainDisplay(site,inland);
+  return <><strong>{display.value}</strong><small>{display.note}</small></>;
 }
 
 function Table({ sites, now, open }) {
   return <>
-    <p className="scroll-hint">Scroll the table for the rest of the evidence.</p>
+    <p className="scroll-hint">Swipe for inland rain, bacteria, and County postings.</p>
     <div className="data-scroll" tabIndex={0} role="region" aria-label="Scrollable beach evidence table">
-      <table><colgroup><col className="rating-column" /><col className="site-column" /><col className="sample-column" /><col /><col /><col /></colgroup>
-        <thead><tr>{["Water quality", "Beach", "Latest bacteria test", "County posting", "72h rain", "Mapped runoff"].map(title => <th key={title} scope="col">{title}</th>)}</tr></thead>
-        <tbody>{sites.map(site => <tr key={site.id} className={site.rating.state}>
-          <td><Rating site={site} /></td>
-          <th scope="row"><button className="beach-link" onClick={event => open(site.id, event.currentTarget)}>{site.name}</button><small>{site.location}</small></th>
+      <table><colgroup><col className="site-column" /><col className="rating-column" /><col /><col /><col className="sample-column" /><col /></colgroup>
+        <thead><tr>{["Beach", "Safety score", "Local rain · 72h", "Inland rain · 4 days", "Latest bacteria test", "County posting"].map(title => <th key={title} scope="col">{title}</th>)}</tr></thead>
+        <tbody>{sites.map(site => <tr key={site.id}>
+          <th scope="row"><button className="beach-link" onClick={event => open(site.id,event.currentTarget)}>{site.name}</button><small>{site.location}</small></th>
+          <td><Rating rating={site.rating} /></td>
+          <td><Rain site={site} /></td><td><Rain site={site} inland /></td>
           <td><Sample sample={site.sample} now={now} /></td>
           <td><strong>{postingText(site)}</strong><small>{date(site.posting?.observedAt)}</small></td>
-          <td><strong>{rainText(site)}</strong><small>{coverage(site)}</small></td>
-          <td><strong>{outfallText(site)}</strong><small>{site.runoff?.hazard || "Current flow unverified"}</small></td>
         </tr>)}</tbody>
       </table>
     </div>
@@ -71,15 +79,20 @@ function MapView({ sites, now, open }) {
   }
   return <>
     <div className="map-controls"><label>Map evidence <select value={layer} onChange={event => setLayer(event.target.value)}>{layers.map(([key,name]) => <option key={key} value={key}>{name}</option>)}</select></label></div>
+    <div className="score-legend" aria-label="Safety scores from 1, lowest observed concern, to 10, dangerous">
+      {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color}}>{index+1}</span>)}
+      <small>Lower concern → higher risk</small>
+    </div>
     <div className="map">
       <figure className="map-figure">
         <div className="map-visual" role="group" aria-label="Map of San Diego County beaches, towns, bays and highways">
           <canvas className="basemap" aria-hidden="true" ref={canvas} /><span className="north" aria-hidden="true">N ↑</span>
           {sites.map(site => {
             const [x,y] = project(site.lon, site.lat);
-            return <div key={site.id} className={`station ${site.rating.state} ${westLabels.has(site.id) ? "station-west" : ""}`}
-              style={{"--x":`${x*100}%`, "--y":`${y*100}%`, "--offset":`${closeLabels.get(site.id) ?? 0}px`}}>
-              <span className="station-dot" aria-hidden="true" />
+            return <div key={site.id} className={`station ${westLabels.has(site.id) ? "station-west" : ""}`}
+              style={{"--x":`${x*100}%`, "--y":`${y*100}%`, "--offset":`${closeLabels.get(site.id) ?? 0}px`, "--rating":site.rating.color}}>
+              <button className="station-dot" type="button" onClick={event => activate(event,site.id)} aria-haspopup="dialog"
+                aria-label={`${site.name}. Safety score ${site.rating.score} of 10. Show details.`} />
               <button className="station-name" type="button" onClick={event => activate(event, site.id)}
                 onPointerEnter={event => hover(event, site.id)} onPointerLeave={() => clearTimeout(timer.current)}
                 aria-haspopup="dialog" aria-label={`${site.name}. ${getValue(site, now)}. Show details.`}>
@@ -90,7 +103,7 @@ function MapView({ sites, now, open }) {
         </div>
         <figcaption>Geography from <a href="https://tigerweb.geo.census.gov/tigerweb/">U.S. Census TIGERweb</a></figcaption>
       </figure>
-      <table className="map-list"><thead><tr><th scope="col">Beach</th><th scope="col">{title}</th></tr></thead><tbody>{sites.map(site => <tr className={site.rating.state} key={site.id}>
+      <table className="map-list"><thead><tr><th scope="col">Beach</th><th scope="col">{title}</th></tr></thead><tbody>{sites.map(site => <tr style={{"--rating":site.rating.color}} key={site.id}>
         <th scope="row"><button className="beach-link" onClick={event => activate(event, site.id)} onPointerEnter={event => hover(event, site.id)} onPointerLeave={() => clearTimeout(timer.current)} aria-haspopup="dialog">{site.name}</button></th>
         <td><span className="evidence-dot" aria-hidden="true" />{getValue(site, now)}</td>
       </tr>)}</tbody></table>
@@ -98,56 +111,48 @@ function MapView({ sites, now, open }) {
   </>;
 }
 
-function Chart({ title, points, maximum, limit, now, note }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const canvas = ref.current;
-    const draw = () => measurementChart(canvas, points, maximum, limit, now);
-    const observer = new ResizeObserver(draw);
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, [points, maximum, limit, now]);
-  const short = new Intl.DateTimeFormat("en-US", { month:"short", day:"numeric", timeZone:"America/Los_Angeles" });
-  return <section className="timeline"><h3>{title}</h3><p>{note}</p>
-    <canvas ref={ref} role="img" aria-label={`${title} over the last 30 days`} />
-    <div className="axis">{[30,15,0].map(offset => <span key={offset}>{short.format(now - offset*day)}</span>)}</div>
-  </section>;
-}
-
 function Detail({ site, snapshot, now, dismiss }) {
   const dialog = useRef(null);
   useEffect(() => { dialog.current.showModal(); }, []);
   const sample = site.sample;
   const evidence = sampleEvidence(sample);
-  const values = site.history.filter(point => point.units === sample?.units && point.method === sample?.method &&
-    Date.parse(point.collectedAt) >= now - 30*day && Date.parse(point.collectedAt) <= now);
-  const rain = (snapshot.rainSeries[site.rainGauge] ?? []).filter(point => Date.parse(point.end) >= now - 30*day);
   const weather = snapshot.context?.[site.rainGauge];
+  const hazardous = field => site.rating.signals.some(signal => signal.field===field && signal.score>=5) ? "hazard" : undefined;
+  const risks = site.rating.signals.filter(signal => signal.score>=5 && signal.field!=="evidence");
+
   return <dialog ref={dialog} onClose={dismiss} aria-labelledby="detail-title">
     <header className="dialog-heading"><h2 id="detail-title">{site.name}</h2><form method="dialog"><button autoFocus>Close</button></form></header>
-    <p className={site.rating.state}><Rating site={site} /></p>
-    <dl>
-      <dt>Monitoring point</dt><dd>{site.location} · {site.monitor}</dd>
-      <dt>County posting</dt><dd>{postingText(site)}<small>Source update {date(site.posting?.observedAt)} · checked {date(site.posting?.verifiedAt)}</small></dd>
-      <dt>Coastwide rain</dt><dd>{snapshot.regionalRain?.advisory === "active" ? "Countywide advisory" : snapshot.regionalRain?.advisory === "clear" ? "County notice clear at last check" : "Unverified"} {snapshot.regionalRain?.estimatedLiftAt && <small>Estimated lift {date(snapshot.regionalRain.estimatedLiftAt)} Pacific</small>}</dd>
-      <dt>Latest Enterococcus</dt><dd>{reading(sample)} {sample?.units}<small>{sample?.method} · collected {date(sample?.collectedAt)} Pacific</small></dd>
-      <dt>Single-sample limit</dt><dd>{evidence?.threshold?.toLocaleString("en-US") ?? "Unavailable"} {evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>
-      <dt>72h observed rain</dt><dd>{rainText(site)} · {site.rainGauge}<small>{coverage(site)}{site.rain?.endedAt && ` · last measured rain ended ${date(site.rain.endedAt)}`}</small></dd>
-      <dt>Mapped outfall</dt><dd>{outfallText(site)}<small>{site.outfall?.name}{site.outfall?.name ? " · " : ""}{site.runoff?.hazard || "Current flow unverified"}</small></dd>
-      <dt>Spill and runoff reports</dt><dd><a href="https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/south-region-health-concerns/Environmental-Dashboard.html">County environmental dashboard</a></dd>
-      {weather?.river && <><dt>San Diego River flow</dt><dd>{weather.river.cfs} ft³/s · {weather.river.station}<small>{date(weather.river.observedAt)} Pacific · USGS gauge context</small></dd></>}
-      {weather?.air != null && <><dt>Modeled air temperature</dt><dd>{weather.air} °F · Open-Meteo<small>{date(weather.airAt)} Pacific{weather.wind != null && ` · Wind ${weather.wind} mph`}</small></dd></>}
-      {weather?.sunrise && <><dt>Sunrise / sunset</dt><dd>{date(weather.sunrise)} / {date(weather.sunset)} Pacific</dd></>}
-      {weather?.sea && <><dt>Modeled sea temperature</dt><dd>{weather.sea.temperature} °F · Open-Meteo Marine<small>{date(weather.sea.at)} Pacific</small></dd></>}
-      {weather?.level && <><dt>Observed water level</dt><dd>{weather.level.height} ft · {weather.level.station}<small>{date(weather.level.observedAt)} Pacific · NOAA MLLW</small></dd></>}
-      {weather?.water && <><dt>Observed water temperature</dt><dd>{weather.water.temperature} °F · {weather.water.station}<small>{date(weather.water.observedAt)} Pacific · NOAA</small></dd></>}
-      {weather?.tide && <><dt>Next predicted tide</dt><dd>{weather.tide.height} ft {weather.tide.type === "H" ? "high" : "low"} · {weather.tide.station}<small>{date(weather.tide.at)} Pacific · NOAA MLLW</small></dd></>}
+    <div className="modal-score"><Rating rating={site.rating} /><strong className={site.rating.score>=5 ? "hazard" : ""}>{site.rating.reason}</strong></div>
+    {risks.length>1 && <ul className="hazard risk-list">{risks.slice(1,4).map(signal => <li key={signal.field}>{signal.reason}</li>)}</ul>}
+    {site.rating.gaps.length>0 && <p className="timeline-note">{site.rating.gaps.join(" · ")}</p>}
+    <dl className="quick-evidence">
+      <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} />{site.rain?.lowerBound>0 && !site.rain.complete && <small>Gauge minimum {site.rain.lowerBound.toFixed(2)} in</small>}</dd>
+      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>{site.inlandRain?.name}</small>{site.inlandGaugeRain?.lowerBound>0 && !site.inlandGaugeRain.complete && <small>{site.inlandGaugeRain.station} gauge minimum {site.inlandGaugeRain.lowerBound.toFixed(2)} in</small>}</dd>
+      <dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />
+        {evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>
+      <dt>County posting</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong><small>Updated {date(site.posting?.observedAt)} Pacific</small></dd>
     </dl>
-    <Chart title="Enterococcus sample history" note={values.length ? `${values.length} comparable results in the last 30 days.` : "No comparable results in the last 30 days."}
-      points={values.map(point => ({ at:point.collectedAt, value:point.value }))} maximum={Math.max(1,evidence?.threshold ?? 0,...values.map(point => point.value))} limit={evidence?.threshold} now={now} />
-    <Chart title="Observed rain" note="Inches per measured interval. Unobserved intervals remain blank."
-      points={rain.map(point => ({ at:point.end, value:point.inches }))} maximum={Math.max(.1,...rain.map(point => point.inches))} now={now} />
-    <p><a href={`https://cosdapps.sandiegocounty.gov/sdbeachinfo/SamplesReport?SiteId=${site.countyId}`}>County sample report</a> · <a href={countyUrl}>County postings</a></p>
+    <Suspense fallback={<p className="timeline-note">Loading runoff chart…</p>}><RunoffChart site={site} now={now} /></Suspense>
+    <details className="monitoring-details">
+      <summary>Monitoring details and recent tests</summary>
+      <dl>
+        <dt>Sampling point</dt><dd>{site.location} · {site.monitor}</dd>
+        <dt>Sample time</dt><dd>{date(sample?.collectedAt)} Pacific · {sample?.method || "Method unavailable"}</dd>
+        <dt>Nearby outfall</dt><dd>{outfallText(site)}<small>{site.outfall?.name}</small></dd>
+        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}<small>Inland: {site.inlandRain?.name ?? "Unavailable"}</small></dd>
+        <dt>Spill reports</dt><dd><a href="https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/south-region-health-concerns/Environmental-Dashboard.html">County environmental dashboard</a></dd>
+        {weather?.river && <><dt>River discharge</dt><dd>{weather.river.cfs} ft³/s · {weather.river.station}<small>{date(weather.river.observedAt)} Pacific · USGS</small></dd></>}
+        {weather?.air != null && <><dt>Air temperature</dt><dd>{weather.air} °F · Open-Meteo<small>{date(weather.airAt)} Pacific{weather.wind != null && ` · Wind ${weather.wind} mph`}</small></dd></>}
+        {weather?.sunrise && <><dt>Sunrise / sunset</dt><dd>{date(weather.sunrise)} / {date(weather.sunset)} Pacific</dd></>}
+        {weather?.sea && <><dt>Modeled sea temperature</dt><dd>{weather.sea.temperature} °F · Open-Meteo Marine</dd></>}
+        {weather?.water && <><dt>Observed water temperature</dt><dd>{weather.water.temperature} °F · {weather.water.station}<small>{date(weather.water.observedAt)} Pacific · NOAA</small></dd></>}
+        {weather?.level && <><dt>Observed water level</dt><dd>{weather.level.height} ft · {weather.level.station}<small>{date(weather.level.observedAt)} Pacific · NOAA MLLW</small></dd></>}
+        {weather?.tide && <><dt>Next predicted tide</dt><dd>{weather.tide.height} ft {weather.tide.type === "H" ? "high" : "low"} · {weather.tide.station}<small>{date(weather.tide.at)} Pacific · NOAA MLLW</small></dd></>}
+      </dl>
+      {site.history.length>0 && <table className="sample-history"><thead><tr><th scope="col">Collected</th><th scope="col">Enterococcus</th></tr></thead>
+        <tbody>{site.history.slice(0,4).map(point => <tr key={point.id}><td>{date(point.collectedAt)}</td><td className={sampleEvidence(point)?.above ? "hazard" : undefined}>{reading(point)} {point.units} · {point.method}</td></tr>)}</tbody></table>}
+      <p><a href={`https://cosdapps.sandiegocounty.gov/sdbeachinfo/SamplesReport?SiteId=${site.countyId}`}>County sample report</a> · <a href={countyUrl}>County postings</a></p>
+    </details>
   </dialog>;
 }
 
@@ -161,7 +166,7 @@ function CoastNotice({ result, snapshot, now }) {
   const regional = snapshot.regionalRain;
   const isActive = regional?.advisory === "active";
   const estimated = regional?.estimatedLiftAt;
-  const heading = result.coastRainHold || (result.candidates.length ? `${result.candidates.length} sites with recent tests below the limit` : "No lower-concern beach verified");
+  const heading = result.coastRainHold || (result.candidates.length ? `${result.candidates.length} sites with the lowest observed concern` : "No beach currently scores 1–2");
   return <section className="coast-status" aria-label="Coastwide water quality">
     <strong>{heading}</strong>
     {result.coastRainHold && <p>Applies to all coastal beaches and bays. {isActive && estimated && (
@@ -173,7 +178,7 @@ function CoastNotice({ result, snapshot, now }) {
 }
 
 function App() {
-  const [snapshot,setSnapshot] = useState(initial);
+  const [snapshot,setSnapshot] = useState(null);
   const [now,setNow] = useState(Date.now);
   const [view,setView] = useState(new URLSearchParams(location.search).get("view") === "map" ? "map" : "table");
   const [detailId,setDetailId] = useState(null);
@@ -201,7 +206,7 @@ function App() {
     setStatus("");
     const apply = ({snapshot: incoming}) => {
       if (incoming?.sites?.length) setSnapshot(previous =>
-        Date.parse(incoming.generatedAt) >= Date.parse(previous.generatedAt) ? incoming : previous);
+        !previous || Date.parse(incoming.generatedAt) >= Date.parse(previous.generatedAt) ? incoming : previous);
     };
     const timeout = setTimeout(() => controller.abort(),65000);
     const check = manual ? requestSnapshot("/api/cache",controller.signal,"POST") : requestSnapshot("/api/source",controller.signal);
@@ -211,6 +216,7 @@ function App() {
     clearTimeout(timeout);
     if (pending.current !== controller) return;
     pending.current = null;
+    setSnapshot(previous => previous ?? initial);
     setNow(Date.now());
     setRefreshing(false);
     const source = results[1];
@@ -220,6 +226,7 @@ function App() {
 
   useEffect(() => {
     void refresh();
+    const fallback = setTimeout(() => setSnapshot(previous => previous ?? initial),1600);
     const sampleClock = setInterval(() => setNow(Date.now()),60000);
     const updates = setInterval(() => { if (!document.hidden) void refresh(); },5*60000);
     const connected = () => { void refresh(); };
@@ -227,16 +234,22 @@ function App() {
     return () => {
       pending.current?.abort();
       pending.current = null;
+      clearTimeout(fallback);
       clearInterval(sampleClock);
       clearInterval(updates);
       window.removeEventListener("online",connected);
     };
   }, []);
 
-  const result = assessCoast(snapshot.sites,{regionalRain:snapshot.regionalRain},now);
-  const sites = snapshot.sites.map((site,index) => ({...site,rating:result.results[index].water}));
-  const urgency = { avoid:0, rain:1, unknown:2, recent:3 };
-  const tableSites = [...sites].sort((a,b) => urgency[a.rating.state]-urgency[b.rating.state] || b.lat-a.lat);
+  if (!snapshot) return <>
+    <header className="page-heading"><h1>San Diego Beach Finder</h1><p>Water quality from Oceanside to the border</p></header>
+    <div className="skeleton" role="status"><span className="visually-hidden">Loading beach conditions</span><div /><div /><div /><div /><div /></div>
+  </>;
+
+  const enriched = snapshot.sites.map(site => withPointRain(site,snapshot.pointRain,now));
+  const result = assessCoast(enriched,{regionalRain:snapshot.regionalRain},now);
+  const sites = enriched.map((site,index) => ({...site,rating:result.results[index].water}));
+  const tableSites = [...sites].sort((a,b) => a.rating.score-b.rating.score || b.lat-a.lat);
   const detail = sites.find(site => site.id === detailId);
 
   return <>

@@ -2,7 +2,7 @@
 
 An independent React and Vite PWA on Cloudflare Workers at [sdbeachfinder.gingernet.net](https://sdbeachfinder.gingernet.net/). The project uses its own package, Worker, install scope, and D1 binding. WeatherDash runs from the repository root as before.
 
-Evidence Matrix shows the water-quality rating first, followed by County postings, sample results and age, rain, and runoff. The map includes named monitoring points, towns, bays, and highways. Select or hover a beach name to open the sample and rain timelines. The build includes the geographic basemap and can reopen with saved data offline.
+Evidence Matrix pins the Beach and Safety score columns, followed by local rain, inland rain, bacteria results and age, and the County posting. The map includes named monitoring points, towns, bays, and highways. Select a marker or select or hover a beach name to open the detail and runoff chart. The build includes the geographic basemap and can reopen with saved data offline.
 
 ## Run locally
 
@@ -25,7 +25,7 @@ The client requests D1 and the provider refresh in parallel. Provider writes tak
 
 - County postings are refreshed on demand at most every 29 minutes. A 30-minute Worker schedule also checks for updates. The Worker treats the County’s general rain notice independently of local postings.
 - County lab histories are checked every six hours. Each sample retains its station, method, unit, qualifier, and collection time.
-- NWS gauge observations are checked at most every 15 minutes. Rain values represent measured intervals, with gaps and overlapping periods accounted for.
+- NWS gauge observations are checked at most every 15 minutes. Measured intervals account for gaps and overlaps. Open-Meteo coastal and inland grid estimates are checked at most every 29 minutes and labeled separately from gauge measurements.
 - NOAA, USGS, and Open-Meteo context is checked at most every 30 minutes. Tide, modeled weather and sea temperature, and river discharge are context for the detail view.
 - County storm-drain coordinates provide mapped runoff context. Current flow at each drain requires separate evidence. The USGS San Diego River gauge is labeled as river flow and the County environmental dashboard provides spill notices.
 

@@ -45,3 +45,53 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
   .station-name { font-size:.61rem; padding-inline:.18rem }
   .station[data-short] .station-name { max-width:7rem; white-space:normal }
 }
+
+.data-scroll {
+  --beach-width:11.5rem;
+  --safety-width:11.25rem;
+}
+.data-scroll table { min-width:58rem; table-layout:fixed }
+.data-scroll .site-column { width:var(--beach-width) }
+.data-scroll .rating-column { width:var(--safety-width) }
+.data-scroll .sample-column { width:11rem }
+.data-scroll :is(th,td):first-child { position:sticky; left:0; z-index:2 }
+.data-scroll :is(th,td):nth-child(2) { position:sticky; left:var(--beach-width); z-index:2; border-right:1px solid var(--line) }
+.data-scroll tbody :is(th,td):nth-child(-n+2) { background:var(--panel) }
+.data-scroll thead th:nth-child(-n+2) { background:#e9f1f4 }
+.data-scroll tbody tr:hover :is(th,td):nth-child(-n+2) { background:#f7fbfc }
+.score-number { display:inline-flex; align-items:baseline; gap:.13em; font-size:1.2rem; line-height:1.1; font-variant-numeric:tabular-nums }
+.score-number::before { content:""; align-self:center; display:inline-block; width:.6rem; height:.6rem; border-radius:50%; background:var(--score-color); margin-right:.2rem }
+.score-number span { font-size:.73rem; font-weight:550 }
+.score small { margin-top:.14rem }
+.hazard,.hazard small { color:var(--avoid); font-weight:750 }
+.score-legend { display:flex; align-items:center; flex-wrap:wrap; gap:.22rem; margin:.25rem 0 .7rem }
+.score-legend span { min-width:1.3rem; padding:.12rem .2rem; text-align:center; background:var(--score-color); color:#fff; border-radius:.18rem; font-size:.68rem; font-weight:750 }
+.score-legend small { margin-left:.35rem }
+.station-dot { min-height:0; width:1.55rem; height:1.55rem; padding:0; background:transparent; border:0; box-shadow:none; isolation:isolate }
+.station-dot::before { position:absolute; inset:.3rem; content:""; background:var(--rating); border:1px solid #fff; border-radius:50%; box-shadow:0 0 0 1px var(--rating) }
+.station-dot:hover { background:#fff8 }
+.dialog-heading { position:sticky; top:-1rem; z-index:3; padding-block:.25rem; margin-bottom:.6rem; }
+.modal-score { display:flex; align-items:center; gap:.65rem 1rem; flex-wrap:wrap; background:#f1f6f7; padding:.6rem .7rem; border-radius:.4rem }
+.modal-score .score-number { font-size:1.55rem }
+.modal-score .score-number span { font-size:.82rem }
+.risk-list { margin:.5rem 0 0; padding-left:1.25rem }
+.timeline-note { color:var(--muted); font-size:.83rem; margin:.45rem 0 }
+.quick-evidence { grid-template-columns:minmax(7.5rem,1fr) 1.3fr; margin:.8rem 0; align-items:baseline }
+.quick-evidence dd { border-bottom:1px solid #e3ecf0; padding-bottom:.28rem }
+.runoff-chart { margin-top:.8rem }
+.runoff-chart h3 { font-size:.96rem; margin:0 }
+.runoff-chart p { font-size:.8rem; color:var(--muted); margin:.2rem 0 }
+.runoff-plot { position:relative; height:15rem }
+.monitoring-details { margin-top:1rem; border-top:1px solid var(--line); padding-top:.6rem }
+.monitoring-details summary { cursor:pointer; font-weight:650 }
+.monitoring-details p { margin-top:.6rem; font-size:.84rem }
+
+@media(max-width:52rem) {
+  .data-scroll { --beach-width:8rem; --safety-width:7rem }
+  .data-scroll .sample-column { width:9rem }
+}
+@media(max-width:25rem) {
+  .data-scroll { --beach-width:7.6rem; --safety-width:6.7rem }
+  .score small { font-size:.68rem }
+  .score-legend small { margin-left:0 }
+}

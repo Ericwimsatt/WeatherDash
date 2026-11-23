@@ -1,8 +1,10 @@
+import { inlandGaugeFor } from "../data/point-rain.mjs";
+import { loadPointRain } from "./point-rain.mjs";
 import { loadCounty, loadSamples } from "./county.mjs";
 import { loadContext, loadRain, summarizeRain } from "./water.mjs";
 
 const minute = 60000;
-const schedules = { county:29*minute, samples:6*60*minute, rain:15*minute, context:30*minute };
+const schedules = { county:29*minute, samples:6*60*minute, rain:15*minute, "point-rain":29*minute, context:30*minute };
 const headers = { "Cache-Control":"no-store" };
 const newestTime = (first, second) => !first || second > first ? second : first;
 
@@ -34,16 +36,19 @@ export function assemble(records, now=Date.now()) {
   const rainSeries = { ...root.rainSeries, ...Object.fromEntries(Object.entries(rain).map(([gauge, record]) => [gauge,record.intervals])) };
   const sites = root.sites.map(site => {
     const history = mergeHistory(site.history, samples[site.id] ?? []);
+    const inlandGauge = inlandGaugeFor(site);
+    const inland = rain[inlandGauge];
     return {
       ...site,
       posting:county?.postings[site.id] ?? site.posting,
       history,
+      inlandGaugeRain:inland ? {...summarizeRain(inland.intervals,inland.verifiedAt,now,96),station:inlandGauge} : null,
       sample:history[0] ?? null,
       rain:rain[site.rainGauge] ? summarizeRain(rain[site.rainGauge].intervals, rain[site.rainGauge].verifiedAt, now) : site.rain,
     };
   });
   const generatedAt = Object.values(records).reduce((time, record) => newestTime(time, record.at), root.generatedAt);
-  return { sites, rainSeries, context:records.context?.value ?? {}, regionalRain:county?.regionalRain ?? root.regionalRain, generatedAt,
+  return { sites, rainSeries, pointRain:records["point-rain"]?.value ?? {}, context:records.context?.value ?? {}, regionalRain:county?.regionalRain ?? root.regionalRain, generatedAt,
     countyCheckedAt:records.county?.at ?? root.regionalRain?.verifiedAt ?? null };
 }
 
@@ -63,6 +68,7 @@ const loads = {
     return { ...previous.rain?.value, ...Object.fromEntries(Object.entries(intervals).map(([gauge, values]) =>
       [gauge, { intervals:values, verifiedAt }])) };
   },
+  "point-rain": async (_,previous,now) => ({ ...previous["point-rain"]?.value,...await loadPointRain(now) }),
   context: async (_,previous,now) => mergeContext(previous.context?.value, await loadContext(now)),
 };
 

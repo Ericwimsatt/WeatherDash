@@ -1,4 +1,5 @@
 const shell = "sdbf-shell-__SHELL_VERSION__";
+const builtAssets = __BUILT_ASSETS__;
 const savedData = "sdbf-public-evidence";
 const cachePath = "/api/cache";
 
@@ -9,7 +10,7 @@ self.addEventListener("install", event => {
     if (!response.ok) throw Error("Could not pre-cache Beach Finder");
     const html = await response.clone().text();
     const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map(match => match[1]);
-    await cache.addAll([...new Set([...assets,"/manifest.webmanifest","/icon.svg","/icon-192.png","/icon-512.png","/methodology.html"])]);
+    await cache.addAll([...new Set([...builtAssets,...assets,"/manifest.webmanifest","/icon.svg","/icon-192.png","/icon-512.png","/methodology.html"])]);
     await cache.put("/",response);
     await self.skipWaiting();
   })());

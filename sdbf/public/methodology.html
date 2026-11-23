@@ -1,14 +1,26 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>How Beach Finder rates water quality</title>
-<style>body{font:1rem/1.6 system-ui;color:#112c39;background:#eff5f6;margin:2rem auto;padding:0 1rem;max-width:68ch}a{color:#20556c}li{margin:.45rem 0}</style>
+<title>How Beach Finder scores water quality</title>
+<style>body{font:1rem/1.6 system-ui;color:#112c39;background:#eff5f6;margin:2rem auto;padding:0 1rem;max-width:68ch}a{color:#20556c}li{margin:.45rem 0}th,td{text-align:left;padding:.3rem .65rem;border-bottom:1px solid #cbd9df}table{border-collapse:collapse}</style>
 <a href="/">Back to Beach Finder</a>
-<h1>How Beach Finder rates water quality</h1>
+<h1>How Beach Finder scores water quality</h1>
+<p>The safety score runs from 1 to 10, with 1 for the lowest observed concern and 10 for dangerous conditions. It describes the evidence available for the named monitoring point. Conditions can change between samples and along the beach.</p>
+<table><thead><tr><th scope="col">Score</th><th scope="col">Meaning</th></tr></thead><tbody>
+<tr><td>1–2</td><td>Lowest observed concern</td></tr>
+<tr><td>3–4</td><td>Use caution</td></tr>
+<tr><td>5–6</td><td>Sensitive groups should avoid</td></tr>
+<tr><td>7–8</td><td>Avoid water contact</td></tr>
+<tr><td>9–10</td><td>Dangerous. Avoid water contact.</td></tr>
+</tbody></table>
+<h2>What raises the score</h2>
 <ul>
-<li><strong>Avoid water contact.</strong> A County closure, warning or advisory, a reported spill affecting the site, or the latest comparable bacteria result at or above its limit takes priority.</li>
-<li><strong>Avoid after rain.</strong> A County general rain advisory or evidence of qualifying rain applies coastwide for 72 hours after the rain ends. A tentative lift time stays informational until the County confirms the lift.</li>
-<li><strong>Insufficient data.</strong> The site has missing or stale evidence for the County posting, rain, runoff or a comparable bacteria result.</li>
-<li><strong>Recent test below limit.</strong> The County shows the site open, rain and runoff checks are current, and a comparable result collected in the past 48 hours is below its limit and after any known hazard. A sample describes its monitoring point and collection time.</li>
+<li><strong>County postings and verified spills.</strong> A County closure or warning, or a verified spill affecting the site, scores 10. An active advisory scores at least 9. The published estimate of a lift stays informational until the County updates its postings.</li>
+<li><strong>Known and estimated rain.</strong> Qualifying measured rain or an active Countywide rain advisory gives the whole coast at least 9. Qualifying modeled coastal rain gives a precautionary score of at least 8. The County uses 0.20 inches for qualifying coastal or valley rain and advises avoiding contact for 72 hours after rainfall ends. Inland rain over four days adds caution at 0.35 inches, increases the score to at least 6 at 0.75 inches, and to at least 8 at 1.25 inches. These inland thresholds are app rules.</li>
+<li><strong>Bacteria and sample age.</strong> A result at or above the method’s limit in the past 72 hours scores at least 9. A result at twice the limit, or a recent exceedance with qualifying local rainfall, scores 10. An exceedance up to seven days old scores at least 7. A below-limit result must be within 48 hours and after the latest known hazard to support a low score.</li>
+<li><strong>Missing evidence.</strong> One missing or stale check raises the minimum to 5. Multiple gaps raise it to 6. The main checks are County status, coastwide rain status, local and inland rain, and a comparable lab result. Being within about 75 feet of a mapped outfall also raises the score to at least 5 unless runoff clearance is available.</li>
 </ul>
-<p>Enterococcus limits are 1,413 DNA copies per 100 mL for ddPCR and 104 organisms per 100 mL for culture. The app keeps reported bounds such as &lt;195 and distinguishes measured rain totals from minimum totals when gauge observations are incomplete. A mapped outfall indicates a possible source of runoff. Its mapped location alone cannot tell you whether water is flowing today.</p>
-<p><a href="https://www.sdbeachinfo.com/">Current County notices</a> · <a href="https://www.sandiegocounty.gov/content/dam/sdc/deh/lwqd/Beach%26Bay/DEHQ_bb_public_summary.pdf">County standards and rain guidance</a></p>
+<p>The strongest signal sets the score. A low reading, a dry gauge, or a County open status cannot cancel another hazard. Enterococcus limits are 1,413 DNA copies per 100 mL for ddPCR and 104 organisms per 100 mL for culture. Reported bounds such as &lt;195 retain their original qualifier.</p>
+<h2>Rain estimates and runoff</h2>
+<p>Local rain covers the last 72 hours. Beach Finder uses nearby NWS gauge observations and a coordinate-based Open-Meteo grid estimate. The inland total covers 96 hours at a representative point in the nearby drainage corridor. A grid value is an estimate at that point. The app uses nearby inland gauges where available and displays measured minimums when coverage is partial. Forecast hours appear on the runoff chart and stay outside the current rating.</p>
+<p>An outfall is where a storm drain, creek, river, or lagoon empties into the ocean or bay. Mapped runoff shows the location of a known outfall. Its location alone tells us neither current flow nor bacteria concentration. San Diego County advises staying at least 75 feet from where runoff enters the water.</p>
+<p><a href="https://www.sdbeachinfo.com/">Current County notices</a> · <a href="https://www.sandiegocounty.gov/content/dam/sdc/deh/lwqd/Beach%26Bay/DEHQ_bb_public_summary.pdf">County standards and rain guidance</a> · <a href="https://open-meteo.com/en/docs">Open-Meteo point estimates</a></p>

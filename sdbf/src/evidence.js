@@ -1,5 +1,4 @@
 export const countyUrl = "https://www.sdbeachinfo.com/";
-export const labels = { avoid: "Avoid water contact", rain: "Avoid after rain", unknown: "Insufficient data", recent: "Recent test below limit" };
 
 const pacific = new Intl.DateTimeFormat("en-US", {
   month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
@@ -23,14 +22,19 @@ export function reading(sample) {
   return qualifier + sample.value.toLocaleString("en-US");
 }
 
-export function rainText(site) {
-  const amount = site.rain?.lowerBound;
-  if (site.rain?.complete && Number.isFinite(amount)) return `${amount.toFixed(2)} in`;
-  return amount > 0 ? `≥${amount.toFixed(2)} in` : "Unverified";
-}
-
-export function coverage(site) {
-  return site.rain?.complete ? "Observed gauge intervals" : "Gaps in gauge observations";
+export function rainDisplay(site, inland = false) {
+  const point = inland ? site.inlandRain : site.coastal;
+  const gauge = inland ? site.inlandGaugeRain : site.rain;
+  const station = gauge?.station ?? site.rainGauge;
+  const number = value => `${value.toFixed(2)} in`;
+  if (gauge?.complete && Number.isFinite(gauge.lowerBound) && (!point?.complete || gauge.lowerBound >= point.total)) {
+    return { value:number(gauge.lowerBound), note:`${station} gauge` };
+  }
+  if (Number.isFinite(point?.total) && (gauge?.lowerBound ?? 0) <= point.total) {
+    return { value:(point.complete ? "" : "≥") + number(point.total), note:point.complete ? "Grid estimate" : "Partial grid estimate" };
+  }
+  if (gauge?.lowerBound > 0) return { value:"≥"+number(gauge.lowerBound), note:`${station} gauge minimum` };
+  return { value:"Unavailable", note:"Rain coverage incomplete" };
 }
 
 export function outfallText(site) {
