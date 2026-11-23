@@ -79,6 +79,19 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .runoff-warning { display:block }
 .modal-score .score-factors { margin:0 }
 .map-list .score-factors { font-size:.76rem }
+.factor-help-button {
+  display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;
+  min-height:0; width:1.05rem; height:1.05rem; padding:0; margin-left:.3rem;
+  border:1px solid #9bb0ba; border-radius:50%; background:transparent; color:var(--muted);
+  font-size:.68rem; font-weight:700; line-height:1; cursor:help;
+}
+.factor-help-button:hover { background:#ecf4f6; border-color:#143846; color:#143846 }
+.factor-help-button[aria-expanded="true"] { background:#143846; border-color:#143846; color:#fff }
+.factor-help-text {
+  display:block; margin-top:.3rem; padding:.42rem .55rem;
+  background:#f1f6f7; border-left:2px solid #9bb0ba; border-radius:.25rem;
+  color:var(--muted); font-size:.75rem; line-height:1.35;
+}
 @media(max-width:25rem) { .data-scroll .score-factors { font-size:.69rem } }
 .timeline-note { color:var(--muted); font-size:.83rem; margin:.45rem 0 }
 .quick-evidence { grid-template-columns:minmax(7.5rem,1fr) 1.3fr; margin:.8rem 0; align-items:baseline }

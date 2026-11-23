@@ -24,10 +24,20 @@ function Rating({ rating }) {
   </div>;
 }
 
+function FactorHelp({ why }) {
+  const [open, setOpen] = useState(false);
+  return <>
+    <button type="button" className="factor-help-button" aria-expanded={open} aria-label="Why does this matter?" onClick={() => setOpen(open => !open)}>
+      <span aria-hidden="true">?</span>
+    </button>
+    {open && <span className="factor-help-text" role="note">{why}</span>}
+  </>;
+}
+
 function ScoreFactors({ site, now }) {
   return <ul className="score-factors" aria-label="Contributing factors">
-    {scoreFactors(site,now).map(({score,text,warning}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
-      {text}{warning && <strong className="runoff-warning hazard">{warning}</strong>}
+    {scoreFactors(site,now).map(({score,text,warning,why}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
+      {text}{why && <FactorHelp why={why} />}{warning && <strong className="runoff-warning hazard">{warning}</strong>}
     </li>)}
   </ul>;
 }
