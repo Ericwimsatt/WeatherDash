@@ -41,17 +41,14 @@ export function postingText(site) {
 }
 
 
-const sampleGap = "No comparable below-limit test in the past 48 hours";
-
 export function scoreFactors(site, now) {
   const { rating } = site;
-  const factors = rating.signals.flatMap(signal => {
-    if (signal.field === "evidence" && rating.gaps.length) {
-      return rating.gaps.map(gap => {
-        const timestamp = Date.parse(site.sample?.collectedAt);
-        const old = Number.isFinite(timestamp) && now-timestamp > 48*3600000;
-        return { score:signal.score, text:gap === sampleGap && old ? `Bacteria test ${age(site.sample.collectedAt,now)}` : gap };
-      });
+  return rating.signals.flatMap(signal => {
+    if (signal.field === "evidence" && rating.gaps.length)
+      return rating.gaps.map(text => ({ score:signal.score, text }));
+    if (signal.field === "bacteria" && signal.score===2) {
+      const ageText = site.sample ? age(site.sample.collectedAt,now) : "date unknown";
+      return [{ score:2, text:`Past bacteria exceedance · ${ageText}` }];
     }
     if (Number.isFinite(signal.amount)) {
       const window = signal.field === "local" ? "72h" : "4 days";
@@ -59,5 +56,4 @@ export function scoreFactors(site, now) {
     }
     return [{ score:signal.score, text:signal.reason }];
   });
-  return factors;
 }

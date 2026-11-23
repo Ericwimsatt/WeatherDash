@@ -43,3 +43,17 @@ test("a failed gauge does not inherit another gauge’s verification time", () =
   };
   assert.equal(assemble(records,Date.parse(now)).sites[0].rain.verifiedAt,"2026-11-22T22:00:00Z");
 });
+
+test("a fully identified rain-only posting stays distinct from a separate advisory", () => {
+  const [first,second] = sites;
+  const pins = sites.map(site => [site.countyId,site === first || site === second ? 2 : 1]);
+  const raw = {...county,pins,advisoryCount:3,notices:[
+    {station:first.monitor,description:"General Rain Advisory",issuedAt:regional.issuedAt},
+    {station:second.monitor,description:"General Rain Advisory",issuedAt:regional.issuedAt},
+    {station:second.monitor,description:"Bacterial Exceedance Advisory",issuedAt:regional.issuedAt},
+  ]};
+  const checked = normalizeCounty(raw,{},now);
+  assert.equal(checked.postings[first.id].status,"rain advisory");
+  assert.equal(checked.postings[second.id].status,"advisory");
+  assert.equal(normalizeCounty({...raw,advisoryCount:5},{},now).postings[first.id].status,"advisory");
+});

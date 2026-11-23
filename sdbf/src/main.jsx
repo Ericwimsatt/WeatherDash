@@ -128,6 +128,7 @@ function Detail({ site, snapshot, now, dismiss }) {
   return <dialog ref={dialog} onClose={dismiss} aria-labelledby="detail-title">
     <header className="dialog-heading"><h2 id="detail-title">{site.name}</h2><form method="dialog"><button autoFocus>Close</button></form></header>
     <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /></div>
+    {site.rating.notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
     <dl className="quick-evidence">
       <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} />{site.rain?.lowerBound>0 && !site.rain.complete && <small>Gauge minimum {site.rain.lowerBound.toFixed(2)} in</small>}</dd>
       <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland</small></dd>

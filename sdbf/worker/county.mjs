@@ -120,7 +120,8 @@ export function normalizeCounty(raw, previous, verifiedAt) {
   const candidates = new Map(raw.pins.map(([id,priority]) => [Number(id),statusByPriority[priority]]));
   if (!sites.every(site => candidates.get(site.countyId))) throw Error("County map did not return all monitored sites");
   const rawNotices = Array.isArray(raw.notices) ? raw.notices : [];
-  const rainNotice = rawNotices.find(notice => /general\s+rain\s+advisory/i.test(notice.description?.replace(/<[^>]+>/g," ")));
+  const isRainNotice = notice => /general\s+rain\s+advisory/i.test(notice.description?.replace(/<[^>]+>/g," "));
+  const rainNotice = rawNotices.find(isRainNotice);
   const fullNoticeList = raw.advisoryCount === 0 ||
     Number.isInteger(raw.advisoryCount) && raw.advisoryCount > 0 && rawNotices.length >= raw.advisoryCount;
   const previousRain = previous?.regionalRain;
@@ -137,7 +138,10 @@ export function normalizeCounty(raw, previous, verifiedAt) {
     };
   }
   const postings = Object.fromEntries(sites.map(site => {
-    const status = candidates.get(site.countyId);
+    const posting = candidates.get(site.countyId);
+    const siteNotices = rawNotices.filter(notice => notice.station === site.monitor);
+    const rainOnly = posting === "advisory" && fullNoticeList && siteNotices.length && siteNotices.every(isRainNotice);
+    const status = rainOnly ? "rain advisory" : posting;
     const old = previous?.postings?.[site.id];
     const priorHazard = status === "open" && old?.status && old.status !== "open";
     return [site.id, { status, observedAt:raw.observedAt, verifiedAt, lastHazardEnded:priorHazard ? raw.observedAt : old?.lastHazardEnded }];

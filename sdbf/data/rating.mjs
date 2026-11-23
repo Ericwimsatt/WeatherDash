@@ -1,4 +1,4 @@
-const hour = 60 * 60 * 1000;
+import { hour,rainLimits } from "./point-rain.mjs";
 export const scoreColors = ["#176440","#2e773c","#577b2b","#6c7721","#8e6d13","#a96513","#ac4b19","#a13523","#a0202e","#81162d"];
 
 export function scoreLabel(score) {
@@ -38,11 +38,11 @@ function rainHold(rain, now) {
 }
 
 function coastSignal(regionalRain, sites, now) {
-  if (regionalRain?.advisory === "active") return { score:9, reason:"Countywide rain advisory" };
+  if (regionalRain?.advisory === "active") return { score:7, reason:"Countywide rain advisory" };
   if (rainHold(regionalRain,now) || sites.some(site => rainHold(site.rain,now)))
-    return { score:9, reason:"Qualifying rain measured along the coast" };
+    return { score:7, reason:"Qualifying rain measured along the coast" };
   if (sites.some(site => fresh(site.coastal?.verifiedAt,now,3) && rainHold(site.coastal,now)))
-    return { score:8, reason:"Coastwide caution after rain" };
+    return { score:7, reason:"Coastwide caution after rain" };
   return null;
 }
 
@@ -51,10 +51,11 @@ export function assess(site, now=Date.now(), coast=null) {
   const evidence = sampleEvidence(sample);
   const signals = [];
   const gaps = [];
+  const notes = [];
   const add = (score, reason, field, details) => signals.push({score,reason,field,...details});
   if (coast) add(coast.score,coast.reason,"regional");
 
-  const official = { closure:10, warning:10, advisory:9, "rain advisory":9 }[posting?.status];
+  const official = { closure:10, warning:10, advisory:9, "rain advisory":7 }[posting?.status];
   const countyFresh = fresh(posting?.verifiedAt,now,12);
   if (official) add(official,`${countyFresh ? "County" : "Last County posting:"} ${posting.status}`,"county");
   else if (posting?.status !== "open" || !countyFresh) gaps.push("Current County status unverified");
@@ -72,36 +73,42 @@ export function assess(site, now=Date.now(), coast=null) {
   const localDetails = { amount:localAmount, minimum:!(localModeled ? coastal?.complete : rain?.complete) };
   const hasLocalCoverage = fresh(rain?.verifiedAt,now,3) && rain?.complete || localFresh && coastal?.complete;
   if (!hasLocalCoverage) gaps.push("Local rain coverage incomplete");
-  if (localAmount >= .5) add(rainHold(rain,now) ? 10 : 9,"Heavy local rain in the past 72 hours","local",localDetails);
-  else if (localAmount >= .2) add(rainHold(rain,now) ? 9 : 8,"Local rain in the past 72 hours","local",localDetails);
+  if (localAmount >= .5) add(8,"Heavy local rain in the past 72 hours","local",localDetails);
+  else if (localAmount >= .35) add(7,"Elevated local rain in the past 72 hours","local",localDetails);
+  else if (localAmount >= rainLimits.local) add(6,"Local rain crossed the runoff limit","local",localDetails);
   else if (localAmount >= .05) add(4,"Light local rain in the past 72 hours","local",localDetails);
 
   if (!(inlandFresh && inlandRain?.complete)) gaps.push("Inland rain coverage incomplete");
   const inlandAmount = inlandFresh ? inlandRain?.total ?? 0 : 0;
   const inlandDetails = { amount:inlandAmount, minimum:!inlandRain?.complete };
   if (inlandAmount >= 1.25) add(8,"Heavy inland rain in the past four days","inland",inlandDetails);
-  else if (inlandAmount >= .75) add(6,"Elevated inland rain in the past four days","inland",inlandDetails);
+  else if (inlandAmount >= 1) add(7,"Elevated inland rain in the past four days","inland",inlandDetails);
+  else if (inlandAmount >= rainLimits.inland) add(6,"Inland rain crossed the runoff limit","inland",inlandDetails);
   else if (inlandAmount >= .35) add(4,"Recent inland rain","inland",inlandDetails);
 
   const hasRecentSample = fresh(sample?.collectedAt,now,48);
-  if (evidence?.above && fresh(sample.collectedAt,now,168)) {
-    const recent = fresh(sample.collectedAt,now,72);
-    add(recent ? (sample.value/evidence.threshold >= 2 || localAmount >= .2 ? 10 : 9) : 7,
-      recent ? "Recent bacteria test at or above the limit" : "Bacteria exceeded the limit earlier this week","bacteria");
+  if (evidence?.above) {
+    if (fresh(sample.collectedAt,now,72)) {
+      add(sample.value/evidence.threshold >= 2 || localAmount >= rainLimits.local ? 10 : 9,"Recent bacteria test at or above the limit","bacteria");
+    } else {
+      add(2,"Older bacteria test at or above the limit","bacteria");
+      notes.push("The last exceedance was more than 72 hours ago.");
+    }
   } else if (evidence?.below && hasRecentSample) {
     if (sample.value / evidence.threshold >= .75) add(4,"Recent bacteria result near the limit","bacteria");
-    else if (sample.value / evidence.threshold >= .25) add(3,"Recent bacteria test below the limit","bacteria");
-    const hazardEnded = [posting?.lastHazardEnded, regionalRain?.endedAt, runoff?.lastHazardEnded]
-      .filter(Boolean);
-    if (hazardEnded.some(end => !Number.isFinite(Date.parse(end)) || Date.parse(end) >= Date.parse(sample.collectedAt)))
-      gaps.push("No lab result since the last known hazard");
-  } else gaps.push("No comparable below-limit test in the past 48 hours");
+    const hazardEnded = [posting?.lastHazardEnded, regionalRain?.endedAt, runoff?.lastHazardEnded].filter(Boolean);
+    if (hazardEnded.some(end => !Number.isFinite(Date.parse(end)) || Date.parse(end) >= Date.parse(sample.collectedAt))) {
+      notes.push("The latest bacteria sample predates the last known hazard.");
+    }
+  } else {
+    notes.push(evidence?.below ? "The latest below-limit sample is older than 48 hours." : "No comparable bacteria result is available.");
+  }
 
   if (gaps.length) add(gaps.length > 1 ? 6 : 5,gaps[0],"evidence");
-  if (!signals.length) add(rain?.complete ? 1 : 2,"Recent low bacteria result and low rainfall","evidence");
+  if (!signals.length) add(1,"No current risk indicators","evidence");
   signals.sort((a,b) => b.score-a.score);
   const {score,reason} = signals[0];
-  return { score, reason, label:scoreLabel(score), color:scoreColors[score-1], signals, gaps };
+  return { score, reason, label:scoreLabel(score), color:scoreColors[score-1], signals, gaps, notes };
 }
 
 export function assessCoast(sites, { regionalRain } = {}, now=Date.now()) {
