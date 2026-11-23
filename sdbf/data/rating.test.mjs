@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { assess, sampleEvidence } from "./rating.mjs";
+import { assess, assessCoast, sampleEvidence } from "./rating.mjs";
 
 const now = Date.parse("2026-11-22T20:00:00Z");
 const before = hours => new Date(now - hours * 3600000).toISOString();
@@ -8,6 +8,7 @@ const baseline = {
   posting: { status: "open", verifiedAt: before(1) },
   sample: { parameter: "Enterococcus", method: "ddPCR", units: "Copies/100ml", qualifier: "=", value: 100, collectedAt: before(24) },
   rain: { complete: true, verifiedAt: before(1) },
+  regionalRain: { advisory: "clear", complete: true, verifiedAt: before(1) },
   runoff: { clear: true, verifiedAt: before(1) },
 };
 
@@ -35,4 +36,30 @@ test("a favorable rating requires matching units and an unambiguous below-limit 
   assert.equal(sampleEvidence({ ...baseline.sample, qualifier: "<", value: 1413 }).below, true);
   assert.equal(sampleEvidence({ ...baseline.sample, qualifier: "<", value: 1500 }).below, false);
   assert.equal(sampleEvidence({ ...baseline.sample, value: 1413 }).above, true);
+});
+
+test("a countywide advisory applies everywhere while retaining independent local closures", () => {
+  const sites = [{ ...baseline, id: 1 }, { ...baseline, id: 2, posting: { status: "closure" } }];
+  const result = assessCoast(sites, { regionalRain: { advisory: "active", verifiedAt: before(48) } }, now);
+  assert.equal(result.coastRainHold, "Countywide rain advisory");
+  assert.deepEqual(result.results.map(item => [item.decision, item.water.state]), [["avoid", "rain"], ["avoid", "avoid"]]);
+});
+
+test("qualifying rain at one site applies the 72-hour hold to every site", () => {
+  const sites = [{ ...baseline, id: 1 }, { ...baseline, id: 2, rain: { qualifying: true, endedAt: before(20) } }];
+  const result = assessCoast(sites, { regionalRain: baseline.regionalRain }, now);
+  assert.ok(result.coastRainHold);
+  assert.deepEqual(result.results.map(item => item.water.state), ["rain", "rain"]);
+  assert.deepEqual(result.candidates, []);
+});
+
+test("a high surf risk blocks swimming without altering water quality", () => {
+  const sites = [{ ...baseline, id: 1 }];
+  const surf = { ripCurrentRisk: "high", issuedAt: before(1), validUntil: before(-2) };
+  const result = assessCoast(sites, { regionalRain: baseline.regionalRain, surf }, now);
+  assert.equal(result.surfHold, "NWS high rip-current risk");
+  assert.equal(result.results[0].water.state, "recent");
+  assert.equal(result.results[0].decision, "avoid");
+  assert.deepEqual(assessCoast(sites, { regionalRain: baseline.regionalRain, surf: { ...surf, ripCurrentRisk: "low" } }, now).candidates, [1]);
+  assert.deepEqual(assessCoast(sites, { regionalRain: baseline.regionalRain, surf: { ...surf, validUntil: before(1) } }, now).candidates, []);
 });

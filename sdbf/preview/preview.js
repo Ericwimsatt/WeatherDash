@@ -23,6 +23,25 @@ const details = site => `<button class="detail" data-site="${site.id}" aria-labe
 const reason = site => `<span class="rating">${labels[site.rating.state]}</span><small>${safe(site.rating.reason)}</small>`;
 const grid = document.querySelector("#choices");
 const dialog = document.querySelector("#detail");
+const defaultView = document.documentElement.dataset.initialView === "map" ? "map" : "table";
+
+function paintCoastStatus() {
+  const region = data.regionalRain;
+  const surf = data.surf;
+  const verdict = data.coastRainHold || data.surfHold
+    ? "Skip ocean swimming in this snapshot"
+    : data.candidates?.length
+      ? `${data.candidates.length} sites with lower observed concern`
+      : "No verified ocean-swim option in this snapshot";
+  const rainNotice = data.coastRainHold && region
+    ? `<p>${safe(data.coastRainHold)} · all beaches and bays. Estimated lift ${safe(date(region.estimatedLiftAt))} Pacific, pending County confirmation.</p>`
+    : "";
+  const surfNotice = data.surfHold && surf
+    ? `<p>${safe(data.surfHold)} · ${safe(surf.height)} surf. Forecast issued ${safe(date(surf.issuedAt))} Pacific.</p>`
+    : "";
+  document.querySelector("#coast-status").innerHTML = `<strong>${verdict}</strong>${rainNotice}${surfNotice}
+    <p>Snapshot checked ${safe(date(data.generatedAt))} Pacific. Current sources: <a href="https://www.sdbeachinfo.com/">County postings</a> · <a href="https://forecast.weather.gov/product.php?site=SGX&amp;issuedby=SGX&amp;product=SRF&amp;version=1">NWS surf forecast</a></p>`;
+}
 
 function table(layout) {
   const matrix = layout.id === "matrix";
@@ -90,6 +109,7 @@ function openDetail(site) {
   document.querySelector("#detail-body").innerHTML = `
     <h2 id="detail-title">${safe(site.name)}</h2><p class="${site.rating.state}">${reason(site)}</p>
     <dl><dt>Monitoring point</dt><dd>${safe(site.location)} · ${safe(site.monitor)}</dd>
+    <dt>Coastwide conditions</dt><dd>${safe([data.coastRainHold, data.surfHold].filter(Boolean).join(" · ") || "See the coast outlook above")}</dd>
     <dt>County snapshot</dt><dd>${safe(site.posting.status)} · ${safe(date(site.posting.observedAt))}</dd>
     <dt>Latest Enterococcus</dt><dd>${safe(reading(sample))} ${safe(sample?.units)} ${sample ? `· ${safe(sample.method)}` : ""}</dd>
     <dt>Sample collected</dt><dd>${safe(date(sample?.collectedAt))}</dd>
@@ -128,7 +148,7 @@ function update() {
 }
 
 for (const layout of layouts) {
-  layout.view = "table";
+  layout.view = defaultView;
   const panel = document.createElement("article");
   layout.panel = panel;
   panel.className = `layout ${layout.id}`;
@@ -163,5 +183,6 @@ document.querySelector("#shortlist").onclick = () => { for (const layout of layo
 for (const [id, direction] of [["prev", -1], ["next", 1]]) {
   document.querySelector(`#${id}`).onclick = () => grid.scrollBy({ left: direction * Math.min(grid.clientWidth, 616), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
 }
+paintCoastStatus();
 window.addEventListener("resize", density);
 update();

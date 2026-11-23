@@ -71,3 +71,8 @@ dialog form{margin-top:1rem}
 body.is-carousel .paging{display:flex;margin:0 0 .65rem}
 @media(min-width:62rem){.atlas .map{grid-template-columns:1.8fr 1fr}.atlas .map-list{max-height:27rem}.atlas .map-note{grid-column:1/-1}}
 @media(max-width:370px){td,th{padding-inline:.25rem}table{font-size:.76rem}td small,th small{font-size:.66rem}}
+
+.coast-status{background:#fff;border:1px solid var(--line);border-left:4px solid var(--avoid);padding:.6rem .8rem;margin-top:.7rem;border-radius:.4rem}
+.coast-status strong{color:var(--avoid)}
+.coast-status p{font-size:.84rem;margin-top:.2rem}
+.coast-status a{color:#20556c}

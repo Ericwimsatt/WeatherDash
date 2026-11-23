@@ -4,18 +4,20 @@ The starting view is a real table of monitored ocean sites from Oceanside Pier t
 
 ## Rating rules
 
-Evaluate signals in order. Show the decisive evidence and its timestamp beside the rating. Rank by category only, with north-to-south geography as the tie-breaker.
+Answer “Can I swim anywhere now?” above both views. Show an active coastwide restriction, current NWS surf hazard, or count of lower-concern candidates. Keep the water-quality rating for each sampling point visible underneath, so a regional rain or surf event leaves local closures and readings available. Show source-confirmed times and link to the County and NWS. Rank by category only, with north-to-south geography as the tie-breaker.
 
 | State | Rule |
 | --- | --- |
-| Avoid water contact | County closure, warning, advisory, or general rain advisory; verified spill or water-quality warning covering the site; latest comparable sample at or above its limit. Keep a previously observed restriction visible if current status is unavailable. |
-| Avoid after rain | At least 0.20 inches in a qualifying coastal storm event, during the event and for 72 hours after it ends. An official general rain advisory independently applies. Require supported interval coverage and a known end time to clear the local rule. |
-| Insufficient data | Missing, stale, or contradictory County status, incomplete gauge coverage, missing applicable runoff evidence, or no comparable sample collected within 48 hours. Show what evidence is missing. |
-| Recent test below limit | Explicit current County open status, complete rain coverage, clear applicable runoff evidence, and a comparable below-limit sample within 48 hours that postdates any known hazard. Use this label with its sample age and the County link. |
+| Avoid water contact | County closure, warning, or site advisory; verified spill or water-quality warning covering the site; latest comparable sample at or above its limit. Keep a previously observed restriction visible if current status is unavailable. |
+| Avoid after rain | Apply the hold to the full coast during a County general rain advisory or a verified qualifying storm in coastal or valley areas (at least 0.20 inches), and for 72 hours after the rain ends. One dry gauge or good sample cannot clear a beach. Keep the official hold until the County confirms the lift. An estimated lift is informational. |
+| Insufficient data | Missing, stale, or contradictory County status, unverified coastwide rain status, incomplete gauge coverage, missing applicable runoff evidence, or no comparable sample collected within 48 hours. Show what evidence is missing. |
+| Recent test below limit | Explicit current County open status, current coastwide status and complete rain coverage, clear applicable runoff evidence, and a comparable below-limit sample within 48 hours that postdates any known hazard. Use this label with its sample age and the County link. |
+
+The swim decision also checks the current NWS surf outlook. High rip-current risk means avoid ocean swimming even if water quality looks favorable. To surface a lower-concern candidate, require low rip-current risk from a valid forecast. Keep forecast hazard and water quality separate in the table, map and drilldown.
 
 The 48-hour sample window and 12-hour successful County fetch window are conservative app policies. The County gives 1,413 DNA copies per 100 mL for Enterococcus ddPCR and 104 organisms per 100 mL for the culture single-sample method. Apply thresholds only to validated measurements of the matching method and unit. Keep censored measurements as bounds. For a date without a sample time, calculate freshness conservatively from local midnight, and require the entire possible interval to be after a hazard before using the sample to clear that hazard. Daily or weekly sampling schedules do not extend the useful life of a result.
 
-The detail view should show sample time, result, unit, method, difference from the threshold, County status and verification time, nearby outfall and mapped spill information, storm total and end time, and the measurement window. Align bacteria, rain, and runoff charts to a shared 30-day time axis. Keep days without a sample visibly blank. Distinguish observed precipitation, forecast weather and modeled plume risk. Put tides, water temperature, wind and surf context below the water-quality evidence. Surf and rip-current hazards need their own indicator.
+The detail view should show sample time, result, unit, method, difference from the threshold, County status and verification time, nearby outfall and mapped spill information, storm total and end time, and the measurement window. Align bacteria, rain, and runoff charts to a shared 30-day time axis. Keep days without a sample visibly blank. Distinguish observed precipitation, forecast weather and modeled plume risk. Put tides, water temperature, wind and surf context below the water-quality evidence. Show surf and rip-current hazards in the coast summary and the detail view.
 
 County guidance directs users to avoid contact within 75 feet of runoff. Show a separately labeled outfall layer. Use colored station markers and leave the shoreline neutral between stations unless an official posting supplies an affected segment.
 

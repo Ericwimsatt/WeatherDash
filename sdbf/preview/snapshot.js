@@ -1,5 +1,5 @@
 window.beachSnapshot = {
-  "generatedAt": "2026-11-23T00:01:07Z",
+  "generatedAt": "2026-11-23T00:06:58Z",
   "countyUpdatedAt": "2026-11-21T22:55:45Z",
   "sites": [
     {
@@ -269,7 +269,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 388,
@@ -511,7 +512,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 401,
@@ -699,7 +701,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 381,
@@ -887,7 +890,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 706,
@@ -1075,7 +1079,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 373,
@@ -1335,7 +1340,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 418,
@@ -1604,7 +1610,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 365,
@@ -1792,7 +1799,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 351,
@@ -1980,7 +1988,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 646,
@@ -2177,7 +2186,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 644,
@@ -2365,7 +2375,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 325,
@@ -2856,7 +2867,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County advisory"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 461,
@@ -3041,7 +3053,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County closure"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 322,
@@ -3532,7 +3545,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County closure"
-      }
+      },
+      "decision": "avoid"
     },
     {
       "id": 455,
@@ -3720,7 +3734,8 @@ window.beachSnapshot = {
       "rating": {
         "state": "avoid",
         "reason": "County closure"
-      }
+      },
+      "decision": "avoid"
     }
   ],
   "rainSeries": {
@@ -4406,5 +4421,22 @@ window.beachSnapshot = {
         "hours": 1
       }
     ]
-  }
+  },
+  "regionalRain": {
+    "advisory": "active",
+    "verifiedAt": "2026-11-23T00:06:58Z",
+    "issuedAt": "2026-11-20T01:00:00Z",
+    "estimatedLiftAt": "2026-11-23T01:00:00Z",
+    "source": "https://www.sdbeachinfo.com/"
+  },
+  "surf": {
+    "ripCurrentRisk": "high",
+    "height": "3–5 ft",
+    "issuedAt": "2026-11-22T20:26:00Z",
+    "validUntil": "2026-11-23T10:30:00Z",
+    "source": "https://forecast.weather.gov/product.php?site=SGX&issuedby=SGX&product=SRF&version=1"
+  },
+  "coastRainHold": "Countywide rain advisory",
+  "surfHold": "NWS high rip-current risk",
+  "candidates": []
 };
