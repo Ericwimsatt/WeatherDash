@@ -1,10 +1,10 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
-import { age, countyUrl, date, postingText, rainDisplay, reading, scoreFactors } from "./evidence.js";
+import { age, date, postingText, rainDisplay, reading, scoreFactors } from "./evidence.js";
 import { drawMap, project } from "./map.js";
 
-import { inlandSharingMiles, withPointRain } from "../data/point-rain.mjs";
+import { withPointRain } from "../data/point-rain.mjs";
 import "../preview/geography.js";
 import "../preview/snapshot.js";
 
@@ -26,7 +26,9 @@ function Rating({ rating }) {
 
 function ScoreFactors({ site, now }) {
   return <ul className="score-factors" aria-label="Contributing factors">
-    {scoreFactors(site,now).map(({score,text}) => <li key={text} className={score>=7 ? "hazard" : undefined}>{text}</li>)}
+    {scoreFactors(site,now).map(({score,text,warning}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
+      {text}{warning && <strong className="runoff-warning hazard">{warning}</strong>}
+    </li>)}
   </ul>;
 }
 
@@ -121,7 +123,7 @@ function Detail({ site, snapshot, now, dismiss }) {
     {site.rating.notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
     <dl className="quick-evidence">
       <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} /></dd>
-      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland · shares rain within {inlandSharingMiles} mi</small></dd>
+      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland</small></dd>
       <dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />
         {evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>
       <dt>County posting</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong><small>Updated {date(site.posting?.observedAt)} Pacific</small></dd>
@@ -144,7 +146,7 @@ function Detail({ site, snapshot, now, dismiss }) {
       </dl>
       {site.history.length>0 && <table className="sample-history"><thead><tr><th scope="col">Collected</th><th scope="col">Enterococcus</th></tr></thead>
         <tbody>{site.history.slice(0,4).map(point => <tr key={point.id}><td>{date(point.collectedAt)}</td><td className={sampleEvidence(point)?.above ? "hazard" : undefined}>{reading(point)} {point.units} · {point.method}</td></tr>)}</tbody></table>}
-      <p><a href={`https://cosdapps.sandiegocounty.gov/sdbeachinfo/SamplesReport?SiteId=${site.countyId}`}>County sample report</a> · <a href={countyUrl}>County postings</a></p>
+      <p><a href={`https://cosdapps.sandiegocounty.gov/sdbeachinfo/SamplesReport?SiteId=${site.countyId}`}>County sample report</a></p>
     </details>
   </dialog>;
 }
@@ -160,15 +162,14 @@ function CoastNotice({ result, snapshot, now }) {
   const rainfall = result.regionalRainfall;
   const estimated = regional?.estimatedLiftAt;
   const candidateSummary = result.candidates.length ? `${result.candidates.length} beaches score 1–2` : "No beach currently scores 1–2";
-  const heading = result.coastRainHold || (rainfall.length ? "Regional rainfall" : candidateSummary);
+  const heading = result.coastRainHold ? "Danger" : rainfall.length ? "Regional rainfall" : candidateSummary;
   return <section className="coast-status" aria-label="Coastwide water quality">
-    <strong>{heading}</strong>
-    {result.coastRainHold && <p>The County advisory applies to all coastal beaches and bays. {estimated && (
+    <strong className={result.coastRainHold ? "hazard" : undefined}>{heading}</strong>
+    {result.coastRainHold && <p>Potential runoff danger. The Countywide rain advisory applies to all coastal beaches and bays. {estimated && (
       Date.parse(estimated) > now ? `County estimated lift ${date(estimated)} Pacific, pending confirmation.`
         : `County’s estimated lift was ${date(estimated)} Pacific. Confirmation is pending.`
     )}</p>}
     {rainfall.length > 0 && <p>{result.coastRainHold && "Regional rainfall · "}{rainfall.map(([area,points]) => `${area} up to +${points}`).join(" · ")}. {candidateSummary}.</p>}
-    <p className="stamp">County checked {date(snapshot.countyCheckedAt ?? regional?.verifiedAt)} Pacific · <a href={countyUrl}>Current County postings</a></p>
   </section>;
 }
 
@@ -262,7 +263,7 @@ function App() {
       <section aria-label="Beach water quality evidence">
         {view==="map" ? <MapView sites={sites} now={now} open={open} /> : <Table sites={tableSites} now={now} open={open} />}
       </section>
-      <footer><a href={countyUrl}>Official County beach notices</a> · <a href="/methodology.html">How water quality is rated</a></footer>
+      <footer><a href="/methodology.html">How water quality is rated</a></footer>
     </main>
     {detail && <Detail site={detail} snapshot={snapshot} now={now} dismiss={dismiss} />}
   </>;

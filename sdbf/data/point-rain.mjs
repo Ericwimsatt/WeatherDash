@@ -4,7 +4,7 @@ export const rainLimits = { local:.2, inland:.75 };
 
 const milesInland = 3;
 const milesPerLongitudeDegreeAtEquator = 69.17;
-export const inlandSharingMiles = 5;
+const inlandSharingMiles = 5;
 const inlandKeyPrefix = "inland:3mi:";
 
 export const pointIds = site => [`local:${site.id}`, `${inlandKeyPrefix}${site.id}`];

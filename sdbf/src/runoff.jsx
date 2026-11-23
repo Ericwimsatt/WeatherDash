@@ -1,8 +1,8 @@
 import React, { useEffect,useRef } from "react";
-import { Chart,BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Legend,Tooltip } from "chart.js";
+import { Chart,BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Tooltip } from "chart.js";
 import { pointTotal,rainLimits, rainPeriods, hour } from "../data/point-rain.mjs";
 
-Chart.register(BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Legend,Tooltip);
+Chart.register(BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Tooltip);
 const day = 24*hour;
 const calendar = new Intl.DateTimeFormat("en-CA",{year:"numeric",month:"2-digit",day:"2-digit",timeZone:"America/Los_Angeles"});
 const shortDate = new Intl.DateTimeFormat("en-US",{month:"short",day:"numeric",timeZone:"UTC"});
@@ -38,7 +38,7 @@ export default function RunoffChart({site,now}) {
       ]},
       options:{
         responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:"index",intersect:false},
-        plugins:{legend:{labels:{boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} in`}}},
+        plugins:{tooltip:{callbacks:{label:ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} in`}}},
         scales:{y:{beginAtZero:true,suggestedMax:1,ticks:{callback:value=>`${value}″`}},x:{grid:{display:false}}},
       },
       plugins:[{id:"runoff-guides",beforeDatasetsDraw({ctx,chartArea,scales}){
@@ -63,7 +63,6 @@ export default function RunoffChart({site,now}) {
 
   if (!site.localPoint && !site.inlandPoint) return <p className="timeline-note">Coordinate rainfall chart unavailable. Gauge evidence appears above.</p>;
   return <section className="runoff-chart"><h3>Runoff rain chart</h3>
-    <p>Rainfall in inches. Bars show daily rain and lines show rolling totals. Shading starts today and includes forecast hours.</p>
     <div className="runoff-plot"><canvas ref={canvas} role="img" aria-label="Local and inland daily rain bars and three- and four-day rolling rain totals" /></div>
   </section>;
 }

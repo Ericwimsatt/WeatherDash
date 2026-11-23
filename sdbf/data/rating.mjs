@@ -97,8 +97,8 @@ export function assess(site, now=Date.now(), regionalPoints=0) {
     if (hazardEnded.some(end => !Number.isFinite(Date.parse(end)) || Date.parse(end) >= Date.parse(sample.collectedAt))) {
       notes.push("The latest bacteria sample predates the last known hazard.");
     }
-  } else {
-    notes.push(evidence?.below ? "The latest below-limit sample is older than 48 hours." : "No comparable bacteria result is available.");
+  } else if (!evidence?.below) {
+    notes.push("No comparable bacteria result is available.");
   }
 
   if (gaps.length) add(gaps.length > 1 ? 6 : 5,gaps[0],"evidence");

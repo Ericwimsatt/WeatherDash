@@ -1,5 +1,3 @@
-export const countyUrl = "https://www.sdbeachinfo.com/";
-
 const pacific = new Intl.DateTimeFormat("en-US", {
   month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
   timeZone: "America/Los_Angeles",
@@ -44,8 +42,13 @@ export function scoreFactors(site, now) {
       return [{ score:signal.score, text:`Past bacteria exceedance · ${ageText}` }];
     }
     if (Number.isFinite(signal.amount)) {
-      const window = signal.field === "local" ? "72h" : "4 days";
-      return [{ score:signal.score, text:`${signal.amount.toFixed(2)} in ${signal.field} rain · ${window}` }];
+      const local = signal.field === "local";
+      const window = local ? "72 hours" : "4 days";
+      const text = `${signal.amount.toFixed(2)} in ${signal.field} rain in last ${window}`;
+      const warning = signal.score >= 6
+        ? (local ? "Potential dangerous chemicals from local runoff" : "Potential algae blooms from inland runoff")
+        : undefined;
+      return [{ score:signal.score, text, warning }];
     }
     return [{ score:signal.score, text:signal.reason }];
   });
