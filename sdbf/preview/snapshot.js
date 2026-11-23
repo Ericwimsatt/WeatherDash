@@ -4429,14 +4429,6 @@ window.beachSnapshot = {
     "estimatedLiftAt": "2026-11-23T01:00:00Z",
     "source": "https://www.sdbeachinfo.com/"
   },
-  "surf": {
-    "ripCurrentRisk": "high",
-    "height": "3–5 ft",
-    "issuedAt": "2026-11-22T20:26:00Z",
-    "validUntil": "2026-11-23T10:30:00Z",
-    "source": "https://forecast.weather.gov/product.php?site=SGX&issuedby=SGX&product=SRF&version=1"
-  },
   "coastRainHold": "Countywide rain advisory",
-  "surfHold": "NWS high rip-current risk",
   "candidates": []
 };

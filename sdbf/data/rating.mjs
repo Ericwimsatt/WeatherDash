@@ -68,25 +68,21 @@ export function assess({ posting, sample, rain, runoff, regionalRain, coastRainH
   return { state: "recent", reason: "Recent test below limit" };
 }
 
-export function assessCoast(sites, { regionalRain, surf } = {}, now = Date.now()) {
+export function assessCoast(sites, { regionalRain } = {}, now = Date.now()) {
   const coastRainHold = checkCoastRain(regionalRain, sites, now);
-  const surfCurrent = Date.parse(surf?.issuedAt) <= now && Date.parse(surf?.validUntil) > now;
-  const surfHold = surfCurrent && surf.ripCurrentRisk === "high" ? "NWS high rip-current risk" : null;
-  const coastHold = coastRainHold ?? surfHold;
 
   const results = sites.map(site => {
     const water = assess({ ...site, regionalRain, coastRainHold }, now);
-    const canConsider = water.state === "recent" && surfCurrent && surf.ripCurrentRisk === "low";
     return {
       id: site.id,
       water,
-      decision: coastHold || water.state === "rain" || water.state === "avoid" ? "avoid" : canConsider ? "consider" : "unverified",
+      decision: coastRainHold || water.state === "rain" || water.state === "avoid" ? "avoid"
+        : water.state === "recent" ? "consider" : "unverified",
     };
   });
 
   return {
     coastRainHold,
-    surfHold,
     results,
     candidates: results.filter(site => site.decision === "consider").map(site => site.id),
   };

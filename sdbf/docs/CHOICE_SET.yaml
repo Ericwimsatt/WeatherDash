@@ -60,3 +60,8 @@ CHOICE_SET:
   open_risks:
     - Verify County response latency and a stable ingestion route.
     - Verify map label density and keyboard interactions on handheld devices.
+
+USER_DECISION:
+  id: evidence-matrix
+  title: Evidence Matrix
+  notes: Adopt the dedicated evidence columns and geographic map.

@@ -53,13 +53,11 @@ test("qualifying rain at one site applies the 72-hour hold to every site", () =>
   assert.deepEqual(result.candidates, []);
 });
 
-test("a high surf risk blocks swimming without altering water quality", () => {
+test("surf forecasts do not change the water-quality decision", () => {
   const sites = [{ ...baseline, id: 1 }];
-  const surf = { ripCurrentRisk: "high", issuedAt: before(1), validUntil: before(-2) };
-  const result = assessCoast(sites, { regionalRain: baseline.regionalRain, surf }, now);
-  assert.equal(result.surfHold, "NWS high rip-current risk");
+  const forecast = { ripCurrentRisk: "high", issuedAt: before(1), validUntil: before(-2) };
+  const result = assessCoast(sites, { regionalRain: baseline.regionalRain, surf: forecast }, now);
   assert.equal(result.results[0].water.state, "recent");
-  assert.equal(result.results[0].decision, "avoid");
-  assert.deepEqual(assessCoast(sites, { regionalRain: baseline.regionalRain, surf: { ...surf, ripCurrentRisk: "low" } }, now).candidates, [1]);
-  assert.deepEqual(assessCoast(sites, { regionalRain: baseline.regionalRain, surf: { ...surf, validUntil: before(1) } }, now).candidates, []);
+  assert.deepEqual(result.candidates, [1]);
+  assert.deepEqual(result, assessCoast(sites, { regionalRain: baseline.regionalRain }, now));
 });
