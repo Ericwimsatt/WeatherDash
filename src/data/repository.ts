@@ -17,7 +17,7 @@ import {
   type Fetcher,
   type Range,
 } from "./providers.ts";
-import { pstDate } from "../../shared/time.ts";
+import { pstDate, shiftDate } from "../../shared/time.ts";
 export type Resource = "weather" | "swim";
 export type WeatherResult = {
   bundle: Bundle;
@@ -97,13 +97,21 @@ export async function loadLocation(
   };
   const today = pstDate();
   const forecastRange = { from: today, to: range.to };
-  const dbRead = getJson(databaseUrl(location, range), signal, fetcher)
-    .then((data) => {
-      saved = cleanBundle(data);
-      databaseAvailable = true;
-      emit();
-    })
-    .catch(() => {});
+  const reads: Promise<void>[] = [];
+  // The weather endpoint accepts at most 15 calendar days per read.
+  for (let from = range.from; from <= range.to; from = shiftDate(from, 15)) {
+    const last = shiftDate(from, 14);
+    const to = last < range.to ? last : range.to;
+    reads.push(
+      getJson(databaseUrl(location, { from, to }), signal, fetcher)
+        .then((data) => {
+          saved = mergeBundles(saved, cleanBundle(data));
+          databaseAvailable = true;
+          emit();
+        })
+        .catch(() => {}),
+    );
+  }
   const tasks: [string, () => Promise<Bundle>][] = [
     [
       "Open-Meteo forecast",
@@ -165,7 +173,7 @@ export async function loadLocation(
       emit();
     }
   });
-  await Promise.all([dbRead, ...primary]);
+  await Promise.all([...reads, ...primary]);
   if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
   const final = result(false);
   // Do not await persistence before returning weather to the user.

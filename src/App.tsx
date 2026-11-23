@@ -1,6 +1,15 @@
 import { colorToken, colorWithAlpha } from "./color-tokens.ts";
-import { useEffect, useState } from "octane";
-import { Chart } from "./components/Chart.tsx";
+import { useEffect, useMemo, useState } from "octane";
+import { Chart, type SunMarker } from "./components/Chart.tsx";
+import {
+  createForecastTimeline,
+  forecastDateLabel,
+  forecastDayAt,
+  FORECAST_DAYS,
+  HISTORY_DAYS,
+  TODAY_START_HOUR,
+  type ForecastTimeline,
+} from "./data/forecast-timeline.ts";
 import { LOCATIONS, SWIM_SPOTS, INLAND, type Location } from "./config.ts";
 import { useLocation } from "./data/hooks.ts";
 import { emptyBundle, type Bundle } from "../shared/model.ts";
@@ -12,14 +21,11 @@ import {
   sunForDay,
   waterForDay,
   tidesForDay,
-  tideExtrema,
   extrema,
   observedRain,
   runoffSummary,
   runoffTotals,
   RUNOFF_LIMITS,
-  uvWindowLabel,
-  rainfallDates,
   rainfallTotal,
   runoffExplanation,
   regionWeatherClass,
@@ -35,17 +41,6 @@ import {
 } from "../shared/time.ts";
 const number = (v: number | null | undefined, digits = 0) =>
   typeof v === "number" && Number.isFinite(v) ? v.toFixed(digits) : "—";
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(window.matchMedia(query).matches);
-  useEffect(() => {
-    const mq = window.matchMedia(query);
-    const update = () => setMatches(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, [query]);
-  return matches;
-}
 function Skeleton({ wide = false }: { wide?: boolean }) {
   return (
     <span
@@ -85,41 +80,6 @@ function Status({
     </p>
   ) : null;
 }
-function Summary({
-  title,
-  value,
-  pending,
-  sub,
-  inlineSub = false,
-  multilineOnMobile = false,
-}: {
-  title: string;
-  value: string;
-  pending: boolean;
-  sub?: string;
-  inlineSub?: boolean;
-  multilineOnMobile?: boolean;
-}) {
-  return (
-    <div className="stat-box">
-      <span className="label">{title}</span>
-      <span className={inlineSub ? "value sunset-value" : "value"}>
-        {multilineOnMobile && value.includes(" · ") ? (
-          value.split(" · ").map((part, index) => (
-            <span className="mobile-value-line" key={part}>
-              {index > 0 && <span className="value-separator"> · </span>}
-              {part}
-            </span>
-          ))
-        ) : (
-          <Value value={value} pending={pending} />
-        )}
-        {sub && inlineSub && <span className="sub">{sub}</span>}
-      </span>
-      {sub && !inlineSub && <span className="sub">{sub}</span>}
-    </div>
-  );
-}
 const line = (
   label: string,
   data: (number | null | undefined)[],
@@ -136,338 +96,321 @@ const line = (
   spanGaps: false,
   ...extra,
 });
-function Daylight({
-  location,
-  date,
-  range,
-}: {
+type ForecastProps = {
   location: Location;
-  date: string;
+  today: string;
   range: Range;
-}) {
-  const query = useLocation(location, range),
-    bundle = query.data?.bundle || emptyBundle(),
-    pending = query.isFetching;
-  const hours = weatherDay(bundle, date),
-    sun = sunForDay(bundle, date),
-    uvHours = uvDay(bundle, date),
-    uv = extrema(uvHours.map((r) => r.uv_index));
-  const visible = uvHours.filter(
-    (r) =>
-      Number(r.hour.slice(11, 13)) >= 5 && Number(r.hour.slice(11, 13)) <= 21,
-  );
-  const rainHours = hours.map(({ hour }) =>
-    rainfallTotal(bundle, hour, pst(Date.parse(hour) + HOUR)),
-  );
-  const dailyTotal = rainfallTotal(
-    bundle,
-    midnight(date),
-    midnight(shiftDate(date, 1)),
-  );
-  const hasRain = (dailyTotal.total ?? 0) > 0;
-  const uvWindow = uvWindowLabel(visible);
-  const length =
-    sun?.sunrise_pst && sun?.sunset_pst
-      ? Math.round(
-          (Date.parse(sun.sunset_pst) - Date.parse(sun.sunrise_pst)) / 60000,
-        )
-      : null;
+  timeline: ForecastTimeline;
+};
+
+const forecastDates = (today: string) =>
+  Array.from({ length: HISTORY_DAYS + FORECAST_DAYS + 1 }, (_, index) => shiftDate(today, index - HISTORY_DAYS));
+
+function useSummaryDate(today: string, timeline: ForecastTimeline) {
+  const [day, setDay] = useState(() => timeline.settledDay);
+  useEffect(() => timeline.subscribeSummary(setDay), [timeline]);
+  return shiftDate(today, day);
+}
+
+const sunTime = (time: string | null | undefined) => time ? displayTime(time).slice(0, -1) : "—";
+
+function hourlySamples<T extends { hour: string }>(days: T[][]) {
+  return days.flatMap((rows, index) => {
+    const day = index - HISTORY_DAYS;
+    return rows.map((row, index) => ({
+      ...row,
+      x: day + (index + .5) / rows.length,
+      label: displayHour(row.hour),
+      tick: day === 0 ? (index - TODAY_START_HOUR) % 2 === 0 : index % 4 === 0,
+    }));
+  });
+}
+
+function Daylight({ location, today, range, timeline }: ForecastProps) {
+  const date = useSummaryDate(today, timeline);
+  const query = useLocation(location, range);
+  const bundle = query.data?.bundle;
+  const pending = query.isFetching;
+  const days = useMemo(() => {
+    const data = bundle ?? emptyBundle();
+    const now = Date.now();
+    return forecastDates(today).map((day) => {
+      const sun = sunForDay(data, day);
+      const temperatures = new Map(weatherDay(data, day, now).map((row) => [row.hour, row.temperature_f]));
+      const uv = uvDay(data, day).map((row) => ({
+        ...row,
+        temperature: temperatures.get(row.hour),
+        rain: rainfallTotal(data, row.hour, pst(Date.parse(row.hour) + HOUR), now).total,
+      }));
+      return { day, sun, uv };
+    });
+  }, [bundle, today]);
+  const { sun } = days.find((day) => day.day === date)!;
+  const uvHours = useMemo(() => hourlySamples(days.map((day) => day.uv)), [days]);
+  const sunMarkers = useMemo(() => days.flatMap(({ day: date, sun }, index) => {
+    const day = index - HISTORY_DAYS;
+    const markers: SunMarker[] = [];
+    for (const [kind, time] of [["sunrise", sun?.sunrise_pst], ["sunset", sun?.sunset_pst]] as const) {
+      if (!time) continue;
+      const hour = (Date.parse(time) - Date.parse(midnight(date))) / HOUR;
+      if (hour < 0 || hour >= 24) continue;
+      markers.push({
+        x: day + (hour + .5) / 24,
+        kind,
+        label: sunTime(time),
+      });
+    }
+    return markers;
+  }), [days]);
+  const uvSeries = useMemo(() => [
+    line(
+      "UV index",
+      uvHours.map((r) => r.uv_index),
+      colorToken("chart-warm"),
+      { yAxisID: "y" },
+    ),
+    line(
+      "Temperature (°F)",
+      uvHours.map((r) => r.temperature),
+      colorToken("chart-temperature"),
+      {
+        yAxisID: "temperature",
+        borderDash: [5, 3],
+        fill: false,
+      },
+    ),
+    line(
+      "Rain (in)",
+      uvHours.map((row) => row.rain),
+      colorToken("ocean"),
+      {
+        type: "bar" as const,
+        yAxisID: "rainfall",
+        order: 1,
+        barThickness: "flex",
+        categoryPercentage: .6,
+        backgroundColor: colorWithAlpha("ocean", .42),
+      },
+    ),
+  ], [uvHours]);
+  const uvThresholds = useMemo(() => [{ value: 2, label: "UV 2", color: colorToken("warning") }], []);
+  const hasRain = uvHours.some((row) => (row.rain ?? 0) > 0);
+  const hasRainToday = uvHours.some(({ hour, rain }) => hour.startsWith(today) && (rain ?? 0) > 0);
+  const hasWeather = uvHours.some((row) => row.uv_index != null || row.temperature != null);
   return (
-    <section className="card" id="irCard" aria-labelledby="daylight-heading">
-      <h3 id="daylight-heading">Daylight</h3>
-      {hasRain && (
-        <div className="rain-section">
-          <div className="rain-head">
-            <h3>Rainfall total</h3>
-            <div className="rain-head-right">
-              <span className="rain-total">
-                {dailyTotal.total != null && !dailyTotal.complete ? "≥" : ""}
-                {number(dailyTotal.total, 2)}″
-              </span>
-              <a
-                className="rain-radar"
-                href={`https://www.windy.com/-Weather-radar-radar?radar,${location.lat},${location.lon},9`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Radar ↗
-              </a>
-            </div>
-          </div>
-          <Chart
-            label="Hourly rainfall for the selected day"
-            labels={hours.map((row) => displayHour(row.hour))}
-            datasets={[
-              line(
-                "Rain (in)",
-                rainHours.map((hour) => hour.total),
-                colorToken("ocean"),
-                { type: "bar" as const, backgroundColor: colorToken("ocean") },
-              ),
-            ]}
-            type="bar"
-            minimum={0}
-          />
-        </div>
-      )}
-      <div className="richmond-grid">
-        <Summary
-          title="Sunrise"
-          value={sun?.sunrise_pst ? displayTime(sun.sunrise_pst) : "—"}
-          pending={pending}
-        />
-        <Summary
-          title="Sunset"
-          inlineSub
-          value={sun?.sunset_pst ? displayTime(sun.sunset_pst) : "—"}
-          pending={pending}
-          sub={
-            length != null
-              ? `${Math.floor(length / 60)}h ${length % 60}m`
-              : undefined
-          }
-        />
-        <Summary title="Max UV" value={number(uv?.max, 1)} pending={pending} />
-        <Summary
-          title="UV below 2"
-          value={uvWindow}
-          pending={pending}
-          multilineOnMobile
-        />
-      </div>
+    <section className="card" id="irCard" aria-label="Daylight">
       <Status result={query.data} pending={pending} />
-      {uv ? (
-        <Chart
-          label="Hourly UV index and temperature"
-          labels={visible.map((r) => displayHour(r.hour))}
-          datasets={[
-            line(
-              "UV index",
-              visible.map((r) => r.uv_index),
-              colorToken("chart-warm"),
-            ),
-            line(
-              "Temperature (°F)",
-              visible.map(
-                (r) => hours.find((h) => h.hour === r.hour)?.temperature_f,
-              ),
-              colorToken("chart-temperature"),
-              {
-                yAxisID: "temperature",
-                borderDash: [5, 3],
-                fill: false,
-              },
-            ),
-          ]}
-          minimum={0}
-          maximum={10}
-          temperatureAxis
-          thresholds={[{ value: 2, label: "UV 2", color: colorToken("warning") }]}
-        />
-      ) : (
-        <div className="chart-placeholder">
-          {pending ? <Skeleton wide /> : <p>UV unavailable.</p>}
-        </div>
-      )}
+      <div className="daylight-chart">
+        {hasWeather || hasRain || sunMarkers.length ? (
+          <Chart
+            label="Hourly UV index, temperature, and rainfall"
+            description={`Sunrise ${sunTime(sun?.sunrise_pst)}, sunset ${sunTime(sun?.sunset_pst)}`}
+            samples={uvHours}
+            sunMarkers={sunMarkers}
+            today={today}
+            timeline={timeline}
+            datasets={uvSeries}
+            minimum={0}
+            maximum={10}
+            temperatureAxis
+            thresholds={uvThresholds}
+          />
+        ) : (
+          <div className="chart-placeholder">
+            {pending ? <Skeleton wide /> : <p>UV unavailable.</p>}
+          </div>
+        )}
+        {hasRainToday && (
+          <a
+            className="rain-radar"
+            href={`https://www.windy.com/-Weather-radar-radar?radar,${location.lat},${location.lon},9`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Doppler
+          </a>
+        )}
+      </div>
     </section>
   );
 }
-function Swim({
-  location,
-  inland,
-  date,
-  range,
-}: {
-  location: Location;
-  inland: Location;
-  date: string;
-  range: Range;
-}) {
+function Swim({ location, inland, today, range, timeline }: ForecastProps & { inland: Location }) {
   const query = useLocation(location, range, "swim"),
     inlandQuery = useLocation(inland, range);
-  const bundle = query.data?.bundle || emptyBundle(),
-    inlandBundle = inlandQuery.data?.bundle || emptyBundle(),
-    pending = query.isFetching;
-  const tide = tidesForDay(bundle, date),
-    extremes = tideExtrema(tide),
-    water = waterForDay(bundle, date),
-    hours = weatherDay(bundle, date);
-  const wind = hours.filter(
-    (r) =>
-      Number(r.hour.slice(11, 13)) >= 5 && Number(r.hour.slice(11, 13)) <= 21,
+  const bundle = query.data?.bundle;
+  const inlandBundle = inlandQuery.data?.bundle;
+  const pending = query.isFetching;
+  const swimHours = useMemo(() => {
+    const data = bundle ?? emptyBundle();
+    const now = Date.now();
+    return hourlySamples(forecastDates(today).map((day) => {
+      const heights = new Map(tidesForDay(data, day, now).map((row) => [row.hour_pst, row.height_ft]));
+      return weatherDay(data, day, now).map(({ hour, wind_speed_mph, wind_direction_deg }) => ({
+        hour,
+        height: heights.get(hour),
+        windSpeed: wind_speed_mph,
+        windDirection: wind_direction_deg,
+      }));
+    }));
+  }, [bundle, today]);
+  const runoffData = useMemo(() => {
+    const local = bundle ?? emptyBundle(), upstream = inlandBundle ?? emptyBundle();
+    const dates = [...forecastDates(today), shiftDate(today, FORECAST_DAYS + 1)];
+    const now = Date.now();
+    const rain = (data: Bundle) => dates.map((day) =>
+      rainfallTotal(data, midnight(day), midnight(shiftDate(day, 1)), now),
+    );
+    return {
+      runoff: runoffSummary(local, upstream, today),
+      warningDetails: runoffExplanation(local, upstream, today),
+      samples: dates.map((_, index) => ({ x: index - HISTORY_DAYS + .5, label: "" })),
+      localRain: rain(local),
+      inlandRain: rain(upstream),
+      localTotals: runoffTotals(local, dates, 3, now),
+      inlandTotals: runoffTotals(upstream, dates, 4, now),
+    };
+  }, [bundle, inlandBundle, today]);
+  const { runoff, warningDetails, samples, localRain, inlandRain, localTotals, inlandTotals } = runoffData;
+  const runoffSeries = useMemo(() => [
+    line(
+      "Local",
+      localRain.map((r) => r.total),
+      colorToken("ocean"),
+      { type: "bar" as const, barThickness: 24, backgroundColor: colorToken("ocean") },
+    ),
+    line(
+      "Inland",
+      inlandRain.map((r) => r.total),
+      colorToken("chart-warm"),
+      { type: "bar" as const, barThickness: 24, backgroundColor: colorToken("chart-warm"), order: 1 },
+    ),
+    line(
+      "Local 3 day total",
+      localTotals.map((r) => r.total),
+      colorToken("ocean"),
+      { type: "line" as const, atDayStart: true, order: 2, backgroundColor: colorWithAlpha("ocean", .2) },
+    ),
+    line(
+      "Inland 4 day total",
+      inlandTotals.map((r) => r.total),
+      colorToken("chart-warm"),
+      { type: "line" as const, atDayStart: true, order: 2, backgroundColor: colorWithAlpha("chart-warm", .2) },
+    ),
+  ], [localRain, inlandRain, localTotals, inlandTotals]);
+  const swimSeries = useMemo(() => [
+    line(
+      "Tide height (ft)",
+      swimHours.map((row) => row.height),
+      colorToken("ocean"),
+      { yAxisID: "y", fill: "start" as const, backgroundColor: colorWithAlpha("ocean", .10) },
+    ),
+    line(
+      "Wind (mph)",
+      swimHours.map((row) => row.windSpeed),
+      colorToken("chart-today"),
+      {
+        type: "bar" as const,
+        yAxisID: "wind",
+        order: 1,
+        barThickness: "flex",
+        categoryPercentage: .6,
+        backgroundColor: colorWithAlpha("chart-today", .32),
+      },
+    ),
+  ], [swimHours]);
+  const runoffThresholds = useMemo(() => [
+    {
+      value: RUNOFF_LIMITS.local,
+      label: `Local limit · ${RUNOFF_LIMITS.local}″`,
+      color: colorToken("ocean"),
+    },
+    {
+      value: RUNOFF_LIMITS.inland,
+      color: colorToken("chart-warm"),
+    },
+  ], []);
+  const hasRunoff = [localRain, inlandRain, localTotals, inlandTotals].some(
+    (series) => series.some((day) => (day.total ?? 0) > 0),
   );
-  const runoff = runoffSummary(bundle, inlandBundle);
-  const shownDates = rainfallDates();
-  const runoffDates = [
-    shiftDate(shownDates[0], -1),
-    ...shownDates,
-    shiftDate(shownDates.at(-1)!, 1),
-  ];
-  const localRain = runoffDates.map((day) =>
-    rainfallTotal(bundle, midnight(day), midnight(shiftDate(day, 1))),
-  );
-  const inlandRain = runoffDates.map((day) =>
-    rainfallTotal(inlandBundle, midnight(day), midnight(shiftDate(day, 1))),
-  );
-  const warningDetails = runoffExplanation(bundle, inlandBundle);
-  const localTotals = runoffTotals(bundle, runoffDates, 2);
-  const inlandTotals = runoffTotals(inlandBundle, runoffDates, 4);
-  const isMobile = useMediaQuery("(max-width: 639px)");
   return (
-    <section className="card" id="bbCard" aria-labelledby="swim-heading">
-      <h2 id="swim-heading">{location.name} — Swim Conditions</h2>
-      <p
-        className={runoff.warning ? "runoff-warn" : "runoff-ok"}
-        title={
-          runoff.warning
-            ? "Swimming may be unsafe after more than 0.25 inches of local rain in the last 2 days or over 1 inch of inland rain in the last 4 days, because runoff can carry fertilizer and contribute to possible algae blooms."
-            : undefined
-        }
-        tabIndex={runoff.warning ? 0 : undefined}
-      >
-        {runoff.warning
-          ? `Runoff warning: ${warningDetails}`
-          : runoff.complete
-            ? "No runoff warning"
-            : "Runoff unavailable"}
-      </p>
-      <div className="runoff-section">
-        <div className="runoff-head">
-          <h3>{runoff.warning ? "Runoff Warning" : "Runoff forecast"}</h3>
-          <span className="runoff-summary">
-            Local last 2 days: {number(runoff.local.total, 2)} in · Inland last 4 days:{" "}
-            {number(runoff.inland.total, 2)} in
-          </span>
+    <section className="card" id="bbCard" aria-label={location.name}>
+      {runoff.warning && (
+        <p
+          className="runoff-warn"
+          title="Swimming may be unsafe after more than 0.25 inches of local rain in the last 2 days or over 1 inch of inland rain in the last 4 days, because runoff can carry fertilizer and contribute to possible algae blooms."
+          tabIndex={0}
+        >
+          {`Runoff warning: ${warningDetails}`}
+        </p>
+      )}
+      {hasRunoff && (
+        <div className="runoff-section">
+          <div className="runoff-head">
+            <h3>{location.name} Runoff Forecast</h3>
+            <span className="runoff-summary">
+              Local last 2 days: {number(runoff.local.total, 2)} in · Inland last 4 days:{" "}
+              {number(runoff.inland.total, 2)} in
+            </span>
+          </div>
+          <Chart
+            label="Local and inland rain, rolling totals and runoff thresholds"
+            tooltipUnit="in"
+            daily
+            samples={samples}
+            today={today}
+            timeline={timeline}
+            datasets={runoffSeries}
+            type="bar"
+            minimum={0}
+            height={240}
+            thresholds={runoffThresholds}
+          />
         </div>
-        <Chart
-          label={
-            isMobile
-              ? ""
-              : "Local and inland rain, rolling totals and runoff thresholds"
-          }
-          tooltipUnit="in"
-          labels={runoffDates.map((d) => d.slice(5))}
-          datasets={[
-            line(
-              "Local",
-              localRain.map((r) => r.total),
-              colorToken("ocean"),
-              { type: "bar" as const, backgroundColor: colorToken("ocean") },
-            ),
-            line(
-              "Inland",
-              inlandRain.map((r) => r.total),
-              colorToken("chart-warm"),
-              { type: "bar" as const, backgroundColor: colorToken("chart-warm"), order: 1 },
-            ),
-            line(
-              "Local 2-day",
-              localTotals.map((r) => r.total),
-              colorToken("ocean"),
-              { type: "line" as const, order: 2, backgroundColor: colorWithAlpha("ocean", .2) },
-            ),
-            line(
-              "Inland 4-day",
-              inlandTotals.map((r) => r.total),
-              colorToken("chart-warm"),
-              { type: "line" as const, order: 2, backgroundColor: colorWithAlpha("chart-warm", .2) },
-            ),
-          ]}
-          type="bar"
-          minimum={0}
-          height={240}
-          edgePadding={1}
-          todayIndex={runoffDates.indexOf(pstDate())}
-          thresholds={[
-            {
-              value: RUNOFF_LIMITS.local,
-              color: colorToken("ocean"),
-            },
-            {
-              value: RUNOFF_LIMITS.inland,
-              color: colorToken("chart-warm"),
-            },
-          ]}
-        />
-      </div>
+      )}
       <Status result={query.data} pending={pending} />
-      <h3 className="tide-label">Tides</h3>
-      <div className="tide-times">
-        {extremes.length ? (
-          extremes.map((r) => (
-            <div
-              className={`tide-item ${r.type.toLowerCase()}`}
-              key={r.hour_pst}
-            >
-              <div className="tide-type">{r.type}</div>
-              <div className="tide-time">{displayTime(r.hour_pst)}</div>
-              <div className="tide-height">{number(r.height_ft, 1)} ft</div>
-            </div>
-          ))
+      <div className="swim-chart">
+        <h3>{location.name} Tides and Wind</h3>
+        {swimHours.some((row) => row.height != null || row.windSpeed != null) ? (
+          <Chart
+            label="Hourly tide height and wind speed"
+            description="Tide height in feet relative to MLLW. Wind speed in miles per hour."
+            samples={swimHours}
+            today={today}
+            timeline={timeline}
+            datasets={swimSeries}
+          />
         ) : (
-          <div className="tide-item">
-            {pending ? <Skeleton /> : "Tides unavailable"}
+          <div className="chart-placeholder">
+            {pending ? <Skeleton wide /> : "Tide and wind data unavailable."}
           </div>
         )}
       </div>
-      <div className="swim-charts">
-        <div>
-          <h3>Tide height</h3>
-          {tide.length ? (
-            <Chart
-              label="Hourly tide height in feet relative to MLLW"
-              labels={tide.map((r) => displayHour(r.hour_pst))}
-              datasets={[
-                line(
-                  "Height (ft)",
-                  tide.map((r) => r.height_ft),
-                  colorToken("ocean"),
-                  { fill: "start" as const, backgroundColor: colorWithAlpha("ocean", .2) },
-                ),
-              ]}
-            />
-          ) : (
-            <div className="chart-placeholder">
-              {pending ? <Skeleton wide /> : "Tide data unavailable."}
-            </div>
-          )}
-        </div>
-        <div>
-          <h3>Wind</h3>
-          {wind.some((r) => r.wind_speed_mph != null) ? (
-            <Chart
-              label="Hourly wind speed in miles per hour"
-              labels={wind.map((r) => displayHour(r.hour))}
-              datasets={[
-                line(
-                  "Wind (mph)",
-                  wind.map((r) => r.wind_speed_mph),
-                  colorToken("ocean"),
-                  { type: "bar" as const, backgroundColor: colorToken("ocean") },
-                ),
-              ]}
-              type="bar"
-              minimum={0}
-            />
-          ) : (
-            <div className="chart-placeholder">
-              {pending ? <Skeleton wide /> : "Wind unavailable."}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="water-temp">
-        Water temp:{" "}
-        <strong>
-          <Value
-            value={water ? `${number(water.mean_temperature_f, 1)}°F` : "—"}
-            pending={pending}
-          />
-        </strong>
-      </div>
+      <WaterTemperature bundle={bundle} today={today} timeline={timeline} pending={pending} />
     </section>
   );
 }
+
+function WaterTemperature({ bundle, today, timeline, pending }: {
+  bundle?: Bundle;
+  today: string;
+  timeline: ForecastTimeline;
+  pending: boolean;
+}) {
+  const date = useSummaryDate(today, timeline);
+  const water = bundle && waterForDay(bundle, date);
+  return (
+    <div className="water-temp">
+      Water temp:{" "}
+      <strong>
+        <Value
+          value={water ? `${number(water.mean_temperature_f, 1)}°F` : "—"}
+          pending={pending}
+        />
+      </strong>
+    </div>
+  );
+}
+
 function Region({
   location,
   date,
@@ -525,14 +468,72 @@ function Region({
     </a>
   );
 }
+function ForecastHeading({ name, today, timeline }: {
+  name: string;
+  today: string;
+  timeline: ForecastTimeline;
+}) {
+  const [day, setDay] = useState(() => forecastDayAt(timeline.position));
+  useEffect(() => {
+    let lastDay = forecastDayAt(timeline.position);
+    return timeline.subscribe((position) => {
+      const nextDay = forecastDayAt(position);
+      if (nextDay === lastDay) return;
+      lastDay = nextDay;
+      setDay(nextDay);
+    });
+  }, [timeline]);
+
+  return (
+    <div className="region-heading">
+      <h2>{name}</h2>
+      <span className="forecast-date" aria-live="polite">{forecastDateLabel(today, day)}</span>
+      {day !== 0 && (
+        <button className="today-button" onClick={() => timeline.moveTo(0, true)}>Jump to today</button>
+      )}
+    </div>
+  );
+}
+
+function RegionalTemperatures({ today, range, timeline, onNavigate }: {
+  today: string;
+  range: Range;
+  timeline: ForecastTimeline;
+  onNavigate: (id: string) => void;
+}) {
+  const date = useSummaryDate(today, timeline);
+  const groups = [...new Set(LOCATIONS.map((location) => location.group))];
+  return (
+    <section className="card full" id="regCard" aria-labelledby="regions-heading">
+      <h2 id="regions-heading">Regional Temps</h2>
+      <div id="regionContainer">
+        {groups.map((group) => (
+          <div className="region-group" key={group}>
+            <h3 className="group-title">{group}</h3>
+            <div className="region-row">
+              {LOCATIONS.filter((location) => location.group === group).map((location) => (
+                <Region key={location.id} location={location} date={date} range={range} onNavigate={onNavigate} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function App() {
-  const [today, setToday] = useState(pstDate()),
-    [date, setDate] = useState(pstDate());
+  const [today, setToday] = useState(pstDate());
+  const [timeline] = useState(createForecastTimeline);
   const [regionId, setRegionId] = useState(window.location.pathname.slice(1));
   const region = LOCATIONS.find((l) => l.id === regionId) || LOCATIONS[0],
     spot = SWIM_SPOTS[region.id],
     inland = region.id === "encinitas" ? region : INLAND;
-  const range = { from: shiftDate(today, -6), to: shiftDate(today, 4) };
+  // Inland runoff needs four days of measurements before the earliest visible date.
+  const range = useMemo(() => ({
+    from: shiftDate(today, -HISTORY_DAYS - 4),
+    to: shiftDate(today, FORECAST_DAYS),
+  }), [today]);
   useEffect(() => {
     const timer = setInterval(() => setToday(pstDate()), 60000);
     const pop = () => setRegionId(window.location.pathname.slice(1));
@@ -546,7 +547,7 @@ export function App() {
     document.title = regionId ? `${region.name} — WeatherDash` : "WeatherDash";
   }, [regionId]);
   function navigate(id: string) {
-    history.pushState(null, "", id ? `/${id}` : "/");
+    history.pushState(null, "", `/${id}`);
     setRegionId(id);
     window.scrollTo({
       top: 0,
@@ -555,7 +556,6 @@ export function App() {
         : "smooth",
     });
   }
-  const groups = [...new Set(LOCATIONS.map((l) => l.group))];
   return (
     <>
       <header>
@@ -570,28 +570,6 @@ export function App() {
             EricWeather
           </a>
         </h1>
-        <div className="day-tabs" aria-label="Forecast day">
-          {[0, 1, 2].map((offset) => (
-            <button
-              key={offset}
-              className={date === shiftDate(today, offset) ? "active" : ""}
-              aria-pressed={date === shiftDate(today, offset)}
-              onClick={() => setDate(shiftDate(today, offset))}
-            >
-              {offset === 0
-                ? "Today"
-                : offset === 1
-                  ? "Tomorrow"
-                  : new Date(
-                      midnight(shiftDate(today, offset)),
-                    ).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      timeZone: "Etc/GMT+8",
-                    })}
-              <small>{shiftDate(today, offset).slice(5)}</small>
-            </button>
-          ))}
-        </div>
         {regionId && (
           <div className="header-actions">
             {regionId && (
@@ -610,37 +588,14 @@ export function App() {
         )}
       </header>
       <main id="main">
-        <h2 className="region-heading">{region.name}</h2>
+        <span className="visually-hidden" id="forecast-instructions">
+          Use the left and right arrow keys when a chart is focused to change dates.
+        </span>
+        <ForecastHeading name={region.name} today={today} timeline={timeline} />
         <div className="card-grid">
-          <Daylight location={region} date={date} range={range} />
-          <Swim location={spot} inland={inland} date={date} range={range} />
-          <section
-            className="card full"
-            id="regCard"
-            aria-labelledby="regions-heading"
-          >
-            <h2 id="regions-heading">Regional Temps</h2>
-            <div id="regionContainer">
-              {groups.map((group) => (
-                <div className="region-group" key={group}>
-                  <h3 className="group-title">{group}</h3>
-                  <div className="region-row">
-                    {LOCATIONS.filter((l) => l.group === group).map(
-                      (location) => (
-                        <Region
-                          key={location.id}
-                          location={location}
-                          date={date}
-                          range={range}
-                          onNavigate={navigate}
-                        />
-                      ),
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <Daylight location={region} today={today} range={range} timeline={timeline} />
+          <Swim location={spot} inland={inland} today={today} range={range} timeline={timeline} />
+          <RegionalTemperatures today={today} range={range} timeline={timeline} onNavigate={navigate} />
         </div>
       </main>
     </>

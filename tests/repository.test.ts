@@ -107,3 +107,35 @@ test("value-identical rows do not generate a write request", async () => {
   await publishChanges(LOCATIONS[0], saved, saved, fetcher);
   assert.equal(requests, 0);
 });
+test("the extended timeline merges adjacent database reads through day ten", async () => {
+  const today = pstDate();
+  const from = shiftDate(today, -6);
+  const to = shiftDate(today, 10);
+  const reads: [string | null, string | null][] = [];
+  const fetcher: typeof fetch = async (input) => {
+    const url = String(input);
+    if (!url.startsWith("/api/weather")) throw new Error("offline provider");
+    const params = new URL(url, "https://weatherdash.test").searchParams;
+    reads.push([params.get("from"), params.get("to")]);
+    const saved = emptyBundle();
+    saved.daily_sun_times = [{
+      latitude_e6: 37781100,
+      longitude_e6: -122463500,
+      date_pst: params.get("to")!,
+      source_id: "saved",
+      source_retrieved_at_pst: pst(),
+      sunrise_pst: null,
+      sunset_pst: null,
+    }];
+    return Response.json(saved);
+  };
+  const result = await loadLocation(LOCATIONS[0], { from, to }, { fetcher });
+  assert.deepEqual(reads, [
+    [from, shiftDate(today, 8)],
+    [shiftDate(today, 9), to],
+  ]);
+  assert.deepEqual(
+    result.bundle.daily_sun_times.map(({ date_pst }) => date_pst).sort(),
+    [shiftDate(today, 8), to],
+  );
+});

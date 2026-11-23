@@ -62,30 +62,6 @@ header .updated {
   margin-left: auto;
 }
 
-/* Day tabs */
-.day-tabs {
-  display: flex;
-  gap: 6px;
-  width: 100%;
-  margin-top: 8px;
-}
-.day-tabs button {
-  flex: 1;
-  padding: 10px 6px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.3;
-  transition: all 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.day-tabs button small {
-  display: block;
-  font-weight: 400;
-  font-size: 0.7rem;
-  margin-top: 1px;
-}
 
 /* Card grid */
 .card-grid {
@@ -189,7 +165,7 @@ header .updated {
 
 /* Regions */
 .region-group {
-  margin-top: 12px;
+  margin-top: 9px;
 }
 .region-group:first-child {
   margin-top: 0;
@@ -198,7 +174,7 @@ header .updated {
   font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.055em;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   padding: 0 4px;
 }
 .region-row {
@@ -243,15 +219,6 @@ header .updated {
 .detail-nav {
   margin-bottom: 12px;
 }
-.back-btn {
-  background: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  transition: all 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-
 /* Loading */
 .loading {
   text-align: center;
@@ -280,7 +247,7 @@ header .updated {
 }
 
 /* Desktop */
-@media (min-width: 640px) {
+@media (min-width: 360px) {
   .region-item {
     flex: 1 1 calc(50% - 3px);
   }
@@ -317,9 +284,6 @@ header h1 {
   font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: -0.045em;
-}
-.day-tabs button {
-  border-radius: 0;
 }
 .card {
   border-radius: 0;
@@ -386,10 +350,6 @@ header h1 {
     linear-gradient(var(--color-photo-scrim-light), var(--color-photo-scrim-rain)),
     url("/images/hail.jpg");
 }
-.back-btn {
-  border-radius: 0;
-}
-
 /* Field Notes data accents: stronger ink, restrained ocean/ochre signals. */
 .tide-arrow {
   width: 12px;
@@ -440,32 +400,6 @@ header h1 {
   font-weight: 900;
   letter-spacing: -0.065em;
   color: var(--color-ink);
-}
-.day-tabs {
-  gap: 7px;
-  margin-top: 12px;
-}
-.day-tabs button {
-  border: 0;
-  border-radius: 100px;
-  font-size: 1rem;
-  background: var(--color-surface-control-translucent);
-  padding: 11px 8px;
-  font-family: var(--font-body);
-  font-weight: 700;
-  line-height: 1.2;
-  box-shadow: inset 0 0 0 1px var(--color-border-warm);
-}
-.day-tabs button.active {
-  border: 0;
-  background: var(--color-accent);
-  box-shadow: none;
-}
-.day-tabs button.active small {
-  opacity: 0.78;
-}
-.day-tabs button small {
-  font-family: var(--font-body);
 }
 .card-grid {
   gap: 22px;
@@ -538,11 +472,7 @@ header h1 {
   box-shadow: none;
   border-radius: 0;
   padding: 22px 0 26px;
-  border-top: 1px solid var(--color-water-divider);
   border-bottom: 1px solid var(--color-water-divider);
-}
-#bbCard h2 {
-  color: var(--color-water-ink);
 }
 #bbCard .tide-times .tide-item {
   background: var(--color-water-surface);
@@ -577,10 +507,11 @@ header h1 {
 }
 .region-item {
   border: 0;
-  border-radius: 16px;
-  min-height: 54px;
-  padding: 10px 14px;
-  box-shadow: 0 4px 0 var(--color-section-shadow);
+  border-radius: 10px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 0 var(--color-section-shadow);
 }
 .region-item .name,
 .region-item .temps {
@@ -590,20 +521,6 @@ header h1 {
 .region-item .precip {
   color: var(--color-on-photo-muted);
   text-shadow: 0 1px 2px var(--color-photo-text-shadow);
-}
-.back-btn {
-  border: 0;
-  border-radius: 100px;
-  background: var(--color-surface-control);
-  color: var(--color-accent);
-  box-shadow: inset 0 0 0 1px var(--color-border-warm);
-  padding: 10px 17px;
-  font-weight: 850;
-}
-.back-btn:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-on-accent);
 }
 .loading {
   color: var(--color-muted);
@@ -631,10 +548,6 @@ header h1 {
   }
   #bbCard .chart-wrap + .chart-wrap {
     margin-left: 0 !important;
-  }
-  .region-item {
-    min-height: 50px;
-    padding: 9px 12px;
   }
 }
 
@@ -671,10 +584,9 @@ main::before {
 #irCard {
   position: relative;
   background: var(--color-page);
-  box-shadow: 0 12px 0 var(--color-section-shadow);
+  padding-bottom: 12px;
 }
 #irCard h2,
-#bbCard h2,
 #regCard h2 {
   max-width: 1200px;
   margin-left: auto;
@@ -694,12 +606,14 @@ main::before {
   background: linear-gradient(180deg, var(--color-water-surface) 0, var(--color-water-end) 100%);
   box-shadow: 0 12px 0 var(--color-water-divider);
   border-radius: 0;
-  padding-top: 28px;
-  padding-bottom: 32px;
+  padding-block: 0 8px;
 }
 #regCard {
   background: var(--color-page);
-  padding-top: 28px;
+  padding-top: 16px;
+}
+#regCard h2 {
+  margin-bottom: 8px;
 }
 #regCard {
   box-shadow: none;
@@ -713,11 +627,12 @@ main::before {
   #regCard {
     padding-left: 16px;
     padding-right: 16px;
-    padding-top: 22px;
-    padding-bottom: 26px;
   }
   #irCard {
-    box-shadow: 0 10px 0 var(--color-section-shadow);
+    padding-top: 22px;
+  }
+  #regCard {
+    padding-bottom: 26px;
   }
   #bbCard {
     box-shadow: 0 10px 0 var(--color-water-divider);
@@ -727,61 +642,26 @@ main::before {
   padding-left: 6px;
   padding-right: 6px;
 }
-@media (min-width: 360px) {
-  .region-item {
-    flex: 1 1 calc(50% - 3px);
-  }
-}
 
-/* Rain section (Daylight card) */
-#irCard .rain-section {
+.daylight-chart {
+  position: relative;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.rain-section {
-  display: block;
-  background: var(--color-water-surface);
-  border: 1px solid var(--color-water-border);
-  border-radius: 16px;
-  padding: 12px 14px;
-  margin-bottom: 14px;
-}
-.rain-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 12px;
-  margin-bottom: 8px;
-}
-.rain-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 800;
-  color: var(--color-ocean);
-}
-.rain-total {
-  font-size: 0.85rem;
-  font-weight: 850;
-  color: var(--color-water-ink);
-}
-.rain-head-right {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 10px;
+  margin-inline: auto;
 }
 .rain-radar {
-  font-size: 1rem;
-  font-weight: 800;
-  text-decoration: none;
-  border-bottom: 1px solid var(--color-link-underline);
+  position: absolute;
+  top: 24px;
+  right: 44px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--color-surface);
+  font-size: .875rem;
+  font-weight: 700;
+  text-underline-offset: 2px;
   white-space: nowrap;
 }
 .rain-radar:hover {
   color: var(--color-accent);
-  border-color: var(--color-accent);
 }
 .uv-low-hint {
   font-size: 0.8rem;
@@ -791,9 +671,6 @@ main::before {
 }
 
 /* Runoff warning */
-#bbCard h2 {
-  margin-bottom: 4px;
-}
 .runoff-ok {
   font-size: 0.72rem;
   margin: 0 0 12px;
@@ -811,14 +688,10 @@ main::before {
 
 /* Runoff chart */
 .runoff-section {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  background: var(--color-surface-warning);
-  border: 1px solid var(--color-border-warm);
-  border-radius: 16px;
-  padding: 12px 14px;
+  margin-inline: calc(-1 * var(--content-gutter, 16px));
   margin-bottom: 14px;
+  padding: 12px var(--content-gutter, 16px);
+  background: #eefdfe;
 }
 .runoff-head {
   display: flex;
@@ -826,7 +699,8 @@ main::before {
   align-items: flex-start;
   justify-content: space-between;
   gap: 4px 12px;
-  margin-bottom: 8px;
+  max-width: 1200px;
+  margin: 0 auto 8px;
 }
 .runoff-label {
   font-size: 0.7rem;
@@ -931,17 +805,6 @@ header .updated {
 ::selection {
   background: var(--color-water-surface);
   color: var(--color-water-ink);
-}
-.day-tabs button small,
-.day-tabs button {
-  color: var(--color-muted-strong);
-}
-.day-tabs button.active,
-.day-tabs button.active small {
-  color: var(--color-on-accent);
-}
-.day-tabs button:hover:not(.active) {
-  background: var(--color-surface-inset);
 }
 .header-actions {
   display: flex;
@@ -1050,39 +913,15 @@ h3 {
 .rain-radar {
   color: var(--color-water-link);
 }
-.swim-charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+.swim-chart {
   max-width: 1200px;
   margin: 14px auto;
 }
-.swim-charts > div {
-  min-width: 0;
-}
-#bbCard .swim-charts .chart-wrap {
-  display: block;
-  width: 100%;
-  margin-left: 0 !important;
-}
-#bbCard .tide-label {
-  display: block;
-  font-size: 0.9rem;
-  text-transform: none;
-  letter-spacing: normal;
-  margin-top: 18px;
+.swim-chart h3 {
   color: var(--color-water-ink);
 }
 #bbCard .source-note {
   color: var(--color-water-muted-strong);
-}
-#bbCard .runoff-section .chart-wrap {
-  height: 180px;
-  min-height: 180px;
-}
-#bbCard .runoff-section .chart-wrap canvas {
-  height: 180px !important;
-  max-height: 180px;
 }
 .tide-times {
   flex-wrap: wrap;
@@ -1106,7 +945,7 @@ h3 {
 }
 .region-item {
   text-decoration: none;
-  gap: 8px;
+  gap: 5px;
   background-color: var(--color-photo-fallback);
 }
 .region-item:hover {
@@ -1114,6 +953,9 @@ h3 {
 }
 .region-item .name {
   flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .region-item .temps {
   font-variant-numeric: tabular-nums;
@@ -1123,9 +965,6 @@ h3 {
 }
 .region-group .group-title {
   color: var(--color-muted-strong);
-}
-.region-row {
-  gap: 10px;
 }
 .data-table {
   margin-top: 14px;
@@ -1165,12 +1004,6 @@ footer a {
   text-underline-offset: 3px;
 }
 @media (max-width: 639px) {
-  .swim-charts {
-    grid-template-columns: 1fr;
-  }
-  .day-tabs button {
-    min-height: 48px;
-  }
   .richmond-grid .stat-box .value {
     font-size: 1.05rem;
   }
@@ -1189,15 +1022,6 @@ footer a {
     transition: none !important;
     animation: none !important;
   }
-}
-
-#bbCard .runoff-section .chart-wrap {
-  height: 240px;
-  min-height: 240px;
-}
-#bbCard .runoff-section .chart-wrap canvas {
-  height: 240px !important;
-  max-height: 240px;
 }
 
 .richmond-grid .stat-box .sunset-value {
@@ -1220,30 +1044,29 @@ footer a {
   .richmond-grid .stat-box .value {
     font-weight: 600;
   }
-  .rain-total {
-    font-weight: 600;
-  }
 }
 
 .region-heading {
+  --location-ink: #e0ebde;
+  display: grid;
+  grid-template-columns: minmax(0, auto) 1fr auto;
+  align-items: center;
+  gap: 4px 16px;
   position: sticky;
   top: 0;
   z-index: 5;
   margin: 0;
+  min-height: calc(36px + 1.16rem);
   padding: .58rem var(--content-gutter, 16px);
   background: var(--color-ink);
-  color: #e0ebde;
+  color: var(--location-ink);
   font-size: 1rem;
   font-weight: 550;
   line-height: 1.35;
   letter-spacing: 0.005em;
 }
-#daylight-heading {
-  margin: 0 0 .85rem;
-  color: var(--color-muted-strong);
-}
 
-:is(.temps, .value, .rain-total, .tide-time, .precip, .runoff-summary) {
+:is(.temps, .value, .tide-time, .precip, .runoff-summary) {
   font-variant-numeric: tabular-nums;
 }
 
@@ -1303,5 +1126,80 @@ footer a {
 @media (max-width: 540px) {
   #bbCard .tide-times .tide-item {
     grid-template-columns: 1fr;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.region-heading h2,
+#regions-heading {
+  font: 700 1rem/1.35 var(--font-body);
+  letter-spacing: 0.005em;
+}
+
+.forecast-date {
+  font-size: .875rem;
+  font-weight: 550;
+}
+
+.today-button {
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--location-ink);
+  border-radius: 100px;
+  background: var(--location-ink);
+  color: var(--color-ink);
+  font-size: .875rem;
+  font-weight: 650;
+}
+
+.today-button:hover {
+  background: var(--color-surface);
+}
+
+.today-button:focus-visible {
+  outline: 2px solid var(--location-ink);
+  outline-offset: 2px;
+}
+
+.forecast-chart canvas:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.forecast-chart canvas {
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+}
+
+.forecast-chart canvas.dragging {
+  cursor: grabbing;
+}
+
+@media (max-width: 639px) {
+  .region-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: calc(44px + 1.16rem);
+    column-gap: 8px;
+    row-gap: 0;
+  }
+
+  .forecast-date {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .today-button {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-height: 44px;
   }
 }

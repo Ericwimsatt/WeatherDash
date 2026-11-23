@@ -1,7 +1,7 @@
 /* Shared holiday header artwork. Preserve the incumbent header dimensions. */
 header{isolation:isolate}
-header::before{content:'';position:absolute;inset:0 0 auto;height:66px;background:linear-gradient(90deg,var(--color-header-art-scrim),transparent 60%),url('./assets/holiday/village-header.jpg') center 63%/auto 170px repeat-x,var(--color-header-art-base);z-index:-1;pointer-events:none}
+header::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--color-header-art-scrim),transparent 60%),url('./assets/holiday/village-header.jpg') center 63%/auto 170px repeat-x,var(--color-header-art-base);z-index:-1;pointer-events:none}
 header h1{position:relative}
 header h1 a{color:transparent;display:block;min-width:190px}
 header h1 a::after{content:'';position:absolute;left:0;top:calc(50% - 9px);transform:translateY(-50%);width:190px;height:64px;background:url('./assets/holiday/ericweather-wordmark.png') center/contain no-repeat;pointer-events:none}
-@media(max-width:639px){header::before{height:62px}header h1 a{min-width:170px}header h1 a::after{width:170px;height:57px}}
+@media(max-width:639px){header h1 a{min-width:170px}header h1 a::after{width:170px;height:57px}}

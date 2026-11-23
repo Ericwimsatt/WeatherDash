@@ -255,9 +255,10 @@ test("runoff curves use trailing windows without inventing missing rain", async 
       rainfall_end_pst: pst(start + (i + 1) * HOUR),
     }),
   );
-  const dates = ["2026-11-14", "2026-11-16", "2026-11-18"];
-  const local = runoffTotals(bundle, dates, 2),
-    inland = runoffTotals(bundle, dates, 4);
+  const dates = ["2026-11-15", "2026-11-17", "2026-11-19"];
+  const now = Date.parse("2026-11-19T12:00:00-08:00");
+  const local = runoffTotals(bundle, dates, 2, now),
+    inland = runoffTotals(bundle, dates, 4, now);
   assert.equal(local[0].total, null);
   assert.equal(local[1].total, 0.48);
   assert.equal(local[1].complete, true);
@@ -265,9 +266,7 @@ test("runoff curves use trailing windows without inventing missing rain", async 
   assert.equal(inland[1].complete, false);
   assert.equal(inland[2].total, 0.96);
   assert.equal(inland[2].complete, true);
-  const trailing = runoffTotals(bundle, ["2026-11-18"], 4)[0];
-  assert.equal(
-    trailing.total,
-    runoffSummary(bundle, bundle, "2026-11-19").inland.total,
-  );
+  const warning = runoffSummary(bundle, bundle, dates[2]);
+  assert.deepEqual(local[2], warning.local);
+  assert.deepEqual(inland[2], warning.inland);
 });

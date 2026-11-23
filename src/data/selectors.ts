@@ -18,8 +18,11 @@ export function weatherAt(
   hour: string,
   now = Date.now(),
 ): Partial<Weather> {
+  return weatherRowsAt(bundle.hourly_weather, hour, now);
+}
+function weatherRowsAt(weather: Weather[], hour: string, now: number): Partial<Weather> {
   const kind = Date.parse(hour) + HOUR <= now ? "observation" : "forecast";
-  const rows = bundle.hourly_weather
+  const rows = weather
     .filter((r) => r.hour_pst === hour && r.data_kind === kind)
     .sort((a, b) =>
       a.source_retrieved_at_pst.localeCompare(b.source_retrieved_at_pst),
@@ -31,8 +34,9 @@ export function weatherAt(
   return result as Partial<Weather>;
 }
 export function weatherDay(bundle: Bundle, date: string, now = Date.now()) {
+  const dayRows = bundle.hourly_weather.filter((row) => row.hour_pst.startsWith(date));
   return hoursBetween(midnight(date), midnight(shiftDate(date, 1))).map(
-    (hour) => ({ hour, ...weatherAt(bundle, hour, now) }),
+    (hour) => ({ hour, ...weatherRowsAt(dayRows, hour, now) }),
   );
 }
 export function uvDay(bundle: Bundle, date: string) {
@@ -244,20 +248,18 @@ export function rainfallTotal(
 export function rainfallDates(today = pstDate()) {
   return [-1, 0, 1, 2, 3].map((offset) => shiftDate(today, offset));
 }
+// A runoff point describes conditions at the start of its labeled day.
+function runoffWindow(date: string, days: number): [string, string] {
+  return [midnight(shiftDate(date, -days)), midnight(date)];
+}
 export function runoffTotals(
   bundle: Bundle,
   dates: string[],
   days: number,
-  lagDays = 0,
   now = Date.now(),
 ) {
   return dates.map((date) =>
-    rainfallTotal(
-      bundle,
-      midnight(shiftDate(date, 1 - days - lagDays)),
-      midnight(shiftDate(date, 1 - lagDays)),
-      now,
-    ),
+    rainfallTotal(bundle, ...runoffWindow(date, days), now),
   );
 }
 export function runoffExplanation(
@@ -267,28 +269,12 @@ export function runoffExplanation(
 ) {
   const summary = runoffSummary(local, inland, today);
   const details: string[] = [];
-  const describe = (
-    bundle: Bundle,
-    total: number,
-    label: string,
-    offsets: number[],
-  ) => {
-    const latest = offsets.find(
-      (ago) =>
-        (observedRain(
-          bundle,
-          midnight(shiftDate(today, -ago)),
-          midnight(shiftDate(today, 1 - ago)),
-        ).total ?? 0) > 0,
-    );
-    return `${total.toFixed(2)}″ ${label} ${latest ? `${latest} day${latest === 1 ? "" : "s"} ago` : `in the past ${offsets.length} days`}`;
-  };
-  if ((summary.local.total ?? 0) >= RUNOFF_LIMITS.local)
-    details.push(describe(local, summary.local.total!, "local", [1, 2]));
-  if ((summary.inland.total ?? 0) >= RUNOFF_LIMITS.inland)
-    details.push(
-      describe(inland, summary.inland.total!, "inland", [1, 2, 3, 4]),
-    );
+  const localTotal = summary.local.total ?? 0;
+  const inlandTotal = summary.inland.total ?? 0;
+  if (localTotal >= RUNOFF_LIMITS.local)
+    details.push(`${localTotal.toFixed(2)}″ rain locally in last 2 days`);
+  if (inlandTotal >= RUNOFF_LIMITS.inland)
+    details.push(`${inlandTotal.toFixed(2)}″ ${details.length ? "" : "rain "}inland in last 4 days`);
   return details.join(" and ");
 }
 export function regionWeatherClass(
@@ -309,16 +295,8 @@ export function runoffSummary(
   inland: Bundle,
   today = pstDate(),
 ) {
-  const localRain = observedRain(
-    local,
-    midnight(shiftDate(today, -2)),
-    midnight(today),
-  );
-  const inlandRain = observedRain(
-    inland,
-    midnight(shiftDate(today, -4)),
-    midnight(today),
-  );
+  const localRain = observedRain(local, ...runoffWindow(today, 2));
+  const inlandRain = observedRain(inland, ...runoffWindow(today, 4));
   const warning =
     (localRain.total ?? 0) >= RUNOFF_LIMITS.local ||
     (inlandRain.total ?? 0) >= RUNOFF_LIMITS.inland;

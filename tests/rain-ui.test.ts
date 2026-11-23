@@ -8,6 +8,7 @@ import {
   runoffExplanation,
   regionWeatherClass,
   runoffSummary,
+  runoffTotals,
   uvWindowLabel,
 } from "../src/data/selectors.ts";
 function rainRow(
@@ -62,18 +63,18 @@ test("rain timeline spans yesterday through three future days", () => {
     "2026-11-22",
   ]);
 });
-test("runoff explanation identifies measured amounts, source region and recency", () => {
+test("runoff explanation states the measured totals and their accumulation windows", () => {
   const local = emptyBundle(),
     inland = emptyBundle();
   local.hourly_weather = [
-    rainRow(Date.parse("2026-11-18T10:00:00-08:00"), 2.43, "observation"),
+    rainRow(Date.parse("2026-11-18T10:00:00-08:00"), 0.32, "observation"),
   ];
   inland.hourly_weather = [
-    rainRow(Date.parse("2026-11-17T10:00:00-08:00"), 1.2, "observation"),
+    rainRow(Date.parse("2026-11-17T10:00:00-08:00"), 1.46, "observation"),
   ];
   assert.equal(
     runoffExplanation(local, inland, "2026-11-19"),
-    "2.43″ local 1 day ago and 1.20″ inland 2 days ago",
+    "0.32″ rain locally in last 2 days and 1.46″ inland in last 4 days",
   );
   assert.equal(
     runoffExplanation(emptyBundle(), emptyBundle(), "2026-11-19"),
@@ -121,6 +122,33 @@ test("inland warning uses the last four days and the one-inch cutoff", () => {
   );
   assert.equal(
     runoffExplanation(emptyBundle(), inland, "2026-11-19"),
-    "1.10″ inland 1 day ago",
+    "1.10″ rain inland in last 4 days",
   );
+});
+
+test("runoff chart totals use 3 local days and 4 inland days", () => {
+  const local = emptyBundle(), inland = emptyBundle();
+  const today = "2026-11-22", tomorrow = "2026-11-23";
+  const start = Date.parse(midnight(today));
+  const now = start + 12 * HOUR;
+  local.hourly_weather = [
+    rainRow(Date.parse("2026-11-19T10:00:00-08:00"), 0.18, "observation"),
+    rainRow(Date.parse("2026-11-20T10:00:00-08:00"), 0.32, "observation"),
+    rainRow(start + 6 * HOUR, 0, "observation"),
+    rainRow(start + 14 * HOUR, 0.05, "forecast"),
+  ];
+  inland.hourly_weather = [
+    rainRow(Date.parse("2026-11-18T10:00:00-08:00"), 1.07, "observation"),
+    rainRow(Date.parse("2026-11-21T10:00:00-08:00"), 0.39, "observation"),
+  ];
+  const warning = runoffSummary(local, inland, today);
+  const dates = [today, tomorrow];
+  const localLine = runoffTotals(local, dates, 3, now);
+  const inlandLine = runoffTotals(inland, dates, 4, now);
+  assert.equal(warning.warning, true);
+  assert.equal(warning.local.total, 0.32);
+  assert.equal(localLine[0].total, 0.5);
+  assert.deepEqual(inlandLine[0], warning.inland);
+  assert.equal(localLine[1].total, 0.37);
+  assert.equal(inlandLine[1].total, 0.39);
 });
