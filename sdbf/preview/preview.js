@@ -11,10 +11,9 @@ const age = timestamp => {
   return hours < 24 ? `${hours}h old` : `${Math.floor(hours / 24)}d old`;
 };
 const reading = sample => sample ? `${sample.qualifier === "=" ? "" : sample.qualifier}${sample.value.toLocaleString("en-US")}` : "—";
-const rainText = site => site.rain?.lowerBound > 0 ? `≥${site.rain.lowerBound.toFixed(2)} in` : "Unverified";
+const rainText = site => site.rain?.lowerBound > 0 ? `≥${site.rain.lowerBound.toFixed(2)} in` : "";
 const outfallText = site => site.outfall ? `${site.outfall.meters.toLocaleString("en-US")} m to outfall` : "Unverified";
 const postingText = site => ({ advisory: "Advisory", closure: "Closure", warning: "Warning", open: "Open" })[site.posting?.status] ?? "Unverified";
-const coverage = site => site.rain?.complete ? "Gauge record complete" : "Partial gauge coverage";
 const sampleCell = site => `<strong>${safe(reading(site.sample))}</strong><small>${safe(site.sample?.units)}${site.sample ? " · " : ""}${safe(age(site.sample?.collectedAt))}</small>`;
 const details = site => `<button type="button" class="detail" data-site="${site.id}" aria-label="Details for ${safe(site.name)}">Details</button>`;
 const reason = site => `<span class="rating">${labels[site.rating.state]}</span><small>${safe(site.rating.reason)}</small>`;
@@ -50,7 +49,7 @@ function table() {
     <th scope="row"><button type="button" class="beach-link" data-site="${site.id}" aria-label="Details for ${safe(site.name)}">${safe(site.name)}</button><small>${safe(site.location)}</small></th>
     <td>${reason(site)}</td><td>${sampleCell(site)}</td>
     <td><strong class="${site.posting.status === "closure" ? "closure-text" : ""}">${safe(postingText(site))}</strong><small>County map</small></td>
-    <td><strong>${safe(rainText(site))}</strong><small>${safe(coverage(site))}</small></td>
+    <td><strong>${safe(rainText(site))}</strong></td>
     <td><strong>${safe(outfallText(site))}</strong><small>Current flow unverified</small></td>
   </tr>`).join("")}</tbody></table></div>`;
 }
@@ -167,7 +166,7 @@ function map() {
         <h2>${safe(selected.name)}</h2><p>${reason(selected)}</p>
         <dl><dt>County posting</dt><dd>${safe(postingText(selected))}</dd>
           <dt>Latest bacteria test</dt><dd>${sampleCell(selected)}</dd>
-          <dt>72h rain</dt><dd>${safe(rainText(selected))}<small>${safe(coverage(selected))}</small></dd>
+          <dt>72h rain</dt><dd>${safe(rainText(selected))}</dd>
           <dt>Mapped runoff</dt><dd>${safe(outfallText(selected))}<small>Current flow unverified</small></dd></dl>
         ${details(selected)}
       </section>
@@ -218,10 +217,10 @@ function openDetail(site) {
     <dt>Latest Enterococcus</dt><dd>${safe(reading(sample))} ${safe(sample?.units)} ${sample ? `· ${safe(sample.method)}` : ""}</dd>
     <dt>Sample collected</dt><dd>${safe(date(sample?.collectedAt))}</dd>
     <dt>Single-sample limit</dt><dd>${sample?.threshold ? safe(sample.threshold.toLocaleString("en-US")) : "Unavailable"} ${difference == null ? "" : `· ${Math.abs(difference).toLocaleString("en-US")} ${difference >= 0 ? "at or above" : "below"}`}</dd>
-    <dt>72h measured rain</dt><dd>${safe(rainText(site))} · ${safe(site.rainGauge)} · partial coverage</dd>
+    <dt>72h measured rain</dt><dd>${safe(rainText(site))} · ${safe(site.rainGauge)}</dd>
     <dt>Mapped outfall</dt><dd>${site.outfall ? `${safe(site.outfall.name)} · ${safe(site.outfall.meters)} m` : "Unavailable"}</dd></dl>
     <div class="timeline"><strong>Sample history</strong><p>${points.length ? `${points.length} comparable recorded results in the past 30 days.` : "No comparable results for this point in the snapshot."}</p><canvas id="bacteria" role="img" aria-label="Sample observations on a 30 day axis"></canvas>${axis}</div>
-    <div class="timeline"><strong>Measured rain intervals</strong><p>Gauge observations with gaps. Values are inches per reported interval.</p><canvas id="rain" role="img" aria-label="Rain observations on the same 30 day axis"></canvas>${axis}</div>
+    <div class="timeline"><strong>Measured rain intervals</strong><p>Values are inches per reported interval.</p><canvas id="rain" role="img" aria-label="Rain observations on the same 30 day axis"></canvas>${axis}</div>
     <p><a href="https://cosdapps.sandiegocounty.gov/sdbeachinfo/SamplesReport?SiteId=${site.countyId}">County sample report</a> · <a href="https://www.sdbeachinfo.com/">Current County postings</a></p>`;
   dialog.setAttribute("aria-labelledby", "detail-title");
   dialog.showModal();

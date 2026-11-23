@@ -61,7 +61,7 @@ export default function RunoffChart({site,now}) {
     return () => chart.destroy();
   },[site.localPoint,site.inlandPoint,throughHour]);
 
-  if (!site.localPoint && !site.inlandPoint) return <p className="timeline-note">Coordinate rainfall chart unavailable. Gauge evidence appears above.</p>;
+  if (!site.localPoint && !site.inlandPoint) return null;
   return <section className="runoff-chart"><h3>Runoff rain chart</h3>
     <div className="runoff-plot"><canvas ref={canvas} role="img" aria-label="Local and inland daily rain bars and three- and four-day rolling rain totals" /></div>
   </section>;

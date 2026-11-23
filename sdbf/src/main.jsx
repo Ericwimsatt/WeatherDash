@@ -144,7 +144,7 @@ function Detail({ site, snapshot, now, dismiss }) {
       <dl>
         <dt>Sampling point</dt><dd>{site.location} · {site.monitor}</dd>
         <dt>Sample time</dt><dd>{date(sample?.collectedAt)} Pacific · {sample?.method || "Method unavailable"}</dd>
-        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}<small>Inland · {site.inlandRain?.name ?? "Unavailable"}</small></dd>
+        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}{site.inlandRain?.name && <small>Inland · {site.inlandRain.name}</small>}</dd>
         <dt>Spill reports</dt><dd><a href="https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/south-region-health-concerns/Environmental-Dashboard.html">County environmental dashboard</a></dd>
         {weather?.river && <><dt>River discharge</dt><dd>{weather.river.cfs} ft³/s · {weather.river.station}<small>{date(weather.river.observedAt)} Pacific · USGS</small></dd></>}
         {weather?.air != null && <><dt>Air temperature</dt><dd>{weather.air} °F · Open-Meteo<small>{date(weather.airAt)} Pacific{weather.wind != null && ` · Wind ${weather.wind} mph`}</small></dd></>}

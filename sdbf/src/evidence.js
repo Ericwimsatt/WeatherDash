@@ -24,7 +24,7 @@ export function rainDisplay(site, inland = false) {
   const point = inland ? site.inlandRain : site.coastal;
   const gauge = inland ? null : site.rain;
   const estimates = [point?.total,gauge?.lowerBound].filter(Number.isFinite);
-  return estimates.length ? `${Math.max(...estimates).toFixed(2)} in` : "Unavailable";
+  return estimates.length ? `${Math.max(...estimates).toFixed(2)} in` : "";
 }
 
 export function postingText(site) {
