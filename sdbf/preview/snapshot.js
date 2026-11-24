@@ -1,0 +1,4434 @@
+window.beachSnapshot = {
+  "generatedAt": "2026-11-23T00:06:58Z",
+  "countyUpdatedAt": "2026-11-21T22:55:45Z",
+  "sites": [
+    {
+      "id": 588,
+      "name": "Oceanside Pier",
+      "area": "North County",
+      "monitor": "OC-080",
+      "location": "Oceanside Pier",
+      "lat": 33.1937,
+      "lon": -117.3843,
+      "rainGauge": "KOKB",
+      "countyId": 181,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 1
+      },
+      "outfall": {
+        "name": "Pier Storm Drain",
+        "meters": 85
+      },
+      "history": [
+        {
+          "id": "7452",
+          "collectedAt": "2026-10-19T14:06:00Z",
+          "value": 499,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7118",
+          "collectedAt": "2026-10-06T13:52:00Z",
+          "value": 564,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7107",
+          "collectedAt": "2026-10-05T13:55:00Z",
+          "value": 6017,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6842",
+          "collectedAt": "2026-09-28T13:38:00Z",
+          "value": 309,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6423",
+          "collectedAt": "2026-09-22T14:07:00Z",
+          "value": 4270,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6366",
+          "collectedAt": "2026-09-21T14:03:00Z",
+          "value": 2483,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6177",
+          "collectedAt": "2026-09-14T13:47:00Z",
+          "value": 596,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5880",
+          "collectedAt": "2026-09-08T13:37:00Z",
+          "value": 538,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5341",
+          "collectedAt": "2026-08-31T13:40:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5234",
+          "collectedAt": "2026-08-24T13:27:00Z",
+          "value": 416,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5051",
+          "collectedAt": "2026-08-17T13:50:00Z",
+          "value": 454,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4869",
+          "collectedAt": "2026-08-10T14:10:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4382",
+          "collectedAt": "2026-08-03T13:50:00Z",
+          "value": 340,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4289",
+          "collectedAt": "2026-07-27T13:49:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3411",
+          "collectedAt": "2026-07-20T14:21:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3315",
+          "collectedAt": "2026-07-13T13:45:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3086",
+          "collectedAt": "2026-07-06T13:58:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2854",
+          "collectedAt": "2026-06-29T14:11:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2463",
+          "collectedAt": "2026-06-22T13:52:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "1840",
+          "collectedAt": "2026-06-15T13:47:00Z",
+          "value": 213,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2434",
+          "collectedAt": "2026-06-09T13:42:00Z",
+          "value": 561,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2328",
+          "collectedAt": "2026-06-08T13:48:00Z",
+          "value": 1796,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2272",
+          "collectedAt": "2026-06-03T13:50:00Z",
+          "value": 490,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "329",
+          "collectedAt": "2026-06-01T13:56:00Z",
+          "value": 1580,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "303",
+          "collectedAt": "2026-05-26T13:40:00Z",
+          "value": 276,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "7452",
+        "collectedAt": "2026-10-19T14:06:00Z",
+        "value": 499,
+        "qualifier": "=",
+        "method": "ddPCR",
+        "units": "Copies/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 1413,
+        "above": false,
+        "below": true,
+        "difference": -914
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 388,
+      "name": "Tamarack Beach",
+      "area": "North County",
+      "monitor": "EH-460",
+      "location": "Tamarack Ave",
+      "lat": 33.1454,
+      "lon": -117.3451,
+      "rainGauge": "KCRQ",
+      "countyId": 82,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 5
+      },
+      "outfall": {
+        "name": "Tamarack Parking Lot Storm Drain",
+        "meters": 54
+      },
+      "history": [
+        {
+          "id": "10182",
+          "collectedAt": "2026-11-10T14:59:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7655",
+          "collectedAt": "2026-10-27T13:23:00Z",
+          "value": 422,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7465",
+          "collectedAt": "2026-10-20T13:38:00Z",
+          "value": 234,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6853",
+          "collectedAt": "2026-09-29T13:30:00Z",
+          "value": 251,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6417",
+          "collectedAt": "2026-09-22T14:35:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6188",
+          "collectedAt": "2026-09-15T13:45:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6294",
+          "collectedAt": "2026-09-15T13:45:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5344",
+          "collectedAt": "2026-08-31T14:23:00Z",
+          "value": 230,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5238",
+          "collectedAt": "2026-08-24T14:09:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5112",
+          "collectedAt": "2026-08-18T13:23:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4879",
+          "collectedAt": "2026-08-11T13:43:00Z",
+          "value": 284,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4584",
+          "collectedAt": "2026-08-04T13:35:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4300",
+          "collectedAt": "2026-07-28T13:26:00Z",
+          "value": 949,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3420",
+          "collectedAt": "2026-07-21T13:28:00Z",
+          "value": 543,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3333",
+          "collectedAt": "2026-07-14T13:46:00Z",
+          "value": 546,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3091",
+          "collectedAt": "2026-07-07T13:20:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2876",
+          "collectedAt": "2026-06-30T13:52:00Z",
+          "value": 689,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2473",
+          "collectedAt": "2026-06-23T13:28:00Z",
+          "value": 265,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "1852",
+          "collectedAt": "2026-06-16T13:59:00Z",
+          "value": 494,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2430",
+          "collectedAt": "2026-06-09T14:14:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2249",
+          "collectedAt": "2026-06-02T13:35:00Z",
+          "value": 1182,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "307",
+          "collectedAt": "2026-05-26T13:51:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10182",
+        "collectedAt": "2026-11-10T14:59:00Z",
+        "value": 195,
+        "qualifier": "<",
+        "method": "ddPCR",
+        "units": "Copies/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 1413,
+        "above": false,
+        "below": true,
+        "difference": null
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 401,
+      "name": "South Ponto",
+      "area": "North County",
+      "monitor": "EN-020",
+      "location": "Ponto Drive",
+      "lat": 33.106306,
+      "lon": -117.321583,
+      "rainGauge": "KCRQ",
+      "countyId": 95,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 5
+      },
+      "outfall": {
+        "name": "Carlsbad Boulevard at Ponto Drive Storm Drain",
+        "meters": 980
+      },
+      "history": [
+        {
+          "id": "10279",
+          "collectedAt": "2026-11-09T21:10:00Z",
+          "value": 4,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "9793",
+          "collectedAt": "2026-11-04T21:37:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "9808",
+          "collectedAt": "2026-10-26T20:25:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7744",
+          "collectedAt": "2026-10-19T19:51:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7411",
+          "collectedAt": "2026-10-15T14:12:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7265",
+          "collectedAt": "2026-10-05T20:14:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6997",
+          "collectedAt": "2026-09-29T15:50:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6564",
+          "collectedAt": "2026-09-21T20:10:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6245",
+          "collectedAt": "2026-09-14T19:46:00Z",
+          "value": 6,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6022",
+          "collectedAt": "2026-09-08T20:25:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5431",
+          "collectedAt": "2026-08-24T18:50:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5695",
+          "collectedAt": "2026-08-17T17:01:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4942",
+          "collectedAt": "2026-08-10T20:45:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4679",
+          "collectedAt": "2026-08-03T20:49:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4575",
+          "collectedAt": "2026-07-27T20:42:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3847",
+          "collectedAt": "2026-07-20T17:52:00Z",
+          "value": 1,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10279",
+        "collectedAt": "2026-11-09T21:10:00Z",
+        "value": 4,
+        "qualifier": "=",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -100
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 381,
+      "name": "Moonlight Beach",
+      "area": "North County",
+      "monitor": "EH-420",
+      "location": "Cottonwood Creek Outlet",
+      "lat": 33.0481,
+      "lon": -117.2989,
+      "rainGauge": "KCRQ",
+      "countyId": 72,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 5
+      },
+      "outfall": {
+        "name": "Cottonwood Creek Outfall- Moonlight Beach",
+        "meters": 15
+      },
+      "history": [
+        {
+          "id": "10285",
+          "collectedAt": "2026-11-09T18:07:00Z",
+          "value": 20,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "9781",
+          "collectedAt": "2026-11-04T16:19:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7848",
+          "collectedAt": "2026-10-26T17:35:00Z",
+          "value": 34,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7238",
+          "collectedAt": "2026-10-05T17:17:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6979",
+          "collectedAt": "2026-09-30T15:35:00Z",
+          "value": 26,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6976",
+          "collectedAt": "2026-09-28T17:02:00Z",
+          "value": 672,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6537",
+          "collectedAt": "2026-09-21T17:17:00Z",
+          "value": 1,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6227",
+          "collectedAt": "2026-09-14T16:55:00Z",
+          "value": 21,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6034",
+          "collectedAt": "2026-09-09T17:05:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5677",
+          "collectedAt": "2026-08-31T16:55:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5437",
+          "collectedAt": "2026-08-24T16:22:00Z",
+          "value": 4,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5058",
+          "collectedAt": "2026-08-17T17:17:00Z",
+          "value": 34,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4963",
+          "collectedAt": "2026-08-10T16:41:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4700",
+          "collectedAt": "2026-08-05T16:44:00Z",
+          "value": 6,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4697",
+          "collectedAt": "2026-08-03T16:45:00Z",
+          "value": 112,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4548",
+          "collectedAt": "2026-07-27T17:24:00Z",
+          "value": 7,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10285",
+        "collectedAt": "2026-11-09T18:07:00Z",
+        "value": 20,
+        "qualifier": "=",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -84
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 706,
+      "name": "Cardiff State Beach",
+      "area": "North County",
+      "monitor": "SE-040",
+      "location": "Las Olas (Georges)",
+      "lat": 33.005833,
+      "lon": -117.278472,
+      "rainGauge": "KCRQ",
+      "countyId": 202,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 5
+      },
+      "outfall": {
+        "name": "San Elijo Lagoon Outfall",
+        "meters": 1157
+      },
+      "history": [
+        {
+          "id": "10225",
+          "collectedAt": "2026-11-03T15:33:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "9766",
+          "collectedAt": "2026-10-26T14:52:00Z",
+          "value": 20,
+          "qualifier": "=",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7821",
+          "collectedAt": "2026-10-20T14:36:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7426",
+          "collectedAt": "2026-10-14T14:55:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7504",
+          "collectedAt": "2026-10-06T14:24:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7286",
+          "collectedAt": "2026-09-29T14:50:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6949",
+          "collectedAt": "2026-09-22T14:19:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6397",
+          "collectedAt": "2026-09-15T15:00:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6203",
+          "collectedAt": "2026-09-08T14:47:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5920",
+          "collectedAt": "2026-09-01T15:02:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5497",
+          "collectedAt": "2026-08-25T14:51:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5449",
+          "collectedAt": "2026-08-18T15:06:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5395",
+          "collectedAt": "2026-08-10T15:18:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4921",
+          "collectedAt": "2026-08-04T14:40:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4398",
+          "collectedAt": "2026-07-21T14:53:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3808",
+          "collectedAt": "2026-07-14T14:52:00Z",
+          "value": 10,
+          "qualifier": "<",
+          "method": "MTF",
+          "units": "MPN/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10225",
+        "collectedAt": "2026-11-03T15:33:00Z",
+        "value": 10,
+        "qualifier": "=",
+        "method": "MTF",
+        "units": "MPN/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -94
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 373,
+      "name": "Del Mar 15th Street",
+      "area": "North County",
+      "monitor": "EH-360",
+      "location": "15th St. Near Outlet",
+      "lat": 32.96,
+      "lon": -117.268555777,
+      "rainGauge": "KNKX",
+      "countyId": 63,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 16
+      },
+      "outfall": {
+        "name": "15th Street Park Storm Drain",
+        "meters": 29
+      },
+      "history": [
+        {
+          "id": "8092",
+          "collectedAt": "2026-11-04T14:15:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7659",
+          "collectedAt": "2026-10-27T13:19:00Z",
+          "value": 565,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7469",
+          "collectedAt": "2026-10-20T13:22:00Z",
+          "value": 621,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7111",
+          "collectedAt": "2026-10-06T13:20:00Z",
+          "value": 305,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6857",
+          "collectedAt": "2026-09-29T13:13:00Z",
+          "value": 503,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6412",
+          "collectedAt": "2026-09-22T13:19:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6183",
+          "collectedAt": "2026-09-15T13:20:00Z",
+          "value": 301,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6289",
+          "collectedAt": "2026-09-15T13:20:00Z",
+          "value": 301,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5932",
+          "collectedAt": "2026-09-09T13:49:00Z",
+          "value": 1412,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5350",
+          "collectedAt": "2026-09-01T14:00:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5250",
+          "collectedAt": "2026-08-25T14:01:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5117",
+          "collectedAt": "2026-08-18T13:25:00Z",
+          "value": 541,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4873",
+          "collectedAt": "2026-08-11T13:25:00Z",
+          "value": 225,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4579",
+          "collectedAt": "2026-08-04T13:10:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4305",
+          "collectedAt": "2026-07-28T13:34:00Z",
+          "value": 371,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3415",
+          "collectedAt": "2026-07-21T13:25:00Z",
+          "value": 379,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3328",
+          "collectedAt": "2026-07-14T13:20:00Z",
+          "value": 214,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3095",
+          "collectedAt": "2026-07-07T13:42:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2873",
+          "collectedAt": "2026-06-30T13:06:00Z",
+          "value": 397,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2477",
+          "collectedAt": "2026-06-23T14:41:00Z",
+          "value": 304,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "1857",
+          "collectedAt": "2026-06-16T15:25:00Z",
+          "value": 327,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2425",
+          "collectedAt": "2026-06-09T13:33:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2253",
+          "collectedAt": "2026-06-02T13:31:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "348",
+          "collectedAt": "2026-05-27T13:23:00Z",
+          "value": 418,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "8092",
+        "collectedAt": "2026-11-04T14:15:00Z",
+        "value": 195,
+        "qualifier": "<",
+        "method": "ddPCR",
+        "units": "Copies/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 1413,
+        "above": false,
+        "below": true,
+        "difference": null
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 418,
+      "name": "Torrey Pines",
+      "area": "Central Coast",
+      "monitor": "FM-100",
+      "location": "Los Peñasquitos Lagoon",
+      "lat": 32.9345,
+      "lon": -117.261955166,
+      "rainGauge": "KNKX",
+      "countyId": 109,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 16
+      },
+      "outfall": {
+        "name": "Penasquitos Lagoon Outfall",
+        "meters": 111
+      },
+      "history": [
+        {
+          "id": "8093",
+          "collectedAt": "2026-11-04T14:32:00Z",
+          "value": 576,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10025",
+          "collectedAt": "2026-10-28T16:50:00Z",
+          "value": 4,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7660",
+          "collectedAt": "2026-10-27T13:40:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "9980",
+          "collectedAt": "2026-10-26T16:35:00Z",
+          "value": 27,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7938",
+          "collectedAt": "2026-10-20T17:40:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7470",
+          "collectedAt": "2026-10-20T13:48:00Z",
+          "value": 259,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7914",
+          "collectedAt": "2026-10-19T17:45:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7125",
+          "collectedAt": "2026-10-06T13:35:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6858",
+          "collectedAt": "2026-09-29T13:38:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7235",
+          "collectedAt": "2026-09-23T17:20:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6413",
+          "collectedAt": "2026-09-22T13:42:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7217",
+          "collectedAt": "2026-09-21T17:25:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6922",
+          "collectedAt": "2026-09-15T17:20:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6184",
+          "collectedAt": "2026-09-15T13:37:00Z",
+          "value": 1309,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6290",
+          "collectedAt": "2026-09-15T13:37:00Z",
+          "value": 1309,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6135",
+          "collectedAt": "2026-09-11T13:25:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6657",
+          "collectedAt": "2026-09-09T17:00:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6010",
+          "collectedAt": "2026-09-09T14:03:00Z",
+          "value": 89247,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6612",
+          "collectedAt": "2026-09-02T17:40:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5351",
+          "collectedAt": "2026-09-01T14:19:00Z",
+          "value": 85,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5989",
+          "collectedAt": "2026-08-25T17:35:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5251",
+          "collectedAt": "2026-08-25T14:19:00Z",
+          "value": 195,
+          "qualifier": "<",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5659",
+          "collectedAt": "2026-08-19T17:05:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5118",
+          "collectedAt": "2026-08-18T13:53:00Z",
+          "value": 988,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5614",
+          "collectedAt": "2026-08-17T17:25:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "8093",
+        "collectedAt": "2026-11-04T14:32:00Z",
+        "value": 576,
+        "qualifier": "=",
+        "method": "ddPCR",
+        "units": "Copies/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 1413,
+        "above": false,
+        "below": true,
+        "difference": -837
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 365,
+      "name": "La Jolla Shores",
+      "area": "Central Coast",
+      "monitor": "EH-320",
+      "location": "Vallecitos",
+      "lat": 32.8556,
+      "lon": -117.2581,
+      "rainGauge": "KNKX",
+      "countyId": 54,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 16
+      },
+      "outfall": {
+        "name": "Vallecitos Storm Drain",
+        "meters": 9
+      },
+      "history": [
+        {
+          "id": "10004",
+          "collectedAt": "2026-10-28T15:50:00Z",
+          "value": 100,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "9853",
+          "collectedAt": "2026-10-26T15:45:00Z",
+          "value": 80,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7923",
+          "collectedAt": "2026-10-20T16:30:00Z",
+          "value": 22,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7893",
+          "collectedAt": "2026-10-19T16:25:00Z",
+          "value": 12,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7220",
+          "collectedAt": "2026-09-23T16:00:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7196",
+          "collectedAt": "2026-09-21T16:10:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6901",
+          "collectedAt": "2026-09-15T16:25:00Z",
+          "value": 60,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6636",
+          "collectedAt": "2026-09-09T15:50:00Z",
+          "value": 12,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6591",
+          "collectedAt": "2026-09-02T16:35:00Z",
+          "value": 28,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5968",
+          "collectedAt": "2026-08-25T16:25:00Z",
+          "value": 12,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5638",
+          "collectedAt": "2026-08-19T16:00:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5593",
+          "collectedAt": "2026-08-17T16:15:00Z",
+          "value": 4,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5798",
+          "collectedAt": "2026-08-11T16:30:00Z",
+          "value": 38,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5162",
+          "collectedAt": "2026-08-04T16:15:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4811",
+          "collectedAt": "2026-07-28T16:10:00Z",
+          "value": 56,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4766",
+          "collectedAt": "2026-07-21T16:20:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10004",
+        "collectedAt": "2026-10-28T15:50:00Z",
+        "value": 100,
+        "qualifier": "=",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -4
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 351,
+      "name": "Pacific Beach",
+      "area": "Central Coast",
+      "monitor": "EH-250",
+      "location": "Grand Ave.",
+      "lat": 32.7945,
+      "lon": -117.2562,
+      "rainGauge": "KSAN",
+      "countyId": 37,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 4
+      },
+      "outfall": {
+        "name": "Grand Avenue Storm Drain",
+        "meters": 2
+      },
+      "history": [
+        {
+          "id": "9986",
+          "collectedAt": "2026-10-28T17:20:00Z",
+          "value": 6,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "9838",
+          "collectedAt": "2026-10-26T17:35:00Z",
+          "value": 5,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7875",
+          "collectedAt": "2026-10-19T17:50:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7540",
+          "collectedAt": "2026-09-30T15:20:00Z",
+          "value": 4,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7178",
+          "collectedAt": "2026-09-21T16:05:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6883",
+          "collectedAt": "2026-09-15T17:50:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6618",
+          "collectedAt": "2026-09-09T17:23:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6573",
+          "collectedAt": "2026-09-02T17:50:00Z",
+          "value": 48,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5950",
+          "collectedAt": "2026-08-25T15:30:00Z",
+          "value": 10,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5620",
+          "collectedAt": "2026-08-19T18:00:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5575",
+          "collectedAt": "2026-08-17T17:25:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5780",
+          "collectedAt": "2026-08-11T17:10:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5144",
+          "collectedAt": "2026-08-04T17:25:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4793",
+          "collectedAt": "2026-07-28T17:05:00Z",
+          "value": 6,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4748",
+          "collectedAt": "2026-07-21T17:40:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4497",
+          "collectedAt": "2026-07-14T16:45:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "9986",
+        "collectedAt": "2026-10-28T17:20:00Z",
+        "value": 6,
+        "qualifier": "=",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -98
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 646,
+      "name": "Mission Beach",
+      "area": "Central Coast",
+      "monitor": "PL-120",
+      "location": "Belmont Park",
+      "lat": 32.771314863,
+      "lon": -117.253558792,
+      "rainGauge": "KSAN",
+      "countyId": 195,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 4
+      },
+      "outfall": {
+        "name": "West Mission Bay Drive Storm Drain",
+        "meters": 438
+      },
+      "history": [
+        {
+          "id": "10108",
+          "collectedAt": "2026-10-28T15:03:00Z",
+          "value": 20,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10132",
+          "collectedAt": "2026-10-21T15:06:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7756",
+          "collectedAt": "2026-10-14T14:59:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7609",
+          "collectedAt": "2026-09-29T14:41:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7334",
+          "collectedAt": "2026-09-23T15:06:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7012",
+          "collectedAt": "2026-09-16T14:19:00Z",
+          "value": 14,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6516",
+          "collectedAt": "2026-09-09T14:14:00Z",
+          "value": 8,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6492",
+          "collectedAt": "2026-09-02T14:35:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6059",
+          "collectedAt": "2026-08-27T19:57:00Z",
+          "value": 5,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6043",
+          "collectedAt": "2026-08-26T13:26:00Z",
+          "value": 17,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5515",
+          "collectedAt": "2026-08-19T14:59:00Z",
+          "value": 1,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5713",
+          "collectedAt": "2026-08-12T17:11:00Z",
+          "value": 3,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5737",
+          "collectedAt": "2026-08-05T15:01:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6089",
+          "collectedAt": "2026-07-29T14:50:00Z",
+          "value": 7,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4616",
+          "collectedAt": "2026-07-22T14:20:00Z",
+          "value": 1,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4476",
+          "collectedAt": "2026-07-15T17:52:00Z",
+          "value": 1,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3868",
+          "collectedAt": "2026-07-08T15:03:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10108",
+        "collectedAt": "2026-10-28T15:03:00Z",
+        "value": 20,
+        "qualifier": "=",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -84
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 644,
+      "name": "Ocean Beach",
+      "area": "Central Coast",
+      "monitor": "PL-100",
+      "location": "Newport Ave",
+      "lat": 32.7491121,
+      "lon": -117.253271417,
+      "rainGauge": "KSAN",
+      "countyId": 193,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 4
+      },
+      "outfall": {
+        "name": "Newport Avenue Storm Drain",
+        "meters": 239
+      },
+      "history": [
+        {
+          "id": "10102",
+          "collectedAt": "2026-10-28T15:37:00Z",
+          "value": 20,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10126",
+          "collectedAt": "2026-10-21T15:42:00Z",
+          "value": 20,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7750",
+          "collectedAt": "2026-10-14T15:44:00Z",
+          "value": 4,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7603",
+          "collectedAt": "2026-09-29T15:17:00Z",
+          "value": 20,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7328",
+          "collectedAt": "2026-09-23T15:37:00Z",
+          "value": 20,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7006",
+          "collectedAt": "2026-09-16T14:51:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6510",
+          "collectedAt": "2026-09-09T14:45:00Z",
+          "value": 14,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6486",
+          "collectedAt": "2026-09-02T15:08:00Z",
+          "value": 1,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6037",
+          "collectedAt": "2026-08-26T13:56:00Z",
+          "value": 3,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5509",
+          "collectedAt": "2026-08-19T15:34:00Z",
+          "value": 20,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5707",
+          "collectedAt": "2026-08-12T16:24:00Z",
+          "value": 15,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5731",
+          "collectedAt": "2026-08-05T15:31:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6083",
+          "collectedAt": "2026-07-29T17:15:00Z",
+          "value": 20,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4610",
+          "collectedAt": "2026-07-22T14:48:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4470",
+          "collectedAt": "2026-07-15T16:34:00Z",
+          "value": 29,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3862",
+          "collectedAt": "2026-07-08T15:33:00Z",
+          "value": 1,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10102",
+        "collectedAt": "2026-10-28T15:37:00Z",
+        "value": 20,
+        "qualifier": "=",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -84
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 325,
+      "name": "Coronado Central Beach",
+      "area": "South County",
+      "monitor": "EH-050",
+      "location": "Coronado Main Lifeguard Tower",
+      "lat": 32.68184,
+      "lon": -117.18526,
+      "rainGauge": "KSAN",
+      "countyId": 7,
+      "posting": {
+        "status": "advisory",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0,
+        "complete": false,
+        "intervalCount": 4
+      },
+      "outfall": null,
+      "history": [
+        {
+          "id": "8090",
+          "collectedAt": "2026-11-04T16:32:00Z",
+          "value": 822,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7983",
+          "collectedAt": "2026-10-31T15:30:00Z",
+          "value": 2842,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7786",
+          "collectedAt": "2026-10-28T13:49:00Z",
+          "value": 793,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7670",
+          "collectedAt": "2026-10-27T13:49:00Z",
+          "value": 590,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7647",
+          "collectedAt": "2026-10-23T15:48:00Z",
+          "value": 14410,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7631",
+          "collectedAt": "2026-10-22T13:44:00Z",
+          "value": 9287,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7491",
+          "collectedAt": "2026-10-21T15:07:00Z",
+          "value": 3287,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7463",
+          "collectedAt": "2026-10-20T15:00:00Z",
+          "value": 6522,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7448",
+          "collectedAt": "2026-10-19T14:58:00Z",
+          "value": 3505,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7398",
+          "collectedAt": "2026-10-18T15:00:00Z",
+          "value": 2490,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7390",
+          "collectedAt": "2026-10-17T13:48:00Z",
+          "value": 8429,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7374",
+          "collectedAt": "2026-10-16T13:51:00Z",
+          "value": 2834,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7357",
+          "collectedAt": "2026-10-15T13:36:00Z",
+          "value": 14175,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7171",
+          "collectedAt": "2026-10-10T13:39:00Z",
+          "value": 3966,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6173",
+          "collectedAt": "2026-09-14T15:04:00Z",
+          "value": 419,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6166",
+          "collectedAt": "2026-09-13T14:58:00Z",
+          "value": 2012,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6158",
+          "collectedAt": "2026-09-12T13:59:00Z",
+          "value": 6726,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6149",
+          "collectedAt": "2026-09-11T13:49:00Z",
+          "value": 8525,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5995",
+          "collectedAt": "2026-09-10T14:56:00Z",
+          "value": 5390,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6009",
+          "collectedAt": "2026-09-09T13:50:00Z",
+          "value": 3943,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5892",
+          "collectedAt": "2026-09-08T13:42:00Z",
+          "value": 7347,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5876",
+          "collectedAt": "2026-09-07T13:36:00Z",
+          "value": 13495,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5856",
+          "collectedAt": "2026-09-04T13:43:00Z",
+          "value": 238,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5478",
+          "collectedAt": "2026-09-03T13:46:00Z",
+          "value": 513,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5382",
+          "collectedAt": "2026-09-02T13:45:00Z",
+          "value": 1305,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5363",
+          "collectedAt": "2026-09-01T13:49:00Z",
+          "value": 3673,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5338",
+          "collectedAt": "2026-08-31T15:05:00Z",
+          "value": 1916,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5315",
+          "collectedAt": "2026-08-30T15:00:00Z",
+          "value": 2839,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5307",
+          "collectedAt": "2026-08-29T13:38:00Z",
+          "value": 2306,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5297",
+          "collectedAt": "2026-08-28T13:53:00Z",
+          "value": 4052,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5283",
+          "collectedAt": "2026-08-27T13:57:00Z",
+          "value": 10487,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5275",
+          "collectedAt": "2026-08-26T13:44:00Z",
+          "value": 8225,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5246",
+          "collectedAt": "2026-08-25T15:08:00Z",
+          "value": 3113,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5231",
+          "collectedAt": "2026-08-24T15:06:00Z",
+          "value": 2525,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5224",
+          "collectedAt": "2026-08-23T14:24:00Z",
+          "value": 972,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5190",
+          "collectedAt": "2026-08-20T13:59:00Z",
+          "value": 579,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5128",
+          "collectedAt": "2026-08-19T13:50:00Z",
+          "value": 2155,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5110",
+          "collectedAt": "2026-08-18T13:43:00Z",
+          "value": 2955,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5047",
+          "collectedAt": "2026-08-17T15:09:00Z",
+          "value": 17580,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5039",
+          "collectedAt": "2026-08-16T14:57:00Z",
+          "value": 2667,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5031",
+          "collectedAt": "2026-08-15T13:53:00Z",
+          "value": 3843,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5017",
+          "collectedAt": "2026-08-14T13:56:00Z",
+          "value": 6022,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5009",
+          "collectedAt": "2026-08-13T15:26:00Z",
+          "value": 835168,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4908",
+          "collectedAt": "2026-08-12T15:00:00Z",
+          "value": 2605,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4890",
+          "collectedAt": "2026-08-11T15:16:00Z",
+          "value": 2516,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4864",
+          "collectedAt": "2026-08-10T15:10:00Z",
+          "value": 6991,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4857",
+          "collectedAt": "2026-08-09T14:53:00Z",
+          "value": 1856,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4378",
+          "collectedAt": "2026-08-03T15:10:00Z",
+          "value": 411,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4370",
+          "collectedAt": "2026-08-02T15:20:00Z",
+          "value": 2296,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4362",
+          "collectedAt": "2026-08-01T13:52:00Z",
+          "value": 3013,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "8090",
+        "collectedAt": "2026-11-04T16:32:00Z",
+        "value": 822,
+        "qualifier": "=",
+        "method": "ddPCR",
+        "units": "Copies/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 1413,
+        "above": false,
+        "below": true,
+        "difference": -591
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County advisory"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 461,
+      "name": "Silver Strand",
+      "area": "South County",
+      "monitor": "IB-070",
+      "location": "Silver Strand N End (Ocean)",
+      "lat": 32.6358,
+      "lon": -117.14317,
+      "rainGauge": "KNRS",
+      "countyId": 120,
+      "posting": {
+        "status": "closure",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0.0118,
+        "complete": false,
+        "intervalCount": 1
+      },
+      "outfall": null,
+      "history": [
+        {
+          "id": "10078",
+          "collectedAt": "2026-10-27T15:46:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10099",
+          "collectedAt": "2026-10-20T15:14:00Z",
+          "value": 76,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7600",
+          "collectedAt": "2026-09-30T14:46:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7325",
+          "collectedAt": "2026-09-22T15:16:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6080",
+          "collectedAt": "2026-08-25T14:03:00Z",
+          "value": 18,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5551",
+          "collectedAt": "2026-08-18T15:35:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5774",
+          "collectedAt": "2026-08-11T16:05:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5849",
+          "collectedAt": "2026-08-04T15:44:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6134",
+          "collectedAt": "2026-07-28T15:23:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4652",
+          "collectedAt": "2026-07-21T15:31:00Z",
+          "value": 6,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4467",
+          "collectedAt": "2026-07-14T14:49:00Z",
+          "value": 8,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3904",
+          "collectedAt": "2026-07-07T15:12:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4144",
+          "collectedAt": "2026-06-30T15:09:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4075",
+          "collectedAt": "2026-06-24T15:17:00Z",
+          "value": 40,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3017",
+          "collectedAt": "2026-06-16T16:07:00Z",
+          "value": 8,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2683",
+          "collectedAt": "2026-06-09T15:44:00Z",
+          "value": 14,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10078",
+        "collectedAt": "2026-10-27T15:46:00Z",
+        "value": 2,
+        "qualifier": "<",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": null
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County closure"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 322,
+      "name": "Imperial Beach Pier",
+      "area": "South County",
+      "monitor": "EH-030",
+      "location": "Imperial Beach Pier",
+      "lat": 32.57875,
+      "lon": -117.133186,
+      "rainGauge": "KNRS",
+      "countyId": 4,
+      "posting": {
+        "status": "closure",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0.0118,
+        "complete": false,
+        "intervalCount": 1
+      },
+      "outfall": null,
+      "history": [
+        {
+          "id": "10202",
+          "collectedAt": "2026-11-12T14:59:00Z",
+          "value": 1225,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10195",
+          "collectedAt": "2026-11-11T15:13:00Z",
+          "value": 1054,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10189",
+          "collectedAt": "2026-11-10T15:21:00Z",
+          "value": 1651,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10171",
+          "collectedAt": "2026-11-09T14:55:00Z",
+          "value": 1007,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10165",
+          "collectedAt": "2026-11-08T14:26:00Z",
+          "value": 1713,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10159",
+          "collectedAt": "2026-11-07T15:01:00Z",
+          "value": 4446,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10150",
+          "collectedAt": "2026-11-06T15:55:00Z",
+          "value": 1000,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "8110",
+          "collectedAt": "2026-11-05T14:55:00Z",
+          "value": 10393,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "8086",
+          "collectedAt": "2026-11-04T14:55:00Z",
+          "value": 18204,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7979",
+          "collectedAt": "2026-10-31T13:59:00Z",
+          "value": 16185,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7966",
+          "collectedAt": "2026-10-30T14:04:00Z",
+          "value": 17712,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7950",
+          "collectedAt": "2026-10-29T14:16:00Z",
+          "value": 14465,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7782",
+          "collectedAt": "2026-10-28T14:59:00Z",
+          "value": 25199,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7666",
+          "collectedAt": "2026-10-27T15:11:00Z",
+          "value": 1842,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7643",
+          "collectedAt": "2026-10-23T14:19:00Z",
+          "value": 56526,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7627",
+          "collectedAt": "2026-10-22T14:42:00Z",
+          "value": 83162,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7487",
+          "collectedAt": "2026-10-21T13:54:00Z",
+          "value": 43661,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7459",
+          "collectedAt": "2026-10-20T13:46:00Z",
+          "value": 40152,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7444",
+          "collectedAt": "2026-10-19T13:49:00Z",
+          "value": 11057,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7394",
+          "collectedAt": "2026-10-18T13:36:00Z",
+          "value": 6909,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7386",
+          "collectedAt": "2026-10-17T15:21:00Z",
+          "value": 33000,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7369",
+          "collectedAt": "2026-10-16T15:11:00Z",
+          "value": 61703,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7353",
+          "collectedAt": "2026-10-15T14:35:00Z",
+          "value": 53457,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7167",
+          "collectedAt": "2026-10-10T15:06:00Z",
+          "value": 18290,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7159",
+          "collectedAt": "2026-10-09T13:55:00Z",
+          "value": 9347,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7142",
+          "collectedAt": "2026-10-08T14:33:00Z",
+          "value": 4890,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7129",
+          "collectedAt": "2026-10-07T13:57:00Z",
+          "value": 1954,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7121",
+          "collectedAt": "2026-10-06T14:24:00Z",
+          "value": 7510,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7100",
+          "collectedAt": "2026-10-05T13:47:00Z",
+          "value": 6449,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7094",
+          "collectedAt": "2026-10-04T13:21:00Z",
+          "value": 3246,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7088",
+          "collectedAt": "2026-10-03T14:23:00Z",
+          "value": 1615,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7077",
+          "collectedAt": "2026-10-02T13:59:00Z",
+          "value": 1013,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7052",
+          "collectedAt": "2026-10-01T14:11:00Z",
+          "value": 1598,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6961",
+          "collectedAt": "2026-09-30T14:06:00Z",
+          "value": 8931,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6849",
+          "collectedAt": "2026-09-29T13:47:00Z",
+          "value": 8589,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6836",
+          "collectedAt": "2026-09-28T13:48:00Z",
+          "value": 72929,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6692",
+          "collectedAt": "2026-09-27T13:14:00Z",
+          "value": 14262,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6686",
+          "collectedAt": "2026-09-26T13:58:00Z",
+          "value": 5122,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6676",
+          "collectedAt": "2026-09-25T14:12:00Z",
+          "value": 1015,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6666",
+          "collectedAt": "2026-09-24T13:37:00Z",
+          "value": 754,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6427",
+          "collectedAt": "2026-09-23T13:39:00Z",
+          "value": 2753,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6408",
+          "collectedAt": "2026-09-22T13:34:00Z",
+          "value": 2155,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6360",
+          "collectedAt": "2026-09-21T13:41:00Z",
+          "value": 932,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6354",
+          "collectedAt": "2026-09-20T13:21:00Z",
+          "value": 902,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6348",
+          "collectedAt": "2026-09-19T15:08:00Z",
+          "value": 1599,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6341",
+          "collectedAt": "2026-09-18T14:58:00Z",
+          "value": 1880,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6320",
+          "collectedAt": "2026-09-17T13:53:00Z",
+          "value": 3414,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6300",
+          "collectedAt": "2026-09-16T14:20:00Z",
+          "value": 5063,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6285",
+          "collectedAt": "2026-09-15T14:46:00Z",
+          "value": 2222,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6182",
+          "collectedAt": "2026-09-14T13:51:00Z",
+          "value": 2624,
+          "qualifier": "=",
+          "method": "ddPCR",
+          "units": "Copies/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10202",
+        "collectedAt": "2026-11-12T14:59:00Z",
+        "value": 1225,
+        "qualifier": "=",
+        "method": "ddPCR",
+        "units": "Copies/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 1413,
+        "above": false,
+        "below": true,
+        "difference": -188
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County closure"
+      },
+      "decision": "avoid"
+    },
+    {
+      "id": 455,
+      "name": "Border Field",
+      "area": "South County",
+      "monitor": "IB-010",
+      "location": "Border Fence N Side",
+      "lat": 32.53595,
+      "lon": -117.1243,
+      "rainGauge": "KNRS",
+      "countyId": 110,
+      "posting": {
+        "status": "closure",
+        "observedAt": "2026-11-21T22:55:45Z",
+        "verifiedAt": "2026-11-22T23:55:37Z"
+      },
+      "rain": {
+        "lowerBound": 0.0118,
+        "complete": false,
+        "intervalCount": 1
+      },
+      "outfall": {
+        "name": "Tijuana River Outfall",
+        "meters": 1970
+      },
+      "history": [
+        {
+          "id": "10055",
+          "collectedAt": "2026-10-27T17:15:00Z",
+          "value": 52,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "10090",
+          "collectedAt": "2026-10-20T17:04:00Z",
+          "value": 280,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7591",
+          "collectedAt": "2026-09-30T15:53:00Z",
+          "value": 6,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "7316",
+          "collectedAt": "2026-09-22T16:36:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6071",
+          "collectedAt": "2026-08-25T15:05:00Z",
+          "value": 34,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5542",
+          "collectedAt": "2026-08-18T16:42:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5765",
+          "collectedAt": "2026-08-11T15:03:00Z",
+          "value": 38,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "5840",
+          "collectedAt": "2026-08-04T17:20:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "6125",
+          "collectedAt": "2026-07-28T16:42:00Z",
+          "value": 8,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4643",
+          "collectedAt": "2026-07-21T17:06:00Z",
+          "value": 2,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4458",
+          "collectedAt": "2026-07-14T16:01:00Z",
+          "value": 30,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3895",
+          "collectedAt": "2026-07-07T16:23:00Z",
+          "value": 4,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4135",
+          "collectedAt": "2026-06-30T16:25:00Z",
+          "value": 14,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "4066",
+          "collectedAt": "2026-06-24T16:20:00Z",
+          "value": 20,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "3008",
+          "collectedAt": "2026-06-16T15:06:00Z",
+          "value": 26,
+          "qualifier": "=",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        },
+        {
+          "id": "2773",
+          "collectedAt": "2026-06-09T17:29:00Z",
+          "value": 2,
+          "qualifier": "<",
+          "method": "MF",
+          "units": "CFU/100ml",
+          "parameter": "Enterococcus"
+        }
+      ],
+      "sample": {
+        "id": "10055",
+        "collectedAt": "2026-10-27T17:15:00Z",
+        "value": 52,
+        "qualifier": "=",
+        "method": "MF",
+        "units": "CFU/100ml",
+        "parameter": "Enterococcus",
+        "threshold": 104,
+        "above": false,
+        "below": true,
+        "difference": -52
+      },
+      "rating": {
+        "state": "avoid",
+        "reason": "County closure"
+      },
+      "decision": "avoid"
+    }
+  ],
+  "rainSeries": {
+    "KOKB": [
+      {
+        "start": "2026-11-20T01:52:00Z",
+        "end": "2026-11-20T02:52:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:52:00Z",
+        "end": "2026-11-20T02:52:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-19T17:52:00Z",
+        "end": "2026-11-19T23:52:00Z",
+        "inches": 0.4409,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-19T21:33:00Z",
+        "end": "2026-11-19T22:33:00Z",
+        "inches": 0.1496,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:29:00Z",
+        "end": "2026-11-19T22:29:00Z",
+        "inches": 0.1299,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:21:00Z",
+        "end": "2026-11-19T22:21:00Z",
+        "inches": 0.1102,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:17:00Z",
+        "end": "2026-11-19T22:17:00Z",
+        "inches": 0.1102,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:08:00Z",
+        "end": "2026-11-19T22:08:00Z",
+        "inches": 0.0906,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:00:00Z",
+        "end": "2026-11-19T22:00:00Z",
+        "inches": 0.0591,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T20:52:00Z",
+        "end": "2026-11-19T21:52:00Z",
+        "inches": 0.248,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T19:52:00Z",
+        "end": "2026-11-19T20:52:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T17:52:00Z",
+        "end": "2026-11-19T20:52:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-19T19:49:00Z",
+        "end": "2026-11-19T20:49:00Z",
+        "inches": 0,
+        "hours": 1
+      }
+    ],
+    "KCRQ": [
+      {
+        "start": "2026-11-20T14:53:00Z",
+        "end": "2026-11-20T15:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T01:53:00Z",
+        "end": "2026-11-20T02:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:53:00Z",
+        "end": "2026-11-20T02:53:00Z",
+        "inches": 0.0118,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-20T01:16:00Z",
+        "end": "2026-11-20T02:16:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T01:06:00Z",
+        "end": "2026-11-20T02:06:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T00:53:00Z",
+        "end": "2026-11-20T01:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T17:53:00Z",
+        "end": "2026-11-19T23:53:00Z",
+        "inches": 0.1614,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-19T22:34:00Z",
+        "end": "2026-11-19T23:34:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:36:00Z",
+        "end": "2026-11-19T22:36:00Z",
+        "inches": 0.0984,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:32:00Z",
+        "end": "2026-11-19T22:32:00Z",
+        "inches": 0.0906,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:29:00Z",
+        "end": "2026-11-19T22:29:00Z",
+        "inches": 0.0906,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:18:00Z",
+        "end": "2026-11-19T22:18:00Z",
+        "inches": 0.0709,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T20:58:00Z",
+        "end": "2026-11-19T21:58:00Z",
+        "inches": 0.0315,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T20:53:00Z",
+        "end": "2026-11-19T21:53:00Z",
+        "inches": 0.0394,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T19:53:00Z",
+        "end": "2026-11-19T20:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T17:53:00Z",
+        "end": "2026-11-19T20:53:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-19T05:53:00Z",
+        "end": "2026-11-19T11:53:00Z",
+        "inches": 0,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-19T07:53:00Z",
+        "end": "2026-11-19T08:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T05:53:00Z",
+        "end": "2026-11-19T08:53:00Z",
+        "inches": 0,
+        "hours": 3
+      }
+    ],
+    "KNKX": [
+      {
+        "start": "2026-11-21T17:55:00Z",
+        "end": "2026-11-21T23:55:00Z",
+        "inches": 0,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-21T20:55:00Z",
+        "end": "2026-11-21T21:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T13:55:00Z",
+        "end": "2026-11-20T14:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T11:55:00Z",
+        "end": "2026-11-20T14:55:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-20T12:55:00Z",
+        "end": "2026-11-20T13:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T11:55:00Z",
+        "end": "2026-11-20T12:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T08:55:00Z",
+        "end": "2026-11-20T09:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T07:55:00Z",
+        "end": "2026-11-20T08:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T05:55:00Z",
+        "end": "2026-11-20T08:55:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-20T06:55:00Z",
+        "end": "2026-11-20T07:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T04:55:00Z",
+        "end": "2026-11-20T05:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:55:00Z",
+        "end": "2026-11-20T05:55:00Z",
+        "inches": 0.0394,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-20T03:55:00Z",
+        "end": "2026-11-20T04:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T01:55:00Z",
+        "end": "2026-11-20T02:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:55:00Z",
+        "end": "2026-11-20T02:55:00Z",
+        "inches": 0.0394,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-20T01:16:00Z",
+        "end": "2026-11-20T02:16:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T00:55:00Z",
+        "end": "2026-11-20T01:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T00:25:00Z",
+        "end": "2026-11-20T01:25:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:32:00Z",
+        "end": "2026-11-20T00:32:00Z",
+        "inches": 0.0394,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:23:00Z",
+        "end": "2026-11-20T00:23:00Z",
+        "inches": 0.0315,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:12:00Z",
+        "end": "2026-11-20T00:12:00Z",
+        "inches": 0.0197,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:02:00Z",
+        "end": "2026-11-20T00:02:00Z",
+        "inches": 0.0197,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T22:57:00Z",
+        "end": "2026-11-19T23:57:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T22:55:00Z",
+        "end": "2026-11-19T23:55:00Z",
+        "inches": 0.2598,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T17:55:00Z",
+        "end": "2026-11-19T23:55:00Z",
+        "inches": 0.3307,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-19T21:42:00Z",
+        "end": "2026-11-19T22:42:00Z",
+        "inches": 0.0197,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:34:00Z",
+        "end": "2026-11-19T22:34:00Z",
+        "inches": 0.0197,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T20:55:00Z",
+        "end": "2026-11-19T21:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T05:55:00Z",
+        "end": "2026-11-17T11:55:00Z",
+        "inches": 0,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-17T05:55:00Z",
+        "end": "2026-11-17T08:55:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-17T05:55:00Z",
+        "end": "2026-11-17T06:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T05:31:00Z",
+        "end": "2026-11-17T06:31:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T05:17:00Z",
+        "end": "2026-11-17T06:17:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T04:55:00Z",
+        "end": "2026-11-17T05:55:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-16T23:55:00Z",
+        "end": "2026-11-17T05:55:00Z",
+        "inches": 0.2913,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-17T03:55:00Z",
+        "end": "2026-11-17T04:55:00Z",
+        "inches": 0.0315,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T03:48:00Z",
+        "end": "2026-11-17T04:48:00Z",
+        "inches": 0.0315,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T02:55:00Z",
+        "end": "2026-11-17T03:55:00Z",
+        "inches": 0.0315,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T02:43:00Z",
+        "end": "2026-11-17T03:43:00Z",
+        "inches": 0.0197,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:55:00Z",
+        "end": "2026-11-17T02:55:00Z",
+        "inches": 0.189,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-16T23:55:00Z",
+        "end": "2026-11-17T02:55:00Z",
+        "inches": 0.2283,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-17T01:50:00Z",
+        "end": "2026-11-17T02:50:00Z",
+        "inches": 0.1811,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:40:00Z",
+        "end": "2026-11-17T02:40:00Z",
+        "inches": 0.1811,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:32:00Z",
+        "end": "2026-11-17T02:32:00Z",
+        "inches": 0.1693,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:26:00Z",
+        "end": "2026-11-17T02:26:00Z",
+        "inches": 0.1299,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:22:00Z",
+        "end": "2026-11-17T02:22:00Z",
+        "inches": 0.1102,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:12:00Z",
+        "end": "2026-11-17T02:12:00Z",
+        "inches": 0.0787,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:04:00Z",
+        "end": "2026-11-17T02:04:00Z",
+        "inches": 0.0315,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T00:55:00Z",
+        "end": "2026-11-17T01:55:00Z",
+        "inches": 0.0394,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T00:40:00Z",
+        "end": "2026-11-17T01:40:00Z",
+        "inches": 0.0118,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-16T23:28:00Z",
+        "end": "2026-11-17T00:28:00Z",
+        "inches": 0,
+        "hours": 1
+      }
+    ],
+    "KSAN": [
+      {
+        "start": "2026-11-20T11:51:00Z",
+        "end": "2026-11-20T14:51:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-20T12:51:00Z",
+        "end": "2026-11-20T13:51:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-20T01:51:00Z",
+        "end": "2026-11-20T02:51:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:51:00Z",
+        "end": "2026-11-20T02:51:00Z",
+        "inches": 0.0118,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-20T01:10:00Z",
+        "end": "2026-11-20T02:10:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:15:00Z",
+        "end": "2026-11-20T00:15:00Z",
+        "inches": 0.0118,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:09:00Z",
+        "end": "2026-11-20T00:09:00Z",
+        "inches": 0.0118,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:01:00Z",
+        "end": "2026-11-20T00:01:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T22:51:00Z",
+        "end": "2026-11-19T23:51:00Z",
+        "inches": 0.3819,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T17:51:00Z",
+        "end": "2026-11-19T23:51:00Z",
+        "inches": 0.3898,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-19T21:35:00Z",
+        "end": "2026-11-19T22:35:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T21:19:00Z",
+        "end": "2026-11-19T22:19:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T20:51:00Z",
+        "end": "2026-11-19T21:51:00Z",
+        "inches": 0,
+        "hours": 1
+      }
+    ],
+    "KNRS": [
+      {
+        "start": "2026-11-19T23:53:00Z",
+        "end": "2026-11-20T02:53:00Z",
+        "inches": 0.0118,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-20T00:53:00Z",
+        "end": "2026-11-20T01:53:00Z",
+        "inches": 0.0118,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:44:00Z",
+        "end": "2026-11-20T00:44:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:33:00Z",
+        "end": "2026-11-20T00:33:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:24:00Z",
+        "end": "2026-11-20T00:24:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:13:00Z",
+        "end": "2026-11-20T00:13:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T23:04:00Z",
+        "end": "2026-11-20T00:04:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-19T17:53:00Z",
+        "end": "2026-11-19T23:53:00Z",
+        "inches": 0,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-17T05:53:00Z",
+        "end": "2026-11-17T08:53:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-17T05:53:00Z",
+        "end": "2026-11-17T06:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T04:53:00Z",
+        "end": "2026-11-17T05:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-16T23:53:00Z",
+        "end": "2026-11-17T05:53:00Z",
+        "inches": 0,
+        "hours": 6
+      },
+      {
+        "start": "2026-11-17T02:53:00Z",
+        "end": "2026-11-17T03:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-17T01:53:00Z",
+        "end": "2026-11-17T02:53:00Z",
+        "inches": 0,
+        "hours": 1
+      },
+      {
+        "start": "2026-11-16T23:53:00Z",
+        "end": "2026-11-17T02:53:00Z",
+        "inches": 0,
+        "hours": 3
+      },
+      {
+        "start": "2026-11-17T00:53:00Z",
+        "end": "2026-11-17T01:53:00Z",
+        "inches": 0,
+        "hours": 1
+      }
+    ]
+  },
+  "regionalRain": {
+    "advisory": "active",
+    "verifiedAt": "2026-11-23T00:06:58Z",
+    "issuedAt": "2026-11-20T01:00:00Z",
+    "estimatedLiftAt": "2026-11-23T01:00:00Z",
+    "source": "https://www.sdbeachinfo.com/"
+  },
+  "coastRainHold": "Countywide rain advisory",
+  "candidates": []
+};

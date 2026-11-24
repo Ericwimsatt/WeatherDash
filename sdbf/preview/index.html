@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>San Diego Beach Finder</title>
+<link rel="stylesheet" href="preview.css">
+<header class="page-heading">
+  <h1>San Diego Beach Finder</h1>
+  <p>Water quality from Oceanside to the border</p>
+</header>
+<main>
+  <section id="coast-status" class="coast-status" aria-label="County water quality advisory"></section>
+  <div class="view-switch" aria-label="Beach display">
+    <button type="button" data-view="table" aria-controls="view">Table</button>
+    <button type="button" data-view="map" aria-controls="view">Map</button>
+  </div>
+  <section id="view" aria-label="Beach water quality results"></section>
+</main>
+<dialog id="detail"><div id="detail-body"></div><form method="dialog"><button>Close details</button></form></dialog>
+<script src="snapshot.js"></script>
+<script src="geography.js"></script>
+<script src="preview.js"></script>
+</html>

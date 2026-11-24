@@ -1,0 +1,167 @@
+[
+  {
+    "id": 588,
+    "name": "Oceanside Pier",
+    "area": "North County",
+    "monitor": "OC-080",
+    "location": "Oceanside Pier",
+    "lat": 33.1937,
+    "lon": -117.3843,
+    "rainGauge": "KOKB",
+    "countyId": 181
+  },
+  {
+    "id": 388,
+    "name": "Tamarack Beach",
+    "area": "North County",
+    "monitor": "EH-460",
+    "location": "Tamarack Ave",
+    "lat": 33.1454,
+    "lon": -117.3451,
+    "rainGauge": "KCRQ",
+    "countyId": 82
+  },
+  {
+    "id": 401,
+    "name": "South Ponto",
+    "area": "North County",
+    "monitor": "EN-020",
+    "location": "Ponto Drive",
+    "lat": 33.106306,
+    "lon": -117.321583,
+    "rainGauge": "KCRQ",
+    "countyId": 95
+  },
+  {
+    "id": 381,
+    "name": "Moonlight Beach",
+    "area": "North County",
+    "monitor": "EH-420",
+    "location": "Cottonwood Creek Outlet",
+    "lat": 33.0481,
+    "lon": -117.2989,
+    "rainGauge": "KCRQ",
+    "countyId": 72
+  },
+  {
+    "id": 706,
+    "name": "Cardiff State Beach",
+    "area": "North County",
+    "monitor": "SE-040",
+    "location": "Las Olas (Georges)",
+    "lat": 33.005833,
+    "lon": -117.278472,
+    "rainGauge": "KCRQ",
+    "countyId": 202
+  },
+  {
+    "id": 373,
+    "name": "Del Mar 15th Street",
+    "area": "North County",
+    "monitor": "EH-360",
+    "location": "15th St. Near Outlet",
+    "lat": 32.96,
+    "lon": -117.268555777,
+    "rainGauge": "KNKX",
+    "countyId": 63
+  },
+  {
+    "id": 418,
+    "name": "Torrey Pines",
+    "area": "Central Coast",
+    "monitor": "FM-100",
+    "location": "Los Pe\u00f1asquitos Lagoon",
+    "lat": 32.9345,
+    "lon": -117.261955166,
+    "rainGauge": "KNKX",
+    "countyId": 109
+  },
+  {
+    "id": 365,
+    "name": "La Jolla Shores",
+    "area": "Central Coast",
+    "monitor": "EH-320",
+    "location": "Vallecitos",
+    "lat": 32.8556,
+    "lon": -117.2581,
+    "rainGauge": "KNKX",
+    "countyId": 54
+  },
+  {
+    "id": 351,
+    "name": "Pacific Beach",
+    "area": "Central Coast",
+    "monitor": "EH-250",
+    "location": "Grand Ave.",
+    "lat": 32.7945,
+    "lon": -117.2562,
+    "rainGauge": "KSAN",
+    "countyId": 37
+  },
+  {
+    "id": 646,
+    "name": "Mission Beach",
+    "area": "Central Coast",
+    "monitor": "PL-120",
+    "location": "Belmont Park",
+    "lat": 32.771314863,
+    "lon": -117.253558792,
+    "rainGauge": "KSAN",
+    "countyId": 195
+  },
+  {
+    "id": 644,
+    "name": "Ocean Beach",
+    "area": "Central Coast",
+    "monitor": "PL-100",
+    "location": "Newport Ave",
+    "lat": 32.7491121,
+    "lon": -117.253271417,
+    "rainGauge": "KSAN",
+    "countyId": 193
+  },
+  {
+    "id": 325,
+    "name": "Coronado Central Beach",
+    "area": "South County",
+    "monitor": "EH-050",
+    "location": "Coronado Main Lifeguard Tower",
+    "lat": 32.68184,
+    "lon": -117.18526,
+    "rainGauge": "KSAN",
+    "countyId": 7
+  },
+  {
+    "id": 461,
+    "name": "Silver Strand",
+    "area": "South County",
+    "monitor": "IB-070",
+    "location": "Silver Strand N End (Ocean)",
+    "lat": 32.6358,
+    "lon": -117.14317,
+    "rainGauge": "KNRS",
+    "countyId": 120
+  },
+  {
+    "id": 322,
+    "name": "Imperial Beach Pier",
+    "area": "South County",
+    "monitor": "EH-030",
+    "location": "Imperial Beach Pier",
+    "lat": 32.57875,
+    "lon": -117.133186,
+    "rainGauge": "KNRS",
+    "countyId": 4
+  },
+  {
+    "id": 455,
+    "name": "Border Field",
+    "area": "South County",
+    "monitor": "IB-010",
+    "location": "Border Fence N Side",
+    "lat": 32.53595,
+    "lon": -117.1243,
+    "rainGauge": "KNRS",
+    "countyId": 110
+  }
+]

@@ -1,0 +1,67 @@
+CHOICE_SET:
+  goal: Compare representative beaches quickly on a phone and inspect the cause of each rating on a table or map.
+  matrix_count: 4
+  minimum_matrix_count: 4
+  selected_count: 2
+  matrix:
+    - id: coast-ledger
+      title: Coast Ledger
+      structure: One ruled table with narrow columns and a full map with one active pin callout.
+      strengths: ["Fast vertical scanning", "Most beaches per screen", "Map has room to pan"]
+      weaknesses: ["One visible map reason at a time"]
+      risk: safe
+    - id: regional-atlas
+      title: Regional Atlas
+      structure: Geographic separators within a single table, plus a map with a linked reason list below on mobile or beside it on desktop.
+      strengths: ["Compare nearby sites", "Read map reasons without clicking each marker"]
+      weaknesses: ["Region rows and map list take space"]
+      risk: distinct
+    - id: evidence-matrix
+      title: Evidence Matrix
+      structure: One wide table with separate columns for County posting, bacteria, rain and runoff, paired with a map whose selected evidence layer controls the annotation.
+      strengths: ["Fast evidence comparison on desktop"]
+      weaknesses: ["Horizontal scrolling on phones", "Layer selection can hide the decisive reason"]
+      risk: distinct
+    - id: conditions-board
+      title: Conditions Board
+      structure: One table grouped by rating, with a coast map that places the reason beside as many site markers as space permits.
+      strengths: ["Restrictions immediately visible", "Reasons visible at a glance when labels fit"]
+      weaknesses: ["Breaks north-to-south comparison", "Map labels collide in dense areas"]
+      risk: longshot
+  selected:
+    - id: coast-ledger
+      title: Coast Ledger
+      rationale: Best scanning density and simplest transition between table, map, and detail on phones.
+      tradeoffs: ["Map requires selecting a pin to read the reason."]
+      downstream_notes: ["Use a true table, reserve space for sample age, and keep a visible details button in each row."]
+    - id: regional-atlas
+      title: Regional Atlas
+      rationale: Geographic grouping and a linked map list support choosing among nearby beaches.
+      tradeoffs: ["More vertical space on mobile."]
+      downstream_notes: ["Use table row groups and keep map-pin focus synchronized with the list."]
+  rejected:
+    - id: evidence-matrix
+      reason: Wide evidence columns compromise phone scanning, while the detail view already provides that depth.
+    - id: conditions-board
+      reason: Rating groups scatter neighboring sites and persistent labels compete for space on the narrow map.
+  diversity_check:
+    axes:
+      - axis: table organization
+        result: pass
+        evidence: Flat dense rows versus geographic row groups.
+      - axis: map interaction
+        result: pass
+        evidence: Single map callout versus linked map and list.
+  constraints_applied:
+    - Fixed color palette and typography.
+    - Semantic tables and identical status wording across all options.
+    - Reason and timestamp visible without relying on color.
+    - Mobile-first layout and one shared beach detail dialog.
+  open_risks:
+    - Verify County response latency and a stable ingestion route.
+    - Verify map label density and keyboard interactions on handheld devices.
+
+USER_DECISION:
+  id: evidence-matrix
+  title: Evidence Matrix
+  notes: Adopt the dedicated evidence columns and geographic map.

@@ -1,0 +1,75 @@
+CHOICE_SET:
+  goal: Compare five color and typography treatments of the existing map-click modal with identical content, information order, and hierarchy.
+  matrix_count: 10
+  minimum_matrix_count: 10
+  selected_count: 5
+  constraints_applied:
+    - User-specified directions: artistic, Japanese (Muji / Uniqlo), pop, creative, and the earlier Rain Timeline appearance.
+    - One shared copy of current Detail markup, frozen local evidence, and real runoff chart.
+    - Preserve score, contributing factors, improvement estimate, decisive hazards, chart, remaining evidence, then monitoring details.
+    - No production app, debug list, scoring, ingestion, or deployment changes.
+  matrix:
+    - {id: artistic, title: Coastal editorial, family: artistic, fit: 5, feasibility: 5, risk: distinct}
+    - {id: botanical, title: Botanical fieldbook, family: artistic, fit: 3, feasibility: 4, risk: distinct}
+    - {id: japanese, title: Everyday Japanese, family: Japanese, fit: 5, feasibility: 5, risk: safe}
+    - {id: retail-red, title: Retail red, family: Japanese, fit: 3, feasibility: 5, risk: distinct}
+    - {id: pop, title: Sunshine pop, family: pop, fit: 5, feasibility: 5, risk: distinct}
+    - {id: electric, title: Electric coral, family: pop, fit: 3, feasibility: 4, risk: longshot}
+    - {id: creative, title: Lavender & evergreen, family: creative, fit: 5, feasibility: 5, risk: distinct}
+    - {id: night, title: Night tide, family: creative, fit: 3, feasibility: 3, risk: longshot}
+    - {id: timeline, title: Rain Timeline, family: reference, fit: 5, feasibility: 5, risk: safe}
+    - {id: bluewash, title: Blue wash, family: reference, fit: 3, feasibility: 5, risk: safe}
+  selected:
+    - id: artistic
+      title: Coastal editorial
+      rationale: Parchment, terracotta, an italic Iowan serif title, and Source Sans body give a distinctly editorial character.
+      tradeoffs: [More literary than utilitarian.]
+      downstream_notes: [Iowan is locally available on macOS; choose a licensed portable serif when implementing.]
+    - id: japanese
+      title: Everyday Japanese
+      rationale: Off-white, charcoal, restrained oxblood, Source Sans, and squared controls honor the user's Muji / Uniqlo reference without decorative cultural motifs.
+      tradeoffs: [Subtle rather than theatrical.]
+      downstream_notes: [Use supplied self-hosted Source Sans 3.]
+    - id: pop
+      title: Sunshine pop
+      rationale: Yellow, navy, Quicksand headings, and Atkinson body bring friendly energy while preserving readable red hazards.
+      tradeoffs: [More attention on the score surface.]
+      downstream_notes: [Keep warning contrast high and source ages legible.]
+    - id: creative
+      title: Lavender & evergreen
+      rationale: Lavender paper, evergreen heading band, condensed Barlow title, and Public Sans body create an unexpected visual identity.
+      tradeoffs: [Heading band carries more visual weight.]
+      downstream_notes: [Same title role and section order; change no content structure.]
+    - id: timeline
+      title: Rain Timeline
+      rationale: White, cool gray-blue, ocean ink, and Public Sans reproduce the earlier appearance using current modal order.
+      tradeoffs: [Least departure from incumbent colors.]
+      downstream_notes: [Appearance reference only; retain actual modal hierarchy.]
+  rejected:
+    - {id: botanical, reason: Sage-heavy colors can compete with semantic water-quality colors; too close to the artistic paper direction.}
+    - {id: retail-red, reason: Broad red branding surfaces blur the distinction between decorative red and hazard red.}
+    - {id: electric, reason: Coral and electric blue compete with warning semantics and tire the evidence view.}
+    - {id: night, reason: Requires a full chart and canvas dark-theme pass, and differs more from the user's daytime references.}
+    - {id: bluewash, reason: An all-blue surface is less faithful to the requested Rain Timeline appearance.}
+  diversity_check:
+    axes:
+      - {axis: typography, result: pass, evidence: Literary serif, quiet humanist sans, rounded display plus accessible body, condensed display, neutral Public Sans.}
+      - {axis: color, result: pass, evidence: Parchment/terracotta, ecru/charcoal, yellow/navy, lavender/evergreen, white/ocean.}
+      - {axis: structure preservation, result: pass, evidence: All five frames render identical shared Detail code and frozen snapshot; browser verified identical modal inner text across all five treatments.}
+  open_risks:
+    - Preview native dialog focus is suppressed to prevent five frames from stealing focus from comparison controls; production focus behavior is unchanged.
+    - Iowan title uses the installed macOS typeface with a serif fallback.
+  recommendation:
+    id: japanese
+    why: Quiet color and humanist typography suit dense evidence and preserve warning clarity.
+    what_would_change_it: Pick artistic for stronger editorial character or pop for a more playful product identity.
+CHOICE_DISPLAY:
+  path: index.html
+  mode: Responsive grid measured into a horizontal snap carousel for tall previews.
+  controls: [previous, next, h/l, Home/End, minimize/expand, discard/restore, reset, choose, phone size]
+
+USER_DECISION:
+  id: japanese
+  title: Everyday Japanese
+  instruction: "lets go with japanese. please implement"
+  implementation: src/beach-detail.css, scoped to dialog.beach-detail

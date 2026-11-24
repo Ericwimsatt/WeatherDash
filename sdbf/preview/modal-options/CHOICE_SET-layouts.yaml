@@ -1,0 +1,66 @@
+CHOICE_SET:
+  goal: Redesign the beach detail opened from a map marker; make the concern, its cause, and expected change easy to understand while preserving evidence provenance.
+  scope: Comparison prototypes only. User confirmed beach finder; table/list is a debug screen and receives no redesign work.
+  matrix_count: 8
+  minimum_matrix_count: 8
+  selected_count: 4
+  criteria: [map continuity, immediate concern visibility, evidence clarity, phone usability, implementation feasibility]
+  score_scale: 1–5 per criterion, in criteria order
+  matrix:
+    - {id: brief, title: Compact brief, scores: [3, 5, 4, 5, 5], risk: safe, structure: Centered compact dialog with progressive disclosures}
+    - {id: timeline, title: Rain timeline, scores: [2, 4, 5, 3, 5], risk: distinct, structure: Wide chart-led dialog with persistent hazard override}
+    - {id: tabs, title: Evidence tabs, scores: [3, 5, 4, 4, 4], risk: safe, structure: Persistent verdict above three evidence panels}
+    - {id: inspector, title: Map-side inspector, scores: [5, 5, 4, 4, 4], risk: distinct, structure: Nonmodal desktop panel and phone bottom sheet with beach navigation}
+    - {id: pin-callout, title: Pin callout, scores: [5, 3, 2, 2, 5], risk: safe, structure: Small anchored map popup}
+    - {id: full-page, title: Beach dossier, scores: [1, 4, 5, 4, 4], risk: distinct, structure: Full-screen detail route}
+    - {id: compare, title: Neighbor comparison, scores: [3, 3, 4, 2, 2], risk: longshot, structure: Side-by-side beach evidence}
+    - {id: activity, title: Evidence activity log, scores: [2, 2, 5, 3, 3], risk: longshot, structure: Chronological source and rain events}
+  selected:
+    - id: brief
+      title: Compact brief
+      rationale: Best quick single-beach reading and lowest interaction cost.
+      tradeoffs: [Rain history and source detail require expansion.]
+      downstream_notes: [Retain native dialog behavior and exact source timestamps.]
+    - id: timeline
+      title: Rain timeline
+      rationale: Distinct planning workflow makes runoff trajectory primary.
+      tradeoffs: [Covers map, Requires a persistent override for County closures.]
+      downstream_notes: [Reuse real runoff chart and model estimate; illustrative SVG in preview is not the production calculation.]
+    - id: tabs
+      title: Evidence tabs
+      rationale: Distinct evidence navigation keeps detail compact without a long document.
+      tradeoffs: [Tabs hide secondary evidence.]
+      downstream_notes: [Keep decisive hazards outside tabs, Preserve source ages and units.]
+    - id: inspector
+      title: Map-side inspector
+      rationale: Best fit with the user's map-first scope and declining interest in the list.
+      tradeoffs: [Responsive panel-to-sheet interaction required, Narrower chart.]
+      downstream_notes: [Synchronize selected pin and detail, Maintain focus and beach navigation, Preserve independent closure and lab provenance.]
+  rejected:
+    - {id: pin-callout, reason: Too little room for interacting factors, source age, and meaningful rain history.}
+    - {id: full-page, reason: Loses the coast context central to the requested map workflow.}
+    - {id: compare, reason: Expands scope into comparison and repeats the list's density problem on phones.}
+    - {id: activity, reason: Makes users reconstruct a current verdict from a chronology.}
+  diversity_check:
+    axes:
+      - {axis: structure, result: pass, evidence: Compact centered disclosure vs wide chart vs tab panels vs map-adjacent inspector.}
+      - {axis: primary task, result: pass, evidence: Quick check vs plan a day vs inspect sources vs explore neighboring beaches.}
+      - {axis: interaction, result: pass, evidence: Disclosure vs timeline reading vs tab switching vs persistent beach navigation.}
+  constraints_applied:
+    - Inherit beach finder's ocean/ink palette and evidence terminology.
+    - Do not change the production app, debug list, scoring, database, or deployment.
+    - Treat displayed values as static illustrative evidence, not live conditions.
+    - Keep County restrictions above modeled improvement estimates.
+    - Missing evidence must never render as zero rainfall or an all-clear.
+  open_risks:
+    - Validate the selected design with actual production chart density and long score-factor text.
+    - Prototype beach navigation illustrates interaction only; it retains labeled example evidence.
+  recommendation:
+    id: inspector
+    why: It supports selecting and comparing beaches directly from the map without repeatedly opening and closing a blocking modal.
+    what_would_change_it: Prefer brief if most sessions inspect only one beach; prefer timeline if forecast planning is the dominant job.
+CHOICE_DISPLAY:
+  path: index.html
+  mode: Responsive grid that switches to a horizontal snap carousel when measured content exceeds half the viewport height.
+  controls: [previous, next, h/l, Home/End, minimize/expand, discard/restore, reset, choose, phone preview, evidence scenario]
+  next_step: User selects a direction in chat; implementation is a separate step.

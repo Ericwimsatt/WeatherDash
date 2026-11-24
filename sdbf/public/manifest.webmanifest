@@ -1,0 +1,15 @@
+{
+  "id":"/",
+  "name":"San Diego Beach Finder",
+  "short_name":"Beach Finder",
+  "description":"San Diego County beach water quality, bacteria samples, rain and runoff.",
+  "start_url":"/",
+  "scope":"/",
+  "display":"standalone",
+  "background_color":"#eff5f6",
+  "theme_color":"#143846",
+  "icons":[
+    {"src":"/icon-192.png","type":"image/png","sizes":"192x192","purpose":"any"},
+    {"src":"/icon-512.png","type":"image/png","sizes":"512x512","purpose":"any maskable"}
+  ]
+}
