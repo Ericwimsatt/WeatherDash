@@ -71,10 +71,6 @@ function MapView({ sites, now, open }) {
     open(id, event.currentTarget);
   }
   return <>
-    <div className="score-legend" aria-label="Safety scores from 1, lowest observed concern, to 10, dangerous">
-      {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color}}>{index+1}</span>)}
-      <small>Lower concern → higher risk</small>
-    </div>
     <div className="map">
       <figure className="map-figure">
         <div className="map-visual" role="group" aria-label="Map of San Diego County beaches, towns, bays and highways">
@@ -94,6 +90,10 @@ function MapView({ sites, now, open }) {
           })}
         </div>
         <figcaption>Geography from <a href="https://tigerweb.geo.census.gov/tigerweb/">U.S. Census TIGERweb</a></figcaption>
+        <div className="score-legend" aria-label="Safety scores from 1, lowest observed concern, to 10, dangerous">
+          {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color}}>{index+1}</span>)}
+          <small>Lower concern → higher risk</small>
+        </div>
       </figure>
       <table className="map-list"><thead><tr><th scope="col">Beach</th><th scope="col">Safety score</th></tr></thead><tbody>{sites.map(site => <tr style={{"--rating":site.rating.color}} key={site.id}>
         <th scope="row"><button className="beach-link" onClick={event => activate(event, site.id)} onPointerEnter={event => hover(event, site.id)} onPointerLeave={() => clearTimeout(timer.current)} aria-haspopup="dialog">{site.name}</button></th>

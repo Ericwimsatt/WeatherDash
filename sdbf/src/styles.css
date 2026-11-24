@@ -9,6 +9,10 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .rating-column { width:19% }
 .site-column { width:22% }
 .map-visual { width:100%; min-height:34rem }
+@media (min-width:52.001rem) {
+  .map { grid-template-columns:minmax(0,1fr) }
+  .map-visual { height:max(34rem, calc(100svh - 10rem)); aspect-ratio:auto }
+}
 .station { position:absolute; left:var(--x); top:var(--y); width:0; height:0 }
 .station:focus-within,.station:hover { z-index:2 }
 .station-dot,.evidence-dot { display:inline-block; width:.68rem; height:.68rem; border-radius:50%; background:var(--rating); border:1px solid #fff }
