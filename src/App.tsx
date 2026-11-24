@@ -1,12 +1,14 @@
 import { colorToken, colorWithAlpha } from "./color-tokens.ts";
-import { useEffect, useMemo, useState } from "octane";
-import { Chart, type SunMarker } from "./components/Chart.tsx";
+import { useEffect, useMemo, useRef, useState } from "octane";
+import { Chart } from "./components/Chart.tsx";
 import {
   createForecastTimeline,
   forecastDateLabel,
   forecastDayAt,
   FORECAST_DAYS,
   HISTORY_DAYS,
+  hourlyChartX,
+  positionForForecastDay,
   TODAY_START_HOUR,
   type ForecastTimeline,
 } from "./data/forecast-timeline.ts";
@@ -127,41 +129,33 @@ function hourlySamples<T extends { hour: string }>(days: T[][]) {
 }
 
 function Daylight({ location, today, range, timeline }: ForecastProps) {
-  const date = useSummaryDate(today, timeline);
   const query = useLocation(location, range);
   const bundle = query.data?.bundle;
   const pending = query.isFetching;
+  const date = useSummaryDate(today, timeline);
+  const selectedSun = bundle && sunForDay(bundle, date);
+  const sunMarkers = useMemo(() => forecastDates(today).flatMap((date, index) => {
+    const sun = bundle && sunForDay(bundle, date);
+    return ([sun?.sunrise_pst, sun?.sunset_pst]).flatMap((time) => {
+      if (!time) return [];
+      const hour = (Date.parse(time) - Date.parse(midnight(date))) / HOUR;
+      return hour >= 0 && hour < 24 ? [{ label: sunTime(time), x: index - HISTORY_DAYS + hour / 24 }] : [];
+    });
+  }), [bundle, today]);
   const days = useMemo(() => {
     const data = bundle ?? emptyBundle();
     const now = Date.now();
     return forecastDates(today).map((day) => {
-      const sun = sunForDay(data, day);
       const temperatures = new Map(weatherDay(data, day, now).map((row) => [row.hour, row.temperature_f]));
       const uv = uvDay(data, day).map((row) => ({
         ...row,
         temperature: temperatures.get(row.hour),
         rain: rainfallTotal(data, row.hour, pst(Date.parse(row.hour) + HOUR), now).total,
       }));
-      return { day, sun, uv };
+      return { uv };
     });
   }, [bundle, today]);
-  const { sun } = days.find((day) => day.day === date)!;
   const uvHours = useMemo(() => hourlySamples(days.map((day) => day.uv)), [days]);
-  const sunMarkers = useMemo(() => days.flatMap(({ day: date, sun }, index) => {
-    const day = index - HISTORY_DAYS;
-    const markers: SunMarker[] = [];
-    for (const [kind, time] of [["sunrise", sun?.sunrise_pst], ["sunset", sun?.sunset_pst]] as const) {
-      if (!time) continue;
-      const hour = (Date.parse(time) - Date.parse(midnight(date))) / HOUR;
-      if (hour < 0 || hour >= 24) continue;
-      markers.push({
-        x: day + (hour + .5) / 24,
-        kind,
-        label: sunTime(time),
-      });
-    }
-    return markers;
-  }), [days]);
   const uvSeries = useMemo(() => [
     line(
       "UV index",
@@ -201,12 +195,13 @@ function Daylight({ location, today, range, timeline }: ForecastProps) {
     <section className="card" id="irCard" aria-label="Daylight">
       <Status result={query.data} pending={pending} />
       <div className="daylight-chart">
-        {hasWeather || hasRain || sunMarkers.length ? (
+        {hasWeather || hasRain ? (
           <Chart
+            title="UV Index, Temperature, and Precipitation"
             label="Hourly UV index, temperature, and rainfall"
-            description={`Sunrise ${sunTime(sun?.sunrise_pst)}, sunset ${sunTime(sun?.sunset_pst)}`}
-            samples={uvHours}
+            description={`Sunrise ${sunTime(selectedSun?.sunrise_pst)}, sunset ${sunTime(selectedSun?.sunset_pst)}`}
             sunMarkers={sunMarkers}
+            samples={uvHours}
             today={today}
             timeline={timeline}
             datasets={uvSeries}
@@ -345,14 +340,9 @@ function Swim({ location, inland, today, range, timeline }: ForecastProps & { in
       )}
       {hasRunoff && (
         <div className="runoff-section">
-          <div className="runoff-head">
-            <h3>{location.name} Runoff Forecast</h3>
-            <span className="runoff-summary">
-              Local last 2 days: {number(runoff.local.total, 2)} in · Inland last 4 days:{" "}
-              {number(runoff.inland.total, 2)} in
-            </span>
-          </div>
           <Chart
+            title={`${location.name} Runoff Forecast`}
+            summary={`Local last 2 days: ${number(runoff.local.total, 2)} in · Inland last 4 days: ${number(runoff.inland.total, 2)} in`}
             label="Local and inland rain, rolling totals and runoff thresholds"
             tooltipUnit="in"
             daily
@@ -369,9 +359,9 @@ function Swim({ location, inland, today, range, timeline }: ForecastProps & { in
       )}
       <Status result={query.data} pending={pending} />
       <div className="swim-chart">
-        <h3>{location.name} Tides and Wind</h3>
         {swimHours.some((row) => row.height != null || row.windSpeed != null) ? (
           <Chart
+            title={`${location.name} Tides and Wind`}
             label="Hourly tide height and wind speed"
             description="Tide height in feet relative to MLLW. Wind speed in miles per hour."
             samples={swimHours}
@@ -381,6 +371,7 @@ function Swim({ location, inland, today, range, timeline }: ForecastProps & { in
           />
         ) : (
           <div className="chart-placeholder">
+            <h3>{location.name} Tides and Wind</h3>
             {pending ? <Skeleton wide /> : "Tide and wind data unavailable."}
           </div>
         )}
@@ -468,29 +459,87 @@ function Region({
     </a>
   );
 }
-function ForecastHeading({ name, today, timeline }: {
-  name: string;
+function ForecastHeading({ location, today, timeline }: {
+  location: Location;
   today: string;
   timeline: ForecastTimeline;
 }) {
-  const [day, setDay] = useState(() => forecastDayAt(timeline.position));
+  const [position, setPosition] = useState(() => timeline.position);
+  const day = forecastDayAt(position);
+  const dates = useRef<HTMLDivElement | null>(null);
+  useEffect(() => timeline.subscribe(setPosition), [timeline]);
   useEffect(() => {
-    let lastDay = forecastDayAt(timeline.position);
-    return timeline.subscribe((position) => {
-      const nextDay = forecastDayAt(position);
-      if (nextDay === lastDay) return;
-      lastDay = nextDay;
-      setDay(nextDay);
-    });
+    const strip = dates.current;
+    if (!strip) return;
+    const frame = strip.parentElement?.parentElement;
+    if (!frame) return;
+    let pointer: { id: number; x: number; startX: number; startY: number; dragging: boolean } | undefined;
+    let suppressClick = false;
+    const down = (event: PointerEvent) => {
+      if (!event.isPrimary || event.button !== 0) return;
+      pointer = { id: event.pointerId, x: event.clientX, startX: event.clientX, startY: event.clientY, dragging: false };
+    };
+    const move = (event: PointerEvent) => {
+      if (!pointer || pointer.id !== event.pointerId) return;
+      if (!pointer.dragging) {
+        if (Math.abs(event.clientX - pointer.startX) < 5 || Math.abs(event.clientX - pointer.startX) < Math.abs(event.clientY - pointer.startY)) return;
+        pointer.dragging = true;
+        frame.setPointerCapture(event.pointerId);
+        frame.classList.add("dragging");
+      }
+      timeline.moveTo(timeline.position - (event.clientX - pointer.x) / strip.clientWidth);
+      pointer.x = event.clientX;
+    };
+    const end = () => {
+      suppressClick = !!pointer?.dragging;
+      pointer = undefined;
+      frame.classList.remove("dragging");
+    };
+    const click = (event: MouseEvent) => {
+      if (suppressClick) { event.preventDefault(); event.stopPropagation(); suppressClick = false; }
+    };
+    frame.addEventListener("pointerdown", down);
+    frame.addEventListener("pointermove", move);
+    frame.addEventListener("pointerup", end);
+    frame.addEventListener("pointercancel", end);
+    frame.addEventListener("click", click, true);
+    return () => {
+      frame.removeEventListener("pointerdown", down);
+      frame.removeEventListener("pointermove", move);
+      frame.removeEventListener("pointerup", end);
+      frame.removeEventListener("pointercancel", end);
+      frame.removeEventListener("click", click, true);
+    };
   }, [timeline]);
 
   return (
     <div className="region-heading">
-      <h2>{name}</h2>
-      <span className="forecast-date" aria-live="polite">{forecastDateLabel(today, day)}</span>
-      {day !== 0 && (
-        <button className="today-button" onClick={() => timeline.moveTo(0, true)}>Jump to today</button>
-      )}
+      <h2>{location.name}</h2>
+      <div className="date-ruler-frame"><div className="date-ruler-inner"><div className="date-slider" ref={dates} role="group" aria-label="Forecast dates">
+        {Array.from({ length: HISTORY_DAYS + FORECAST_DAYS + 1 }, (_, index) => {
+          const offset = index - HISTORY_DAYS;
+          const start = hourlyChartX(offset);
+          const end = hourlyChartX(offset + 1);
+          const visibleStart = Math.max(start, position);
+          const visibleEnd = Math.min(end, position + 1);
+          const visibleWidth = visibleEnd - visibleStart;
+          return <div key={offset}>
+          {offset !== 0 && <span aria-hidden="true" className={`date-shade ${Math.abs(offset) % 2 ? "date-shade-odd" : "date-shade-even"}`}
+            style={{ left: `${(start - position) * 100}%`, width: `${(end - start) * 100}%` }} />}
+          {Array.from({ length: 24 }, (_, hour) => <span key={hour} aria-hidden="true"
+            className={`date-tick ${hour === 0 ? "day-tick" : hour % 6 === 0 ? "major-tick" : ""}`}
+            style={{ left: `${(hourlyChartX(offset + hour / 24) - position) * 100}%` }} />)}
+          <button
+            key={offset}
+            className={`date-option ${offset === 0 ? "date-option-today" : Math.abs(offset) % 2 ? "date-option-odd" : "date-option-even"}`}
+            style={{ left: `${(visibleStart - position) * 100}%`, width: `${Math.max(0, visibleWidth) * 100}%`, visibility: visibleWidth >= .09 ? "visible" : "hidden" }}
+            aria-label={forecastDateLabel(today, offset)}
+            aria-current={day === offset ? "date" : undefined}
+            onClick={() => timeline.moveTo(positionForForecastDay(offset), true)}
+          >{forecastDateLabel(today, offset, visibleWidth < .3)}</button></div>;
+        })}
+        <span aria-hidden="true" className="date-tick day-tick" style={{ left: `${(hourlyChartX(FORECAST_DAYS + 1) - position) * 100}%` }} />
+      </div></div></div>
     </div>
   );
 }
@@ -546,6 +595,20 @@ export function App() {
   useEffect(() => {
     document.title = regionId ? `${region.name} — WeatherDash` : "WeatherDash";
   }, [regionId]);
+  useEffect(() => {
+    const wheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.metaKey) return;
+      const dx = event.shiftKey && !event.deltaX ? event.deltaY : event.deltaX;
+      if (!dx || (!event.shiftKey && Math.abs(dx) < Math.abs(event.deltaY))) return;
+      event.preventDefault();
+      const chart = document.querySelector<HTMLElement>(".forecast-chart canvas");
+      const width = Math.max(1, (chart?.clientWidth ?? window.innerWidth) - 94);
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? width : 1;
+      timeline.moveTo(timeline.position + dx * unit / width);
+    };
+    window.addEventListener("wheel", wheel, { passive: false });
+    return () => window.removeEventListener("wheel", wheel);
+  }, [timeline]);
   function navigate(id: string) {
     history.pushState(null, "", `/${id}`);
     setRegionId(id);
@@ -591,7 +654,7 @@ export function App() {
         <span className="visually-hidden" id="forecast-instructions">
           Use the left and right arrow keys when a chart is focused to change dates.
         </span>
-        <ForecastHeading name={region.name} today={today} timeline={timeline} />
+        <ForecastHeading location={region} today={today} timeline={timeline} />
         <div className="card-grid">
           <Daylight location={region} today={today} range={range} timeline={timeline} />
           <Swim location={spot} inland={inland} today={today} range={range} timeline={timeline} />

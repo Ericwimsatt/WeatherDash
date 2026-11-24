@@ -1203,3 +1203,105 @@ footer a {
     min-height: 44px;
   }
 }
+
+/* The ruler shares the charts' plot gutters and horizontal scale. */
+.region-heading {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  background: #fff;
+  color: #164c3b;
+  border-bottom: 1px solid #b8cbbf;
+}
+.region-heading h2 {
+  margin: 0;
+  padding: 10px var(--content-gutter, 16px);
+  background: var(--color-ink);
+  color: var(--location-ink);
+}
+.date-ruler-frame {
+  overflow: hidden;
+  padding: 0 max(8px, calc((100vw - 1200px) / 2));
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+}
+.date-ruler-frame.dragging { cursor: grabbing; }
+.date-ruler-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 52px 0 42px;
+}
+.date-slider {
+  position: relative;
+  height: 34px;
+}
+.date-shade { position: absolute; top: 0; bottom: 0; pointer-events: none; }
+.date-shade-odd { background: #f0f1f0; }
+.date-shade-even { background: #e5e8e6; }
+.date-tick {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  width: 1px;
+  height: 7px;
+  background: rgba(22, 76, 59, .32);
+  pointer-events: none;
+}
+.date-tick.major-tick { height: 15px; }
+.date-tick.day-tick { height: 26px; width: 2px; }
+.date-option {
+  position: absolute;
+  z-index: 4;
+  top: 5px;
+  height: 19px;
+  padding: 0 4px;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: #092f23;
+  font: 600 .78rem/1.2 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  -webkit-text-stroke: 3px var(--date-background);
+  paint-order: stroke fill;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.date-option-today { --date-background: #fff; }
+.date-option-odd { --date-background: #f0f1f0; }
+.date-option-even { --date-background: #e5e8e6; }
+.date-option[aria-current="date"] { font-weight: 800; }
+.date-option:hover { text-decoration: underline; text-underline-offset: 3px; }
+.date-option:focus-visible { outline: 2px solid #164c3b; outline-offset: -2px; }
+#irCard, #bbCard {
+  --content-gutter: max(8px, calc((100vw - 1200px) / 2));
+  padding-left: var(--content-gutter);
+  padding-right: var(--content-gutter);
+}
+#bbCard .chart-wrap { display: block; width: 100%; }
+#irCard { padding-top: 8px; }
+.forecast-chart { position: relative; }
+.chart-overlay-heading {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  left: 46px;
+  right: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  pointer-events: none;
+}
+.chart-overlay-heading h3,
+.chart-overlay-heading .runoff-summary {
+  background: color-mix(in srgb, var(--chart-title-surface, var(--color-water-surface)) 60%, transparent);
+  padding: 2px 5px;
+  color: var(--color-water-ink);
+}
+#irCard { --chart-title-surface: var(--color-page); }
+.runoff-section { --chart-title-surface: #eefdfe; }
+.chart-overlay-heading h3 { font-size: .85rem; line-height: 1.2; }
+.chart-overlay-heading .runoff-summary { font-size: .7rem; text-align: center; }
+.swim-chart { margin-block: 4px 8px; }
+.runoff-section { padding-block: 4px; margin-bottom: 6px; }
