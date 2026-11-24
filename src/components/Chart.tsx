@@ -6,7 +6,6 @@ import {
   FORECAST_DAYS,
   HISTORY_DAYS,
   MAX_FORECAST_SCROLL,
-  forecastDateLabel,
   forecastDayAt,
   hourlyChartX,
   positionForForecastDay,
@@ -18,7 +17,7 @@ type Threshold = { value: number; label?: string; color: string };
 type Dataset = ChartDataset<"line" | "bar", (number | null)[]> & { atDayStart?: boolean };
 type Plot = ChartJS<ChartType, { x: number; y: number | null }[]>;
 type RainPeak = { day: number; x: number; value: number; label: string };
-export type SunMarker = { x: number; kind: "sunrise" | "sunset"; label: string };
+type DailyPeak = { day: number; x: number; value: number; label: string; axis: string; color: string };
 const inches = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 4,
@@ -28,6 +27,8 @@ const TOUCH_DRAG_MULTIPLIER = 1.75;
 
 type Props = {
   label: string;
+  title?: string;
+  summary?: string;
   description?: string;
   samples: ChartSample[];
   datasets: Dataset[];
@@ -40,7 +41,7 @@ type Props = {
   height?: number;
   temperatureAxis?: boolean;
   thresholds?: Threshold[];
-  sunMarkers?: SunMarker[];
+  sunMarkers?: { x: number; label: string }[];
   daily?: boolean;
 };
 
@@ -61,24 +62,13 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   const { daily, timeline } = initial;
   const domainMin = -HISTORY_DAYS;
   const domainMax = hourlyChartX(FORECAST_DAYS + 1);
-  const dateLabels = (today: string) => Array.from(
-    { length: FORECAST_DAYS + 1 - domainMin },
-    (_, index) => {
-      const day = domainMin + index;
-      return {
-        day,
-        full: forecastDateLabel(today, day),
-        compact: forecastDateLabel(today, day, true),
-      };
-    },
-  );
   let props = initial;
-  let labels = dateLabels(props.today);
   let ticks: { x: number; label: string }[] = [];
   let readings: { x: number; index: number }[] = [];
   let rainPeaks: RainPeak[] = [];
+  let dailyPeaks: DailyPeak[] = [];
   let plot: Plot | undefined;
-  let width = 0, height = 0;
+  let width = 0, height = 0, builtSpan = 1;
   let hover: { x: number; y: number } | undefined;
   let pointer: { id: number; x: number; y: number; dragging: boolean } | undefined;
   let frame: number | undefined;
@@ -94,9 +84,9 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
         const start = scales.x.getPixelForValue(hourlyChartX(day));
         const end = scales.x.getPixelForValue(hourlyChartX(day + 1));
         paint.fillStyle = day === 0 ? todayFill : day < 0 ? pastFill[-day % 2] : futureFill[day % 2];
-        paint.fillRect(start, top - 22, end - start, bottom - top + 22);
+        paint.fillRect(start, top, end - start, bottom - top);
         paint.fillStyle = divider;
-        paint.fillRect(start, top - 22, 1, bottom - top + 22);
+        paint.fillRect(start, top, 1, bottom - top);
       }
     },
     afterDatasetsDraw({ ctx: paint, chartArea, scales }) {
@@ -157,8 +147,8 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     const plotWidth = right - left;
     if (plotWidth <= 0) return;
     const start = timeline.position;
-    const end = start + 1;
-    const x = (value: number) => left + (value - start) * plotWidth;
+    const end = start + timeline.span;
+    const x = (value: number) => left + (value - start) * plotWidth / timeline.span;
     const stripStart = scales.x.getPixelForValue(start);
     const stripEnd = scales.x.getPixelForValue(end);
     ctx.clearRect(0, 0, width, height);
@@ -178,16 +168,6 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     ctx.clip();
     ctx.fillStyle = ink;
     ctx.textBaseline = "middle";
-    const selectedDay = forecastDayAt(timeline.position);
-    for (const { day, full, compact } of labels) {
-      const dayLeft = Math.max(left, x(hourlyChartX(day)));
-      const dayRight = Math.min(right, x(hourlyChartX(day + 1)));
-      const available = dayRight - dayLeft - 6;
-      if (available <= 0) continue;
-      ctx.font = `${day === selectedDay ? 750 : 600} 12px ${font}`;
-      const label = ctx.measureText(full).width <= available - 6 ? full : compact;
-      if (ctx.measureText(label).width <= available) ctx.fillText(label, dayLeft + (label === full ? 6 : 3), top - 11);
-    }
 
     if (!daily) {
       ctx.fillStyle = muted;
@@ -200,6 +180,26 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
         if (labelLeft < lastRight + 14 || labelLeft + labelWidth > right) continue;
         ctx.fillText(label, labelLeft, bottom + 13);
         lastRight = labelLeft + labelWidth;
+      }
+      ctx.strokeStyle = muted;
+      ctx.lineWidth = 1.2;
+      for (const marker of props.sunMarkers ?? []) {
+        const sunX = x(hourlyChartX(marker.x));
+        if (sunX < left - 8 || sunX > right + 8) continue;
+        const horizon = bottom - 4;
+        ctx.beginPath();
+        ctx.moveTo(sunX - 6, horizon);
+        ctx.lineTo(sunX + 6, horizon);
+        ctx.moveTo(sunX - 4, horizon);
+        ctx.arc(sunX, horizon, 4, Math.PI, 2 * Math.PI);
+        ctx.moveTo(sunX, horizon - 6);
+        ctx.lineTo(sunX, horizon - 8);
+        ctx.moveTo(sunX - 6, horizon - 5);
+        ctx.lineTo(sunX - 5, horizon - 4);
+        ctx.moveTo(sunX + 6, horizon - 5);
+        ctx.lineTo(sunX + 5, horizon - 4);
+        ctx.stroke();
+        ctx.fillText(marker.label, sunX + 8, bottom - 8);
       }
     }
 
@@ -214,68 +214,31 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       ctx.fillText(label, right - labelWidth - 4, y - 9);
     }
 
-    if (scales.rainfall && rainPeaks.length) {
+    if (dailyPeaks.length) {
       ctx.font = `700 11px ${font}`;
-      ctx.fillStyle = ink;
       ctx.strokeStyle = surface;
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 4;
       ctx.lineJoin = "round";
-      for (const peak of rainPeaks) {
+      const occupied: { left: number; right: number; top: number; bottom: number }[] = [];
+      for (const peak of dailyPeaks) {
         if (peak.x < start || peak.x >= end) continue;
+        const axis = scales[peak.axis];
+        if (!axis) continue;
         const labelWidth = ctx.measureText(peak.label).width;
-        const labelLeft = Math.max(left, x(hourlyChartX(peak.day))) + 3;
-        const labelRight = Math.min(right, x(hourlyChartX(peak.day + 1))) - 3;
-        if (labelRight - labelLeft < labelWidth) continue;
-        const position = Math.max(labelLeft, Math.min(labelRight - labelWidth, x(peak.x) - labelWidth / 2));
-        const y = scales.rainfall.getPixelForValue(peak.value) - 8;
+        const position = Math.max(left + 2, Math.min(right - labelWidth - 2, x(peak.x) - labelWidth / 2));
+        const preferredY = Math.max(top + 8, Math.min(bottom - 8, axis.getPixelForValue(peak.value) - 9));
+        let y = preferredY;
+        for (let attempt = 0; attempt < 24; attempt++) {
+          const offset = attempt === 0 ? 0 : Math.ceil(attempt / 2) * 14 * (attempt % 2 ? -1 : 1);
+          const candidate = preferredY + offset;
+          if (candidate < top + 7 || candidate > bottom - 7) continue;
+          y = candidate;
+          if (!occupied.some((box) => position < box.right + 3 && position + labelWidth > box.left - 3 && y - 6 < box.bottom && y + 6 > box.top)) break;
+        }
+        occupied.push({ left: position, right: position + labelWidth, top: y - 6, bottom: y + 6 });
+        ctx.fillStyle = peak.color;
         ctx.strokeText(peak.label, position, y);
         ctx.fillText(peak.label, position, y);
-      }
-    }
-
-    ctx.font = `650 11px ${font}`;
-    ctx.lineWidth = 3;
-    ctx.lineJoin = "round";
-    for (const marker of props.sunMarkers ?? []) {
-      const anchor = x(hourlyChartX(marker.x));
-      if (anchor < left || anchor >= right) continue;
-      const markerY = top + 19;
-      const captionWidth = ctx.measureText(marker.label).width;
-      const captionLeft = anchor + 13 + captionWidth <= right
-        ? anchor + 13
-        : anchor - 13 - captionWidth;
-
-      // Draw a rising or setting sun and a small arrow at the event's x position.
-      const tipY = marker.kind === "sunrise" ? markerY - 5 : markerY + 1;
-      const wingY = markerY - 2;
-      ctx.beginPath();
-      ctx.moveTo(anchor - 9, markerY + 4);
-      ctx.lineTo(anchor + 11, markerY + 4);
-      ctx.moveTo(anchor - 7, markerY + 4);
-      ctx.arc(anchor - 3, markerY + 4, 4, Math.PI, 2 * Math.PI);
-      ctx.moveTo(anchor - 3, markerY - 3);
-      ctx.lineTo(anchor - 3, markerY - 5);
-      ctx.moveTo(anchor - 8, markerY - 1);
-      ctx.lineTo(anchor - 9.5, markerY - 2.5);
-      ctx.moveTo(anchor + 2, markerY - 1);
-      ctx.lineTo(anchor + 3.5, markerY - 2.5);
-      ctx.moveTo(anchor + 8, markerY - 5);
-      ctx.lineTo(anchor + 8, markerY + 1);
-      ctx.moveTo(anchor + 5.5, wingY);
-      ctx.lineTo(anchor + 8, tipY);
-      ctx.lineTo(anchor + 10.5, wingY);
-      ctx.strokeStyle = surface;
-      ctx.stroke();
-      ctx.save();
-      ctx.lineWidth = 1.25;
-      ctx.strokeStyle = ink;
-      ctx.stroke();
-      ctx.restore();
-
-      if (captionLeft >= left) {
-        ctx.strokeText(marker.label, captionLeft, markerY);
-        ctx.fillStyle = ink;
-        ctx.fillText(marker.label, captionLeft, markerY);
       }
     }
 
@@ -306,8 +269,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
 
     if (nearest >= 0 && hover) {
       const sample = props.samples[nearest];
-      const day = labels[Math.floor(sample.x) - domainMin].full;
-      const heading = sample.label ? `${day} · ${sample.label}` : day;
+      const heading = sample.label || "Daily total";
       const rows = props.datasets.flatMap((dataset) => {
         const value = dataset.data[nearest];
         if (value == null) return [];
@@ -361,6 +323,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     const nextWidth = element.clientWidth, nextHeight = element.clientHeight;
     if (!nextWidth || !nextHeight || disposed) return;
     stripDirty = false;
+    builtSpan = timeline.span;
     width = nextWidth;
     height = nextHeight;
     const deviceRatio = Math.min(window.devicePixelRatio || 1, 2);
@@ -386,6 +349,22 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       }
     });
     rainPeaks = [...peaksByDay.values()];
+    dailyPeaks = props.datasets.flatMap((dataset) => {
+      if (daily && dataset.atDayStart) return [];
+      const peaks = new Map<number, DailyPeak>();
+      const unit = props.tooltipUnit || dataset.label?.match(/\(([^)]+)\)$/)?.[1] || "";
+      const color = typeof dataset.borderColor === "string" ? dataset.borderColor : ink;
+      dataset.data.forEach((value, index) => {
+        if (value == null || !Number.isFinite(value)) return;
+        if (unit === "in" && value === 0) return;
+        const day = Math.floor(props.samples[index].x);
+        const existing = peaks.get(day);
+        if (existing && value <= existing.value) return;
+        const label = unit === "in" ? `${inches.format(value)}″` : `${Number(value.toFixed(1))}${unit === "°F" ? "°" : unit ? ` ${unit}` : ""}`;
+        peaks.set(day, { day, x: dataset.atDayStart ? hourlyChartX(props.samples[index].x - .5) : samples[index].x, value, label, axis: dataset.yAxisID || "y", color });
+      });
+      return [...peaks.values()];
+    });
     const highestRain = Math.max(0, ...rainPeaks.map((peak) => peak.value));
     plot = new ChartJS(source, {
       type: props.type || "line",
@@ -407,7 +386,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
         animation: false,
         parsing: false,
         events: [],
-        layout: { padding: { top: 22, bottom: daily ? 4 : 20 } },
+        layout: { padding: { top: 4, bottom: daily ? 4 : 20, right: wind || props.temperatureAxis ? 0 : 52 } },
         font: { family: font },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         scales: {
@@ -422,6 +401,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
             },
           } : {}),
           y: {
+            afterFit: (scale) => { scale.width = 42; },
             min: props.minimum,
             max: props.maximum,
             suggestedMax: props.thresholds?.length
@@ -436,6 +416,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
           },
           ...(wind ? {
             wind: {
+              afterFit: (scale) => { scale.width = 52; },
               type: "linear" as const,
               position: "right" as const,
               min: 0,
@@ -451,13 +432,14 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
           ...(props.temperatureAxis
             ? {
                 temperature: {
+                  afterFit: (scale) => { scale.width = 52; },
                   type: "linear" as const,
                   position: "right" as const,
                   grid: { drawOnChartArea: false },
                   ticks: {
                     color: colorToken("chart-temperature"),
                     font: { family: font },
-                    callback: (value: string | number) => `${value}°F`,
+                    callback: (value: string | number) => `${value}°`,
                   },
                 },
               }
@@ -467,7 +449,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     });
 
     const { left, right } = plot.chartArea;
-    const stripWidth = Math.round(width + (right - left) * (domainMax - hourlyChartX(domainMin) - 1));
+    const stripWidth = Math.round(width + (right - left) * (domainMax - hourlyChartX(domainMin) - timeline.span) / timeline.span);
     plot.options.devicePixelRatio = Math.min(deviceRatio, 8192 / stripWidth);
     plot.resize(stripWidth, height);
     if (inView) drawViewport();
@@ -481,7 +463,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   function moveByPixels(pixels: number) {
     if (!plot) return;
     const plotWidth = width - plot.width + plot.chartArea.right - plot.chartArea.left;
-    if (plotWidth > 0) timeline.moveTo(timeline.position + pixels / plotWidth);
+    if (plotWidth > 0) timeline.moveTo(timeline.position + pixels * timeline.span / plotWidth);
   }
 
   function pointerDown(event: PointerEvent) {
@@ -521,20 +503,11 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     element.classList.remove("dragging");
   }
 
-  function wheel(event: WheelEvent) {
-    if (event.ctrlKey || event.metaKey) return;
-    const dx = event.shiftKey && !event.deltaX ? event.deltaY : event.deltaX;
-    if (!dx || (!event.shiftKey && Math.abs(dx) < Math.abs(event.deltaY))) return;
-    event.preventDefault();
-    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? width : 1;
-    moveByPixels(dx * unit);
-  }
-
   function keydown(event: KeyboardEvent) {
-    const day = forecastDayAt(timeline.position);
+    const day = forecastDayAt(timeline.position, timeline.span);
     switch (event.key) {
-      case "ArrowLeft": timeline.moveTo(positionForForecastDay(day - 1), true); break;
-      case "ArrowRight": timeline.moveTo(positionForForecastDay(day + 1), true); break;
+      case "ArrowLeft": timeline.moveTo(positionForForecastDay(day - 1, timeline.span), true); break;
+      case "ArrowRight": timeline.moveTo(positionForForecastDay(day + 1, timeline.span), true); break;
       case "Home": timeline.moveTo(0, true); break;
       case "End": timeline.moveTo(MAX_FORECAST_SCROLL, true); break;
       default: return;
@@ -553,12 +526,12 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     hover = undefined;
     scheduleDraw();
   }, { signal });
-  element.addEventListener("wheel", wheel, { passive: false, signal });
   element.addEventListener("keydown", keydown, { signal });
 
   const unsubscribe = timeline.subscribe(() => {
     hover = undefined;
-    if (inView) drawViewport();
+    if (builtSpan !== timeline.span) invalidateStrip();
+    else if (inView) drawViewport();
   });
   const visibility = new IntersectionObserver(([entry]) => {
     inView = entry.isIntersecting;
@@ -579,7 +552,6 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       const dateChanged = props.today !== next.today;
       const markersChanged = props.sunMarkers !== next.sunMarkers;
       props = next;
-      if (dateChanged) labels = dateLabels(props.today);
       if (dataChanged) invalidateStrip();
       else if (inView && (dateChanged || markersChanged)) drawViewport();
     },
@@ -611,6 +583,7 @@ export function Chart(props: Props) {
 
   return (
     <div className="chart-wrap forecast-chart" style={{ height: props.height || 180 }}>
+      {props.title && <div className="chart-overlay-heading"><h3>{props.title}</h3>{props.summary && <span className="runoff-summary">{props.summary}</span>}</div>}
       {props.description && <span className="visually-hidden" id={descriptionId}>{props.description}</span>}
       <canvas
         ref={canvas}

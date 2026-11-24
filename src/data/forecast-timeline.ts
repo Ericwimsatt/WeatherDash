@@ -8,6 +8,8 @@ const TODAY_VISIBLE_WIDTH = .88;
 const TODAY_WIDTH = TODAY_VISIBLE_WIDTH * 24 / (24 - TODAY_START_HOUR);
 const TODAY_LEFT = TODAY_VISIBLE_WIDTH - TODAY_WIDTH;
 const OTHER_DAY_WIDTH = TODAY_VISIBLE_WIDTH / 2;
+// Keep the visible portion of today under 800px on wide screens.
+const MAX_BASE_VIEWPORT_WIDTH = 900;
 
 // The home viewport starts at 5 a.m. and shows part of tomorrow. Scrolling
 // left can still reach today's overnight readings and the three prior dates.
@@ -20,10 +22,10 @@ export function hourlyChartX(calendarX: number) {
 export const MIN_FORECAST_SCROLL = hourlyChartX(-HISTORY_DAYS);
 export const MAX_FORECAST_SCROLL = hourlyChartX(FORECAST_DAYS + 1) - 1;
 
-export function forecastDayAt(position: number) {
+export function forecastDayAt(position: number, span = 1) {
   // Favor the outer day at each edge, where a compressed day can't be centered.
   if (position <= MIN_FORECAST_SCROLL) return -HISTORY_DAYS;
-  if (position >= MAX_FORECAST_SCROLL) return FORECAST_DAYS;
+  if (position >= MAX_FORECAST_SCROLL + 1 - span) return FORECAST_DAYS;
   const center = position + .5;
   for (let day = FORECAST_DAYS; day > -HISTORY_DAYS; day--) {
     if (center >= hourlyChartX(day)) return day;
@@ -31,9 +33,9 @@ export function forecastDayAt(position: number) {
   return -HISTORY_DAYS;
 }
 
-export function positionForForecastDay(day: number) {
+export function positionForForecastDay(day: number, span = 1) {
   if (day === 0) return 0;
-  return Math.max(MIN_FORECAST_SCROLL, Math.min(MAX_FORECAST_SCROLL, hourlyChartX(day + .5) - .5));
+  return Math.max(MIN_FORECAST_SCROLL, Math.min(MAX_FORECAST_SCROLL + 1 - span, hourlyChartX(day + .5) - .5));
 }
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
@@ -52,6 +54,7 @@ export function forecastDateLabel(today: string, offset: number, compact = false
 
 export function createForecastTimeline() {
   let position = 0;
+  let span = 1;
   let settledDay = 0;
   let frame: number | undefined;
   let settleTimer: ReturnType<typeof setTimeout> | undefined;
@@ -59,7 +62,7 @@ export function createForecastTimeline() {
   const summaryListeners = new Set<(day: number) => void>();
   function settle() {
     settleTimer = undefined;
-    const day = forecastDayAt(position);
+    const day = forecastDayAt(position, span);
     if (day === settledDay) return;
     settledDay = day;
     for (const listener of summaryListeners) listener(day);
@@ -69,11 +72,22 @@ export function createForecastTimeline() {
     get position() {
       return position;
     },
+    get span() {
+      return span;
+    },
+    setViewportWidth(width: number) {
+      const next = Math.max(1, Math.min(MAX_FORECAST_SCROLL - MIN_FORECAST_SCROLL + 1, width / MAX_BASE_VIEWPORT_WIDTH));
+      if (next === span) return;
+      span = next;
+      position = Math.max(MIN_FORECAST_SCROLL, Math.min(MAX_FORECAST_SCROLL + 1 - span, position));
+      for (const listener of listeners) listener(position);
+      settle();
+    },
     get settledDay() {
       return settledDay;
     },
     moveTo(next: number, snap = false) {
-      const bounded = Math.max(MIN_FORECAST_SCROLL, Math.min(MAX_FORECAST_SCROLL, next));
+      const bounded = Math.max(MIN_FORECAST_SCROLL, Math.min(MAX_FORECAST_SCROLL + 1 - span, next));
       if (bounded !== position) {
         position = bounded;
         frame ??= requestAnimationFrame(() => {
@@ -84,7 +98,7 @@ export function createForecastTimeline() {
 
       clearTimeout(settleTimer);
       if (snap) settle();
-      else if (forecastDayAt(position) !== settledDay) settleTimer = setTimeout(settle, 140);
+      else if (forecastDayAt(position, span) !== settledDay) settleTimer = setTimeout(settle, 140);
     },
     subscribe(listener: (position: number) => void) {
       listeners.add(listener);
