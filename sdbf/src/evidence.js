@@ -60,11 +60,19 @@ function reasonWhy(signal) {
 export function scoreFactors(site, now) {
   const { rating } = site;
   return rating.signals.flatMap(signal => {
+    if (signal.field === "nearbyCounty") return [{ score:signal.score, text:signal.reason,
+      why:`${signal.sourceName} is ${signal.miles.toFixed(1)} miles away and has a County ${signal.status}. This app applies ${Math.round(signal.weight*100)}% of that posting’s penalty (+6 for an advisory, +8 for a warning, +10 for a closure), rounded to ${signal.penalty} points and added to this beach’s score (maximum 10). Only the strongest direct or nearby County penalty applies. This does not mean the County issued an advisory for this beach.`,
+      href:"https://cosdapps.sandiegocounty.gov/sdbeachinfo/" }];
     if (signal.field === "evidence" && rating.gaps.length)
       return rating.gaps.map(text => ({ score:signal.score, text, why:FACTOR_WHY.unverified }));
     if (signal.field === "bacteria" && signal.historical) {
-      const ageText = site.sample ? age(site.sample.collectedAt,now) : "date unknown";
+      const ageText = signal.collectedAt ? age(signal.collectedAt,now) : "date unknown";
       return [{ score:signal.score, text:`Past bacteria exceedance · ${ageText}`, why:FACTOR_WHY.bacteria }];
+    }
+    if (signal.field === "bacteria" && signal.ratio != null) {
+      const percent = Math.round(signal.ratio * 100);
+      return [{ score:signal.score, text:signal.reason,
+        why:`A test collected ${age(signal.collectedAt,now)} was about ${percent}% of its method’s advisory level. We use the highest concern from tests in the past 4 days. ${signal.score < 7 ? "Below the advisory level does not mean no risk. From 25% of the level, sensitive groups should use caution. At 75%, sensitive groups should avoid water contact. “Higher than normal” is our caution label, not a measured local average or a County advisory." : FACTOR_WHY.bacteria}` }];
     }
     if (Number.isFinite(signal.amount)) {
       const local = signal.field === "local";
@@ -72,10 +80,12 @@ export function scoreFactors(site, now) {
       const gaugeDriven = local && signal.amount > (site.coastal?.total ?? -1);
       const label = signal.field === "local" ? (gaugeDriven ? "Local rain gauge" : "Local rain") : signal.field === "inland" ? "Inland rain" : "Regional rain";
       const text = `${label}: ${signal.amount.toFixed(2)}″ ${window}`;
-      const warning = signal.score >= 6 && local ? "Potential pollutants from local runoff" : undefined;
-      return [{ score:signal.score, text, warning, why: local ? FACTOR_WHY.local : FACTOR_WHY.inland }];
+      const warning = signal.score >= 4 && local ? "Potential pollutants from local runoff" : undefined;
+      return [{ score:signal.score, text, warning, why: local ? FACTOR_WHY.local : signal.field === "regional" ? FACTOR_WHY.regionalRain : FACTOR_WHY.inland }];
     }
-    return [{ score:signal.score, text:signal.reason, why:reasonWhy(signal) }];
+    return [{ score:signal.score, text:signal.reason, why:reasonWhy(signal),
+      href:signal.field === "county" || signal.reason === "Countywide rain advisory"
+        ? "https://cosdapps.sandiegocounty.gov/sdbeachinfo/" : undefined }];
   });
 }
 
@@ -84,8 +94,9 @@ export function mapCauses(site, now) {
     if (/local rain/i.test(factor.text)) return { ...factor, warning:undefined };
     if (/inland rain/i.test(factor.text)) return { ...factor, warning:undefined };
     if (/regional rain/i.test(factor.text)) return { ...factor, warning:undefined };
+    if (/bacteria/i.test(factor.text) && factor.score < 7) return { ...factor, warning:undefined };
     if (/bacteria/i.test(factor.text)) return { ...factor, text:"Elevated bacteria can make swimming unsafe.", warning:undefined, why:"Bacteria in the water can cause stomach illness, rashes, and infections." };
-    if (/posting|advisory|closure|warning/i.test(factor.text)) return { ...factor, text:"Water contact may be unsafe because of contamination or another hazard.", warning:undefined, why:"Recent contamination or another hazard can make swimming unsafe." };
+    if (/posting|advisory|closure|warning/i.test(factor.text)) return { ...factor, warning:undefined };
     if (/regional rain|rain advisory/i.test(factor.text)) return { ...factor, text:"Widespread rain can carry pollutants into coastal water.", warning:undefined, why:"Rain across the region can wash pollutants into beaches and bays." };
     if (/no current risk/i.test(factor.text)) return { ...factor, text:"No current risk factors are showing.", warning:undefined, why:undefined };
     return { ...factor, text:"Current water conditions could not be confirmed.", warning:undefined, why:"Conditions may have changed since the last available evidence." };

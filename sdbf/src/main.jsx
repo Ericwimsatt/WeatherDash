@@ -25,21 +25,32 @@ function Rating({ rating }) {
   </div>;
 }
 
-function FactorHelp({ why }) {
+function FactorHelp({ why, label = "Why does this matter?" }) {
   const [open, setOpen] = useState(false);
   return <>
-    <button type="button" className="factor-help-button" aria-expanded={open} aria-label="Why does this matter?" onClick={() => setOpen(open => !open)}>
+    <button type="button" className="factor-help-button" aria-expanded={open} aria-label={label} onClick={() => setOpen(open => !open)}>
       <span aria-hidden="true">?</span>
     </button>
-    {open && <span className="factor-help-text" role="note">{why}</span>}
+    {open && <div className="factor-help-text" role="note">{why}</div>}
+  </>;
+}
+
+function BacteriaHelp() {
+  return <>
+    <strong>What the bacteria test tells you</strong>
+    <p>Beach tests look for Enterococcus, a sign that human or animal waste may be in the water. Some programs also test coliform bacteria. These are clues that germs may be present, including viruses and bacteria that can cause stomach illness, rashes, or ear and breathing infections.</p>
+    <p>The County uses ddPCR, a test that counts bacterial DNA. Results are usually ready the same day. Its advisory level is 1,413 DNA copies per 100 mL of water. Culture tests grow live bacteria and use a different limit: 104 MPN or CFU per 100 mL. Those limits serve a similar purpose; the readings cannot be compared number for number.</p>
+    <p>We check tests from the past 4 days. A reading at 25% of its test’s advisory level raises the score to at least 3: sensitive groups should use caution. At 40%, it scores at least 4. At 75%, it scores at least 5, and sensitive groups should avoid water contact. Swimming may still be possible below the limit, but some risk remains. “Bacteria levels higher than normal” is our caution label, not a measured local average or a County advisory. Follow current County postings.</p>
+    <a href="https://www.sandiegocounty.gov/content/sdc/deh/lwqd/beachandbay.html">County testing and current beach status</a>{" · "}
+    <a href="https://www.epa.gov/newsreleases/epa-approves-rapid-test-assess-beach-water-quality-san-diego-county">How the DNA test works</a>
   </>;
 }
 
 function ScoreFactors({ site, now }) {
   const factors = mapCauses(site,now);
   return <ul className="score-factors" aria-label="Contributing factors">
-    {factors.map(({score,text,warning,why}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
-      {text}{why && <FactorHelp why={why} />}{warning && <strong className="runoff-warning hazard">{warning}</strong>}
+    {factors.map(({score,text,warning,why,href}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
+      {href ? <a href={href} target="_blank" rel="noopener noreferrer" aria-label={`${text} — view County notices (opens in a new tab)`}>{text}</a> : text}{why && <FactorHelp why={why} />}{warning && <strong className="runoff-warning hazard">{warning}</strong>}
     </li>)}
   </ul>;
 }
@@ -90,7 +101,7 @@ function MapView({ sites, now, open }) {
           })}
         </div>
         <div className="score-legend" aria-label="Safety scores from 1, lowest observed concern, to 10, dangerous">
-          {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color}}>{index+1}</span>)}
+          {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color,"--score-ink":index >= 1 && index <= 6 ? "#182a26" : "#fff"}}>{index+1}</span>)}
           <small>Lower concern → higher risk</small>
         </div>
       </figure>
@@ -102,9 +113,10 @@ function MapView({ sites, now, open }) {
   </>;
 }
 
-function Detail({ site, snapshot, now, dismiss }) {
+function Detail({ site, sites, snapshot, now, dismiss }) {
   const dialog = useRef(null);
   useEffect(() => { dialog.current.showModal(); }, []);
+  const [bacteriaHelpOpen, setBacteriaHelpOpen] = useState(false);
   const sample = site.sample;
   const evidence = sampleEvidence(sample);
   const weather = snapshot.context?.[site.rainGauge];
@@ -112,9 +124,9 @@ function Detail({ site, snapshot, now, dismiss }) {
   const hazardFields = ["bacteria","county"].filter(field=>site.rating.signals.some(signal=>signal.field===field && signal.score>=7));
   const evidenceRows = {
     local: <><dt>Local rain in the past 72 hours</dt><dd className={hazardous("local")}><Rain site={site} now={now} /></dd></>,
-    inland: <><dt>Inland rain in the past 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland now={now} /><small>About 3 miles inland</small></dd></>,
-    bacteria: <><dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />{evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd></>,
-    county: <><dt>County status</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong><small>Updated {date(site.posting?.observedAt)} Pacific</small></dd></>,
+    inland: <><dt>Inland rain in the past 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland now={now} /></dd></>,
+    bacteria: <><dt>Latest bacteria test <button type="button" className="factor-help-button" aria-label="What do bacteria tests mean?" aria-expanded={bacteriaHelpOpen} aria-controls="bacteria-explainer" onClick={() => setBacteriaHelpOpen(open => !open)}><span aria-hidden="true">?</span></button></dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />{evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>{bacteriaHelpOpen && <dd id="bacteria-explainer" className="factor-help-text bacteria-explainer"><BacteriaHelp /></dd>}</>,
+    county: <><dt>County status</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong>{["advisory","warning","closure","rain advisory"].includes(site.posting?.status) && <small><a href="https://cosdapps.sandiegocounty.gov/sdbeachinfo/" target="_blank" rel="noopener noreferrer">View County notices</a></small>}<small>Updated {date(site.posting?.observedAt)} Pacific</small></dd></>,
   };
   const orderedHazards = [...hazardFields].sort((a,b) => Math.max(...site.rating.signals.filter(signal=>signal.field===b).map(signal=>signal.score))-Math.max(...site.rating.signals.filter(signal=>signal.field===a).map(signal=>signal.score)));
   const remaining = ["local","inland","bacteria","county"].filter(field=>!orderedHazards.includes(field));
@@ -122,10 +134,10 @@ function Detail({ site, snapshot, now, dismiss }) {
 
   return <dialog className="beach-detail" ref={dialog} onClose={dismiss} aria-labelledby="detail-title">
     <header className="dialog-heading"><h2 id="detail-title">{site.name}</h2><form method="dialog"><button autoFocus>Close</button></form></header>
-    <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /><p className="safe-estimate">{safeEstimate(site,now,snapshot)}</p></div>
+    <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /><p className="safe-estimate">{safeEstimate(site,now,snapshot,sites)}</p></div>
     {site.rating.notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
     {orderedHazards.length>0 && rows(orderedHazards)}
-    <Suspense fallback={<p className="timeline-note">Loading runoff forecast…</p>}><RunoffChart site={site} now={now} /></Suspense>
+    <Suspense fallback={<p className="timeline-note">Loading runoff forecast…</p>}><RunoffChart site={site} sites={sites} now={now} /></Suspense>
     {rows(remaining)}
     <details className="monitoring-details">
       <summary>Monitoring details and recent tests</summary>
@@ -155,20 +167,16 @@ async function requestSnapshot(endpoint, signal, method="GET") {
   return response.json();
 }
 
-function CoastNotice({ result, snapshot, sites, now }) {
+function CoastNotice({ snapshot, now }) {
   const regional = snapshot.regionalRain;
-  const rainfall = result.regionalRainfall;
-  const countywideWarning = regional?.advisory === "active";
+  if (regional?.advisory !== "active") return null;
   const estimated = regional?.estimatedLiftAt;
-  const safeCount = result.candidates.length;
-  const candidateSummary = `Currently safe to swim at ${safeCount} local ${safeCount === 1 ? "beach" : "beaches"}`;
-  if (!countywideWarning && rainfall.length) return null;
   return <section className="coast-status" aria-label="Coastwide water quality">
-    <strong className={countywideWarning ? "hazard" : undefined}>{countywideWarning ? "Danger" : candidateSummary}</strong>
-    {countywideWarning && <p>County warning following recent regional rainfall. Rain can carry pollutants into beaches and bays across the region. {estimated && (
+    <strong className="hazard">Danger</strong>
+    <p>County warning following recent regional rainfall. Rain can carry pollutants into beaches and bays across the region. {estimated && (
       Date.parse(estimated) > now ? `The County estimates the advisory may lift on ${date(estimated)} Pacific; confirmation is pending.`
         : `The County’s estimated lift date was ${date(estimated)} Pacific; confirmation is pending.`
-    )}</p>}
+    )} <a href="https://cosdapps.sandiegocounty.gov/sdbeachinfo/" target="_blank" rel="noopener noreferrer">View County notices</a></p>
   </section>;
 }
 
@@ -257,13 +265,13 @@ function App() {
   return <>
     <header className="page-heading"><h1>San Diego Beach Finder</h1></header>
     <main>
-      <CoastNotice result={result} snapshot={snapshot} sites={sites} now={now} />
+      <CoastNotice snapshot={snapshot} now={now} />
       <section aria-label="Beach water quality evidence">
         <MapView sites={sites} now={now} open={open} />
       </section>
       <footer><a href="/methodology.html">How water quality is rated</a><p>Geography from <a href="https://tigerweb.geo.census.gov/tigerweb/">U.S. Census TIGERweb</a></p></footer>
     </main>
-    {detail && <Detail site={detail} snapshot={snapshot} now={now} dismiss={dismiss} />}
+    {detail && <Detail site={detail} sites={sites} snapshot={snapshot} now={now} dismiss={dismiss} />}
   </>;
 }
 
