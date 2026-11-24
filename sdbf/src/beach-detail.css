@@ -1,0 +1,125 @@
+@font-face {
+  font-family: "Beach Source Sans";
+  src: url("./assets/fonts/source-sans-3.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+}
+
+/* Everyday Japanese: the approved modal treatment, scoped to beach detail. */
+dialog.beach-detail {
+  --detail-paper: #f8f6f0;
+  --detail-ink: #292b28;
+  --detail-soft: #eeece6;
+  --detail-accent: #6f2428;
+  --line: #d2d0c7;
+  --muted: #65645b;
+  --avoid: #852d31;
+  width: min(94vw, 720px);
+  max-height: 94dvh;
+  padding: 22px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--detail-paper);
+  color: var(--detail-ink);
+  box-shadow: 0 16px 52px #112b3940;
+  font: 15px/1.45 "Beach Source Sans", system-ui, sans-serif;
+  scrollbar-color: var(--detail-accent) var(--detail-soft);
+}
+.beach-detail::backdrop { background: #183c4a36; }
+.beach-detail ::selection { background: var(--detail-accent); color: var(--detail-paper); }
+.beach-detail :is(button, a, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--detail-accent);
+  outline-offset: 3px;
+}
+.beach-detail button {
+  border-color: var(--line);
+  border-radius: 2px;
+  background: var(--detail-paper);
+  color: var(--detail-ink);
+  font-family: inherit;
+}
+.beach-detail button:hover { background: var(--detail-soft); }
+.beach-detail .dialog-heading {
+  top: -22px;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 0 0 13px;
+  border-bottom: 1px solid var(--detail-ink);
+  background: var(--detail-paper);
+}
+.beach-detail h2 {
+  margin: 0;
+  font: 650 27px/1.15 "Beach Source Sans", system-ui, sans-serif;
+  letter-spacing: .005em;
+}
+.beach-detail .dialog-heading form { margin: 0; }
+.beach-detail .dialog-heading button {
+  min-height: 36px;
+  border-color: var(--detail-ink);
+  font-size: 13px;
+}
+.beach-detail .modal-score {
+  gap: 12px;
+  padding: 13px;
+  border-radius: 2px;
+  background: var(--detail-soft);
+}
+.beach-detail .modal-score .score-number { font-size: 25px; }
+.beach-detail .score-number::before { border-radius: 0; }
+.beach-detail :is(.score-number, .quick-evidence dd) { font-variant-numeric: tabular-nums; }
+.beach-detail .score small { font-size: 12px; }
+.beach-detail .modal-score .score-factors {
+  flex: 1 1 170px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.beach-detail .safe-estimate {
+  flex: 1 1 150px;
+  padding: 8px 10px;
+  border-left: 1px solid var(--detail-accent);
+  border-radius: 2px;
+  background: var(--detail-paper);
+  font-size: 13px;
+}
+.beach-detail .factor-help-button { color: var(--muted); }
+.beach-detail .factor-help-button:hover { color: var(--detail-ink); border-color: var(--detail-ink); }
+.beach-detail .factor-help-button[aria-expanded="true"] {
+  background: var(--detail-accent);
+  color: var(--detail-paper);
+  border-color: var(--detail-accent);
+}
+.beach-detail .factor-help-text {
+  border-left: 1px solid var(--line);
+  background: var(--detail-paper);
+  color: var(--muted);
+}
+.beach-detail .runoff-chart { margin-top: 20px; }
+.beach-detail .runoff-chart h3 { font: 650 15px/1.45 "Beach Source Sans", system-ui, sans-serif; }
+.beach-detail .runoff-plot-scroll { border-color: var(--line); border-radius: 2px; background: var(--detail-paper); }
+.beach-detail .no-rain { background: var(--detail-soft); border-radius: 2px; }
+.beach-detail .quick-evidence {
+  gap: 8px 14px;
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.beach-detail dt { font-weight: 600; }
+.beach-detail .quick-evidence dd { padding-bottom: 8px; border-color: var(--line); }
+.beach-detail small { font-size: 12px; }
+.beach-detail .monitoring-details { margin-top: 20px; border-color: var(--line); }
+.beach-detail .monitoring-details summary { font-size: 14px; }
+.beach-detail .monitoring-details p { color: var(--muted); }
+.beach-detail a { color: var(--detail-accent); }
+.beach-detail :is(th, td) { border-color: var(--line); }
+.beach-detail thead th { background: var(--detail-soft); }
+
+@media (max-width: 500px) {
+  dialog.beach-detail { width: 96vw; max-height: 96dvh; padding: 16px; }
+  .beach-detail .dialog-heading { top: -16px; }
+  .beach-detail h2 { font-size: 25px; }
+  .beach-detail .modal-score { gap: 10px; }
+  .beach-detail .modal-score .score-factors { flex-basis: 150px; }
+  .beach-detail .safe-estimate { flex-basis: 120px; }
+  .beach-detail .quick-evidence { font-size: 13px; }
+}

@@ -1,12 +1,9 @@
 @import "../preview/preview.css";
+@import "./beach-detail.css";
 
 :root { scrollbar-color:#95adba #eff5f6 }
 button:disabled { cursor:default; color:var(--muted); background:#edf3f5 }
 footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
-.view-bar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:.5rem; margin:1rem 0 .65rem }
-.view-bar .view-switch { margin:0 }
-.refresh { font-size:.82rem }
-.source-status { color:var(--muted); font-size:.82rem; margin-bottom:.6rem }
 .data-scroll tbody td:first-child { position:sticky; left:0; z-index:1; border-right:1px solid var(--line); background:var(--panel) }
 .data-scroll th[scope=row] { position:static; border-right:0 }
 .rating-column { width:19% }
@@ -97,8 +94,14 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .quick-evidence { grid-template-columns:minmax(7.5rem,1fr) 1.3fr; margin:.8rem 0; align-items:baseline }
 .quick-evidence dd { border-bottom:1px solid #e3ecf0; padding-bottom:.28rem }
 .runoff-chart { margin-top:.8rem }
+.runoff-heading { display:flex; align-items:center; justify-content:space-between; gap:.6rem }
 .runoff-chart h3 { font-size:.96rem; margin:0 }
+.runoff-heading button { min-height:1.8rem; padding:.15rem .55rem; font-size:.78rem }
+.runoff-plot-scroll { overflow-x:auto; overscroll-behavior-inline:contain; border:1px solid #e3ecf0; border-radius:.3rem }
 .runoff-plot { position:relative; height:15rem }
+.runoff-hint { color:var(--muted); font-size:.78rem; margin:.2rem 0 .45rem }
+.no-rain { padding:.6rem .7rem; background:#f1f6f7; border-radius:.3rem }
+.safe-estimate { flex:1 1 12rem; margin:0; padding:.42rem .55rem; border-left:2px solid #247184; border-radius:.25rem; background:#fff; font-size:.86rem; line-height:1.35 }
 .monitoring-details { margin-top:1rem; border-top:1px solid var(--line); padding-top:.6rem }
 .monitoring-details summary { cursor:pointer; font-weight:650 }
 .monitoring-details p { margin-top:.6rem; font-size:.84rem }

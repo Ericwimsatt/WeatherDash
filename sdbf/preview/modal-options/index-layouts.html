@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Beach detail · Four directions</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="viewer-header"><div><h1>One beach. Four ways in.</h1><p>Map-click detail explorations for San Diego Beach Finder.</p></div><div class="toolbar"><label>Preview <select id="size"><option value="desktop">Desktop</option><option value="phone">Phone</option></select></label><label>Evidence <select id="scenario"><option value="rain">Rain concern</option><option value="closure">County closure</option><option value="missing">Missing data</option></select></label></div></header>
+<div class="compare-bar"><p><strong id="count">4 options</strong> <span id="position"></span></p><div><button id="prev" aria-label="Previous option">←</button><button id="next" aria-label="Next option">→</button><button id="reset">Reset comparison</button></div></div>
+<main id="choices" aria-label="Modal design alternatives"></main><section id="restore" aria-label="Discarded options"></section>
+<footer><strong>My pick: Map-side inspector.</strong> Keep the coast visible and switch beaches without closing the detail. Choose Compact brief if this is usually a one-beach check.<p>Static design prototypes · Values illustrate the Nov 23 evidence state, not current water conditions. The production app and debug table are unchanged.</p><span id="announcement" role="status" aria-live="polite"></span></footer>
+<script src="../geography.js"></script><script type="module" src="options.js"></script>
+</body></html>

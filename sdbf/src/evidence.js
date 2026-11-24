@@ -11,7 +11,10 @@ export function date(timestamp) {
 export function age(timestamp, now) {
   const hours = Math.floor((now - Date.parse(timestamp)) / 3600000);
   if (!Number.isFinite(hours) || hours < 0) return "Collection time unavailable";
-  return hours < 24 ? `${hours}h old` : `${Math.floor(hours / 24)}d old`;
+  if (hours < 1) return "Less than an hour ago";
+  if (hours < 24) return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} ${days === 1 ? "day" : "days"} ago`;
 }
 
 export function reading(sample) {
@@ -20,11 +23,13 @@ export function reading(sample) {
   return qualifier + sample.value.toLocaleString("en-US");
 }
 
-export function rainDisplay(site, inland = false) {
+export function rainDisplay(site, inland = false, now = Date.now()) {
   const point = inland ? site.inlandRain : site.coastal;
   const gauge = inland ? null : site.rain;
-  const estimates = [point?.total,gauge?.lowerBound].filter(Number.isFinite);
-  return estimates.length ? `${Math.max(...estimates).toFixed(2)} in` : "";
+  const fresh = time => Number.isFinite(Date.parse(time)) && now >= Date.parse(time) && now - Date.parse(time) <= 3 * 3600000;
+  const estimates = [fresh(point?.verifiedAt) ? point?.total : null,
+    fresh(gauge?.verifiedAt) ? gauge?.lowerBound : null].filter(Number.isFinite);
+  return estimates.length ? `${Math.max(...estimates).toFixed(2)}″` : "Unavailable";
 }
 
 export function postingText(site) {
@@ -33,15 +38,15 @@ export function postingText(site) {
 
 
 const FACTOR_WHY = {
-  local: "Rain washes oil, fertilizer, pet waste, and litter off streets into storm drains, which empty straight into the ocean. In a heavy storm, the sewer system can also overflow into the sea.",
-  inland: "Rain sweeps fertilizer from farms and fields into rivers that reach the ocean, where it feeds algae blooms. Some of that algae is dangerous to people.",
-  bacteria: "Enterococcus is a sign of sewage or animal waste in the water. Swallowing it or swimming in it can cause stomach illness, skin rashes, and ear or eye infections.",
-  county: "The County posts advisories, warnings, and closures when water contact is likely to make people sick, based on recent bacteria results or a known hazard.",
-  runoff: "A reported spill or sewage overflow puts pathogens directly into the water. Stay out until the County confirms it is safe again.",
-  countywide: "Rain across the region washes pollutants off streets into every beach and bay, so all water contact is riskier for a few days.",
-  regionalRain: "Widespread rain raises the runoff risk at every beach in the region, on top of each beach's own conditions.",
-  unverified: "When current County data is unavailable, the true water quality is uncertain, so treat the water with extra caution.",
-  clear: "No hazards are showing right now, but bacteria tests are only a snapshot and conditions can change quickly.",
+  local: "Rain washes oil, waste, and litter from streets into storm drains that empty into the ocean. Heavy storms can also cause sewer overflows.",
+  inland: "Rain carries pollutants through creeks and rivers toward the coast, where they can affect water quality.",
+  bacteria: "Enterococcus can indicate sewage or animal waste in the water. Contact can cause stomach illness, rashes, and ear or eye infections.",
+  county: "Water contact may be unsafe because of recent contamination or another known hazard.",
+  runoff: "A spill or sewage overflow can put pathogens directly into the water. Avoid contact until conditions are confirmed safe.",
+  countywide: "Rain across the region can wash pollutants from streets into beaches and bays, raising risk across the coast.",
+  regionalRain: "Widespread rain can carry pollutants into coastal water, adding to local conditions.",
+  unverified: "Current conditions could not be confirmed. They may have changed since the last available update.",
+  clear: "No current risk factors are showing. Bacteria samples are snapshots, and conditions can change quickly.",
 };
 
 function reasonWhy(signal) {
@@ -66,13 +71,25 @@ export function scoreFactors(site, now) {
     }
     if (Number.isFinite(signal.amount)) {
       const local = signal.field === "local";
-      const window = local ? "72 hours" : "4 days";
-      const text = `${signal.amount.toFixed(2)} in ${signal.field} rain in last ${window}`;
-      const warning = signal.score >= 6
-        ? (local ? "Potential dangerous chemicals from local runoff" : "Potential algae blooms from inland runoff")
-        : undefined;
+      const window = signal.field === "local" ? "in the past 72 hours" : signal.field === "inland" ? "in the past 4 days" : "in the past 72 hours";
+      const label = signal.field === "local" ? "Local rain" : signal.field === "inland" ? "Inland rain" : "Regional rain";
+      const text = `${label}: ${signal.amount.toFixed(2)}″ ${window}`;
+      const warning = signal.score >= 6 && local ? "Potential pollutants from local runoff" : undefined;
       return [{ score:signal.score, text, warning, why: local ? FACTOR_WHY.local : FACTOR_WHY.inland }];
     }
     return [{ score:signal.score, text:signal.reason, why:reasonWhy(signal) }];
+  });
+}
+
+export function mapCauses(site, now) {
+  return scoreFactors(site,now).map(factor => {
+    if (/local rain/i.test(factor.text)) return { ...factor, warning:undefined };
+    if (/inland rain/i.test(factor.text)) return { ...factor, warning:undefined };
+    if (/regional rain/i.test(factor.text)) return { ...factor, warning:undefined };
+    if (/bacteria/i.test(factor.text)) return { ...factor, text:"Elevated bacteria can make swimming unsafe.", warning:undefined, why:"Bacteria in the water can cause stomach illness, rashes, and infections." };
+    if (/posting|advisory|closure|warning/i.test(factor.text)) return { ...factor, text:"Water contact may be unsafe because of contamination or another hazard.", warning:undefined, why:"Recent contamination or another hazard can make swimming unsafe." };
+    if (/regional rain|rain advisory/i.test(factor.text)) return { ...factor, text:"Widespread rain can carry pollutants into coastal water.", warning:undefined, why:"Rain across the region can wash pollutants into beaches and bays." };
+    if (/no current risk/i.test(factor.text)) return { ...factor, text:"No current risk factors are showing.", warning:undefined, why:undefined };
+    return { ...factor, text:"Current water conditions could not be confirmed.", warning:undefined, why:"Conditions may have changed since the last available evidence." };
   });
 }

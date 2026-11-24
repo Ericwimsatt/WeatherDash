@@ -1,7 +1,8 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
-import { age, date, postingText, rainDisplay, reading, scoreFactors } from "./evidence.js";
+import { age, date, mapCauses, postingText, rainDisplay, reading } from "./evidence.js";
+import { safeEstimate } from "../data/runoff-forecast.mjs";
 import { drawMap, project } from "./map.js";
 
 import { withPointRain } from "../data/point-rain.mjs";
@@ -35,33 +36,16 @@ function FactorHelp({ why }) {
 }
 
 function ScoreFactors({ site, now }) {
+  const factors = mapCauses(site,now);
   return <ul className="score-factors" aria-label="Contributing factors">
-    {scoreFactors(site,now).map(({score,text,warning,why}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
+    {factors.map(({score,text,warning,why}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
       {text}{why && <FactorHelp why={why} />}{warning && <strong className="runoff-warning hazard">{warning}</strong>}
     </li>)}
   </ul>;
 }
 
-function Rain({site,inland=false}) {
-  return <strong>{rainDisplay(site,inland)}</strong>;
-}
-
-function Table({ sites, now, open }) {
-  return <>
-    <p className="scroll-hint">Swipe for inland rain, bacteria, and County postings.</p>
-    <div className="data-scroll" tabIndex={0} role="region" aria-label="Scrollable beach evidence table">
-      <table><colgroup><col className="site-column" /><col className="rating-column" /><col /><col /><col className="sample-column" /><col /></colgroup>
-        <thead><tr>{["Beach", "Safety score", "Local rain · 72h", "Inland rain · 4 days", "Latest bacteria test", "County posting"].map(title => <th key={title} scope="col">{title}</th>)}</tr></thead>
-        <tbody>{sites.map(site => <tr key={site.id}>
-          <th scope="row"><button className="beach-link" onClick={event => open(site.id,event.currentTarget)}>{site.name}</button><small>{site.location}</small></th>
-          <td><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /></td>
-          <td><Rain site={site} /></td><td><Rain site={site} inland /></td>
-          <td><Sample sample={site.sample} now={now} /></td>
-          <td><strong>{postingText(site)}</strong><small>{date(site.posting?.observedAt)}</small></td>
-        </tr>)}</tbody>
-      </table>
-    </div>
-  </>;
+function Rain({site,inland=false,now}) {
+  return <strong>{rainDisplay(site,inland,now)}</strong>;
 }
 
 const westLabels = new Set([381, 373, 351, 644, 461, 455]);
@@ -126,19 +110,24 @@ function Detail({ site, snapshot, now, dismiss }) {
   const evidence = sampleEvidence(sample);
   const weather = snapshot.context?.[site.rainGauge];
   const hazardous = field => site.rating.signals.some(signal => signal.field===field && signal.score>=5) ? "hazard" : undefined;
+  const hazardFields = ["bacteria","county"].filter(field=>site.rating.signals.some(signal=>signal.field===field && signal.score>=7));
+  const evidenceRows = {
+    local: <><dt>Local rain in the past 72 hours</dt><dd className={hazardous("local")}><Rain site={site} now={now} /></dd></>,
+    inland: <><dt>Inland rain in the past 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland now={now} /><small>About 3 miles inland</small></dd></>,
+    bacteria: <><dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />{evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd></>,
+    county: <><dt>County status</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong><small>Updated {date(site.posting?.observedAt)} Pacific</small></dd></>,
+  };
+  const orderedHazards = [...hazardFields].sort((a,b) => Math.max(...site.rating.signals.filter(signal=>signal.field===b).map(signal=>signal.score))-Math.max(...site.rating.signals.filter(signal=>signal.field===a).map(signal=>signal.score)));
+  const remaining = ["local","inland","bacteria","county"].filter(field=>!orderedHazards.includes(field));
+  const rows = fields => <dl className="quick-evidence">{fields.map(field=><React.Fragment key={field}>{evidenceRows[field]}</React.Fragment>)}</dl>;
 
-  return <dialog ref={dialog} onClose={dismiss} aria-labelledby="detail-title">
+  return <dialog className="beach-detail" ref={dialog} onClose={dismiss} aria-labelledby="detail-title">
     <header className="dialog-heading"><h2 id="detail-title">{site.name}</h2><form method="dialog"><button autoFocus>Close</button></form></header>
-    <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /></div>
+    <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /><p className="safe-estimate">{safeEstimate(site,now,snapshot)}</p></div>
     {site.rating.notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
-    <dl className="quick-evidence">
-      <dt>Local rain · 72h</dt><dd className={hazardous("local")}><Rain site={site} /></dd>
-      <dt>Inland rain · 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland /><small>3 miles inland</small></dd>
-      <dt>Latest bacteria test</dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />
-        {evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>
-      <dt>County posting</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong><small>Updated {date(site.posting?.observedAt)} Pacific</small></dd>
-    </dl>
-    <Suspense fallback={<p className="timeline-note">Loading runoff chart…</p>}><RunoffChart site={site} now={now} /></Suspense>
+    {orderedHazards.length>0 && rows(orderedHazards)}
+    <Suspense fallback={<p className="timeline-note">Loading runoff forecast…</p>}><RunoffChart site={site} now={now} /></Suspense>
+    {rows(remaining)}
     <details className="monitoring-details">
       <summary>Monitoring details and recent tests</summary>
       <dl>
@@ -167,29 +156,27 @@ async function requestSnapshot(endpoint, signal, method="GET") {
   return response.json();
 }
 
-function CoastNotice({ result, snapshot, now }) {
+function CoastNotice({ result, snapshot, sites, now }) {
   const regional = snapshot.regionalRain;
   const rainfall = result.regionalRainfall;
+  const countywideWarning = regional?.advisory === "active";
   const estimated = regional?.estimatedLiftAt;
-  const candidateSummary = result.candidates.length ? `${result.candidates.length} beaches score 1–2` : "No beach currently scores 1–2";
-  const heading = result.coastRainHold ? "Danger" : rainfall.length ? "Regional rainfall" : candidateSummary;
+  const safeCount = result.candidates.length;
+  const candidateSummary = `Currently safe to swim at ${safeCount} local ${safeCount === 1 ? "beach" : "beaches"}`;
+  if (!countywideWarning && rainfall.length) return null;
   return <section className="coast-status" aria-label="Coastwide water quality">
-    <strong className={result.coastRainHold ? "hazard" : undefined}>{heading}</strong>
-    {result.coastRainHold && <p>Potential runoff danger. The Countywide rain advisory applies to all coastal beaches and bays. {estimated && (
-      Date.parse(estimated) > now ? `County estimated lift ${date(estimated)} Pacific, pending confirmation.`
-        : `County’s estimated lift was ${date(estimated)} Pacific. Confirmation is pending.`
+    <strong className={countywideWarning ? "hazard" : undefined}>{countywideWarning ? "Danger" : candidateSummary}</strong>
+    {countywideWarning && <p>County warning following recent regional rainfall. Rain can carry pollutants into beaches and bays across the region. {estimated && (
+      Date.parse(estimated) > now ? `The County estimates the advisory may lift on ${date(estimated)} Pacific; confirmation is pending.`
+        : `The County’s estimated lift date was ${date(estimated)} Pacific; confirmation is pending.`
     )}</p>}
-    {rainfall.length > 0 && <p>{result.coastRainHold && "Regional rainfall · "}{rainfall.map(([area,points]) => `${area} up to +${points}`).join(" · ")}. {candidateSummary}.</p>}
   </section>;
 }
 
 function App() {
   const [snapshot,setSnapshot] = useState(null);
   const [now,setNow] = useState(Date.now);
-  const [view,setView] = useState(new URLSearchParams(location.search).get("view") === "map" ? "map" : "table");
   const [detailId,setDetailId] = useState(null);
-  const [refreshing,setRefreshing] = useState(true);
-  const [status,setStatus] = useState("");
   const pending = useRef(null);
   const focusTarget = useRef(null);
 
@@ -204,19 +191,17 @@ function App() {
     requestAnimationFrame(() => focusTarget.current?.focus({preventScroll:true}));
   }
 
-  async function refresh(manual = false) {
+  async function refresh() {
     if (pending.current) return;
     const controller = new AbortController();
     pending.current = controller;
-    setRefreshing(true);
-    setStatus("");
     const apply = ({snapshot: incoming}) => {
       if (incoming?.sites?.length) setSnapshot(previous =>
         !previous || Date.parse(incoming.generatedAt) >= Date.parse(previous.generatedAt) ? incoming : previous);
     };
     const timeout = setTimeout(() => controller.abort(),65000);
-    const check = manual ? requestSnapshot("/api/cache",controller.signal,"POST") : requestSnapshot("/api/source",controller.signal);
-    const results = await Promise.allSettled([
+    const check = requestSnapshot("/api/source",controller.signal);
+    await Promise.allSettled([
       requestSnapshot("/api/cache",controller.signal).then(apply), check.then(result => { apply(result); return result; }),
     ]);
     clearTimeout(timeout);
@@ -224,10 +209,6 @@ function App() {
     pending.current = null;
     setSnapshot(previous => previous ?? initial);
     setNow(Date.now());
-    setRefreshing(false);
-    const source = results[1];
-    if (source.status === "rejected" || source.value.unavailable?.length)
-      setStatus("Some sources are unavailable. Showing the latest saved evidence.");
   }
 
   useEffect(() => {
@@ -236,7 +217,22 @@ function App() {
     const sampleClock = setInterval(() => setNow(Date.now()),60000);
     const updates = setInterval(() => { if (!document.hidden) void refresh(); },5*60000);
     const connected = () => { void refresh(); };
+    let pullStartY = null;
+    const pullStart = event => {
+      if (window.scrollY <= 0 && !document.querySelector("dialog[open]") && event.touches.length === 1) {
+        pullStartY = event.touches[0].clientY;
+      } else {
+        pullStartY = null;
+      }
+    };
+    const pullEnd = event => {
+      if (pullStartY !== null && window.scrollY <= 0 && event.changedTouches.length === 1
+        && event.changedTouches[0].clientY - pullStartY >= 90) window.location.reload();
+      pullStartY = null;
+    };
     window.addEventListener("online",connected);
+    document.addEventListener("touchstart",pullStart,{passive:true});
+    document.addEventListener("touchend",pullEnd,{passive:true});
     return () => {
       pending.current?.abort();
       pending.current = null;
@@ -244,34 +240,27 @@ function App() {
       clearInterval(sampleClock);
       clearInterval(updates);
       window.removeEventListener("online",connected);
+      document.removeEventListener("touchstart",pullStart);
+      document.removeEventListener("touchend",pullEnd);
     };
   }, []);
 
   if (!snapshot) return <>
-    <header className="page-heading"><h1>San Diego Beach Finder</h1><p>Water quality from Oceanside to the border</p></header>
+    <header className="page-heading"><h1>San Diego Beach Finder</h1></header>
     <div className="skeleton" role="status"><span className="visually-hidden">Loading beach conditions</span><div /><div /><div /><div /><div /></div>
   </>;
 
-  const enriched = snapshot.sites.map(site => withPointRain(site,snapshot.pointRain,now));
+  const enriched = snapshot.sites.map(site => withPointRain(site,snapshot.pointRain,now,snapshot.rainHistory));
   const result = assessCoast(enriched,{regionalRain:snapshot.regionalRain},now);
   const sites = enriched.map((site,index) => ({...site,rating:result.results[index].water}));
-  const tableSites = [...sites].sort((a,b) => a.rating.score-b.rating.score || b.lat-a.lat);
   const detail = sites.find(site => site.id === detailId);
 
   return <>
-    <header className="page-heading"><h1>San Diego Beach Finder</h1><p>Water quality from Oceanside to the border</p></header>
+    <header className="page-heading"><h1>San Diego Beach Finder</h1></header>
     <main>
-      <CoastNotice result={result} snapshot={snapshot} now={now} />
-      <div className="view-bar">
-        <div className="view-switch" aria-label="Beach display">
-          <button type="button" aria-pressed={view==="table"} onClick={() => setView("table")}>Table</button>
-          <button type="button" aria-pressed={view==="map"} onClick={() => setView("map")}>Map</button>
-        </div>
-        {view==="table" && <button className="refresh" type="button" disabled={refreshing} onClick={() => void refresh(true)}>{refreshing ? "Checking sources…" : "Refresh evidence"}</button>}
-      </div>
-      {status && <p className="source-status" role="status">{status}</p>}
+      <CoastNotice result={result} snapshot={snapshot} sites={sites} now={now} />
       <section aria-label="Beach water quality evidence">
-        {view==="map" ? <MapView sites={sites} now={now} open={open} /> : <Table sites={tableSites} now={now} open={open} />}
+        <MapView sites={sites} now={now} open={open} />
       </section>
       <footer><a href="/methodology.html">How water quality is rated</a></footer>
     </main>

@@ -2,6 +2,7 @@ import { pointIds } from "../data/point-rain.mjs";
 import { loadPointRain } from "./point-rain.mjs";
 import { loadCounty, loadSamples } from "./county.mjs";
 import { loadContext, loadRain, summarizeRain } from "./water.mjs";
+import { readRainHistory, writeRainHistory } from "./weather-history.mjs";
 
 const minute = 60000;
 const schedules = { county:29*minute, samples:6*60*minute, rain:15*minute, "point-rain":29*minute, context:30*minute };
@@ -51,6 +52,15 @@ export function assemble(records, now=Date.now()) {
     countyCheckedAt:records.county?.at ?? root.regionalRain?.verifiedAt ?? null };
 }
 
+async function currentSnapshot(env, records, now=Date.now()) {
+  const snapshot = assemble(records,now);
+  if (snapshot && env.WEATHER_DB) {
+    try { snapshot.rainHistory = await readRainHistory(env.WEATHER_DB,now); }
+    catch (error) { console.warn(JSON.stringify({event:"rain-history-read-failed",message:String(error).slice(0,250)})); }
+  }
+  return snapshot;
+}
+
 const loads = {
   county: (env,previous,now) => loadCounty(env.BROWSER, previous.county?.value ?? {
     regionalRain:previous.bootstrap?.value.regionalRain,
@@ -90,12 +100,16 @@ async function refreshFeeds(env) {
     const value = await loads[name](env,previous,now);
     await env.DB.prepare(store).bind(name,time,JSON.stringify(value)).run();
     previous[name] = { at:time, value };
+    if (name === "rain" && env.WEATHER_DB) {
+      try { await writeRainHistory(env.WEATHER_DB,value,now); }
+      catch (error) { console.warn(JSON.stringify({event:"rain-history-write-failed",message:String(error).slice(0,250)})); }
+    }
   }));
   for (const [index,result] of updated.entries()) {
     if (result.status === "rejected") console.warn(JSON.stringify({event:"source-refresh-failed",feed:due[index], message:String(result.reason).slice(0,350)}));
   }
   // A parallel request may have written another feed while this one refreshed.
-  return { snapshot:assemble(await feeds(env.DB)), unavailable:due.filter((_, index) => updated[index].status === "rejected") };
+  return { snapshot:await currentSnapshot(env,await feeds(env.DB),now), unavailable:due.filter((_, index) => updated[index].status === "rejected") };
 }
 
 export default {
@@ -103,7 +117,7 @@ export default {
     const path = new URL(request.url).pathname;
     try {
       if (path === "/api/cache" && request.method === "GET") {
-        const snapshot = assemble(await feeds(env.DB));
+        const snapshot = await currentSnapshot(env,await feeds(env.DB));
         return Response.json({ snapshot }, { status:snapshot ? 200 : 503, headers });
       }
       if (path === "/api/source" && request.method === "GET") {

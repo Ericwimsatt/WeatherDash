@@ -8,7 +8,7 @@ export async function loadPointRain(now) {
   const query = new URLSearchParams({
     latitude:locations.map(point => point.lat).join(","),
     longitude:locations.map(point => point.lon).join(","),
-    past_days:"7", forecast_days:"3", hourly:"precipitation", precipitation_unit:"inch",
+    past_days:"8", forecast_days:"12", hourly:"precipitation", precipitation_unit:"inch",
     timeformat:"unixtime", timezone:"GMT", cell_selection:"land",
   });
   const data = await json(`https://api.open-meteo.com/v1/forecast?${query}`);

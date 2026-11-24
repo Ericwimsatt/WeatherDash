@@ -42,6 +42,38 @@ export function pointTotal(point, from, through) {
   return { total:hours ? Number(total.toFixed(3)) : null, complete:hours===expected, hours, endedAt };
 }
 
+// NWS hourly observation intervals replace the modeled past in the chart.
+// Keep forecast hours untouched so the historical/forecast seam is explicit.
+export function withObservedRain(point, rows, now) {
+  if (!point || !Array.isArray(rows)) return point;
+  const lat = Math.round(point.lat * 1e6), lon = Math.round(point.lon * 1e6);
+  const historyStart = now - 8 * 24 * hour;
+  const pointRows = rows.filter(row => {
+    const end = Date.parse(row.rainfall_end_pst);
+    return row.latitude_e6 === lat && row.longitude_e6 === lon && row.data_kind === "observation" &&
+      Number.isFinite(end) && end >= historyStart && end <= now;
+  });
+  if (!pointRows.length) return point;
+  const values = [...point.values];
+  const first = Math.max(0, Math.floor((historyStart - point.start) / hour) + 1);
+  const last = Math.min(values.length - 1, Math.floor((now - point.start) / hour));
+  for (let index = first; index <= last; index++) values[index] = null;
+  let changed = last >= first;
+  const observed = new Set();
+  for (const row of pointRows) {
+    const start = Date.parse(row.rainfall_start_pst), end = Date.parse(row.rainfall_end_pst);
+    if (row.latitude_e6 !== lat || row.longitude_e6 !== lon || row.data_kind !== "observation" ||
+        !Number.isFinite(start) || !Number.isFinite(end) || end > now || end - start !== hour ||
+        !Number.isFinite(row.rainfall_in) || row.rainfall_in < 0) continue;
+    const index = Math.round((Date.parse(row.hour_pst) - point.start) / hour) + 1;
+    if (index < 0 || index >= values.length || observed.has(index)) continue;
+    values[index] = row.rainfall_in;
+    observed.add(index);
+    changed = true;
+  }
+  return changed ? { ...point, values } : point;
+}
+
 function inlandEstimate(site, points, key, now) {
   const own = points?.[key];
   const center = own ?? pointLocations([site])[1];
@@ -81,7 +113,7 @@ function inlandEstimate(site, points, key, now) {
   return {...center,start,values,verifiedAt:new Date(checked).toISOString()};
 }
 
-export function withPointRain(site, points, now) {
+export function withPointRain(site, points, now, rainHistory=[]) {
   const [localKey,inlandKey] = pointIds(site);
   const local = points?.[localKey];
   const inland = inlandEstimate(site,points,inlandKey,now);
@@ -95,6 +127,8 @@ export function withPointRain(site, points, now) {
       verifiedAt:point.verifiedAt, name:point.name, lat:point.lat, lon:point.lon,
     };
   };
+  const coastalPoint = withObservedRain(local, rainHistory, now);
+  const inlandPoint = withObservedRain(inland, rainHistory, now);
   const coastal = summarize(local,rainPeriods.local);
   if (coastal?.total >= rainLimits.local) {
     // Qualifying rain must fall in one rolling 24-hour period.
@@ -106,5 +140,5 @@ export function withPointRain(site, points, now) {
       }
     }
   }
-  return { ...site, coastal, inlandRain:summarize(inland,rainPeriods.inland), localPoint:local, inlandPoint:inland };
+  return { ...site, coastal, inlandRain:summarize(inland,rainPeriods.inland), localPoint:coastalPoint, inlandPoint };
 }

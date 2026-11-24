@@ -51,7 +51,7 @@ function regionalRainPoints(amount) {
 
 const countyHold = { score:7, reason:"Countywide rain advisory" };
 
-export function assess(site, now=Date.now(), regionalPoints=0) {
+export function assess(site, now=Date.now(), regionalPoints=0, regionalAmount=0) {
   const { posting, sample, inlandRain, runoff, regionalRain } = site;
   const evidence = sampleEvidence(sample);
   const signals = [];
@@ -109,18 +109,21 @@ export function assess(site, now=Date.now(), regionalPoints=0) {
   const score = baseScore + points;
   if (points) {
     if (baseScore === 1) signals.pop();
-    add(score,`Regional rainfall · +${points}`,"regional");
+    add(score,`Regional rainfall · +${points}`,"regional",{ amount:regionalAmount });
   }
   return { score, reason:baseScore === 1 && points ? signals[0].reason : reason, label:scoreLabel(score), color:scoreColors[score-1], signals, gaps, notes };
 }
 
 export function assessCoast(sites, { regionalRain } = {}, now=Date.now()) {
   const regions = new Map();
+  const amounts = new Map();
   for (const site of sites) {
-    const points = regionalRainPoints(localRainAmount(site,now));
+    const amount = localRainAmount(site,now);
+    const points = regionalRainPoints(amount);
     if (site.area && points > (regions.get(site.area) ?? 0)) regions.set(site.area,points);
+    if (site.area && amount > (amounts.get(site.area) ?? 0)) amounts.set(site.area,amount);
   }
-  const results = sites.map(site => ({ id:site.id, water:assess({ ...site, regionalRain },now,regions.get(site.area)) }));
+  const results = sites.map(site => ({ id:site.id, water:assess({ ...site, regionalRain },now,regions.get(site.area),amounts.get(site.area)) }));
   return {
     coastRainHold:regionalRain?.advisory === "active" ? countyHold.reason : null,
     regionalRainfall:[...regions],

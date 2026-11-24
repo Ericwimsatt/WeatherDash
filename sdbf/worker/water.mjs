@@ -65,10 +65,10 @@ export function summarizeRain(intervals, verifiedAt, now=Date.now(), hours=72) {
 
 async function readGauge(gauge, now) {
   const endpoint = `https://api.weather.gov/stations/${gauge}/observations`;
-  const params = new URLSearchParams({ start:new Date(now-5*24*hour).toISOString(), end:new Date(now).toISOString(), limit:"500" });
+  const params = new URLSearchParams({ start:new Date(now-8*24*hour).toISOString(), end:new Date(now).toISOString(), limit:"500" });
   const records = [];
   let pageURL = endpoint+"?"+params;
-  for (let page=0; page<4 && pageURL?.startsWith(endpoint+"?"); page++) {
+  for (let page=0; page<6 && pageURL?.startsWith(endpoint+"?"); page++) {
     let body;
     try { body = await json(pageURL); }
     catch (error) { if (!records.length) throw error; break; }

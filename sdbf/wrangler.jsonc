@@ -7,7 +7,10 @@
   "workers_dev":false,
   "routes":[{"pattern":"sdbeachfinder.gingernet.net","custom_domain":true}],
   "assets":{"directory":"./dist","run_worker_first":["/api/*"]},
-  "d1_databases":[{"binding":"DB","database_name":"sd-beach-finder","database_id":"9be88a1c-d99d-46f8-94c2-04bf240c1f98"}],
+  "d1_databases":[
+    {"binding":"DB","database_name":"sd-beach-finder","database_id":"9be88a1c-d99d-46f8-94c2-04bf240c1f98"},
+    {"binding":"WEATHER_DB","database_name":"weatherdash","database_id":"d9a37b85-19d4-468f-935a-f38dbd5356d3"}
+  ],
   "browser":{"binding":"BROWSER"},
   "triggers":{"crons":["*/30 * * * *"]},
   "observability":{"enabled":true,"traces":{"enabled":true,"head_sampling_rate":0.05}}
