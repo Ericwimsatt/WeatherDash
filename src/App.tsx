@@ -464,10 +464,19 @@ function ForecastHeading({ location, today, timeline }: {
   today: string;
   timeline: ForecastTimeline;
 }) {
-  const [position, setPosition] = useState(() => timeline.position);
-  const day = forecastDayAt(position);
+  const [, refresh] = useState(0);
+  const position = timeline.position;
+  const span = timeline.span;
+  const day = forecastDayAt(position, span);
   const dates = useRef<HTMLDivElement | null>(null);
-  useEffect(() => timeline.subscribe(setPosition), [timeline]);
+  useEffect(() => timeline.subscribe(() => refresh((value) => value + 1)), [timeline]);
+  useEffect(() => {
+    const strip = dates.current;
+    if (!strip) return;
+    const resize = new ResizeObserver(() => timeline.setViewportWidth(strip.clientWidth));
+    resize.observe(strip);
+    return () => resize.disconnect();
+  }, [timeline]);
   useEffect(() => {
     const strip = dates.current;
     if (!strip) return;
@@ -487,7 +496,7 @@ function ForecastHeading({ location, today, timeline }: {
         frame.setPointerCapture(event.pointerId);
         frame.classList.add("dragging");
       }
-      timeline.moveTo(timeline.position - (event.clientX - pointer.x) / strip.clientWidth);
+      timeline.moveTo(timeline.position - (event.clientX - pointer.x) * timeline.span / strip.clientWidth);
       pointer.x = event.clientX;
     };
     const end = () => {
@@ -521,24 +530,24 @@ function ForecastHeading({ location, today, timeline }: {
           const start = hourlyChartX(offset);
           const end = hourlyChartX(offset + 1);
           const visibleStart = Math.max(start, position);
-          const visibleEnd = Math.min(end, position + 1);
+          const visibleEnd = Math.min(end, position + span);
           const visibleWidth = visibleEnd - visibleStart;
           return <div key={offset}>
           {offset !== 0 && <span aria-hidden="true" className={`date-shade ${Math.abs(offset) % 2 ? "date-shade-odd" : "date-shade-even"}`}
-            style={{ left: `${(start - position) * 100}%`, width: `${(end - start) * 100}%` }} />}
+            style={{ left: `${(start - position) / span * 100}%`, width: `${(end - start) / span * 100}%` }} />}
           {Array.from({ length: 24 }, (_, hour) => <span key={hour} aria-hidden="true"
             className={`date-tick ${hour === 0 ? "day-tick" : hour % 6 === 0 ? "major-tick" : ""}`}
-            style={{ left: `${(hourlyChartX(offset + hour / 24) - position) * 100}%` }} />)}
+            style={{ left: `${(hourlyChartX(offset + hour / 24) - position) / span * 100}%` }} />)}
           <button
             key={offset}
             className={`date-option ${offset === 0 ? "date-option-today" : Math.abs(offset) % 2 ? "date-option-odd" : "date-option-even"}`}
-            style={{ left: `${(visibleStart - position) * 100}%`, width: `${Math.max(0, visibleWidth) * 100}%`, visibility: visibleWidth >= .09 ? "visible" : "hidden" }}
+            style={{ left: `${(visibleStart - position) / span * 100}%`, width: `${Math.max(0, visibleWidth) / span * 100}%`, visibility: visibleWidth / span >= .09 ? "visible" : "hidden" }}
             aria-label={forecastDateLabel(today, offset)}
             aria-current={day === offset ? "date" : undefined}
-            onClick={() => timeline.moveTo(positionForForecastDay(offset), true)}
-          >{forecastDateLabel(today, offset, visibleWidth < .3)}</button></div>;
+            onClick={() => timeline.moveTo(positionForForecastDay(offset, span), true)}
+          >{forecastDateLabel(today, offset, visibleWidth / span < .3)}</button></div>;
         })}
-        <span aria-hidden="true" className="date-tick day-tick" style={{ left: `${(hourlyChartX(FORECAST_DAYS + 1) - position) * 100}%` }} />
+        <span aria-hidden="true" className="date-tick day-tick" style={{ left: `${(hourlyChartX(FORECAST_DAYS + 1) - position) / span * 100}%` }} />
       </div></div></div>
     </div>
   );
@@ -604,7 +613,7 @@ export function App() {
       const chart = document.querySelector<HTMLElement>(".forecast-chart canvas");
       const width = Math.max(1, (chart?.clientWidth ?? window.innerWidth) - 94);
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? width : 1;
-      timeline.moveTo(timeline.position + dx * unit / width);
+      timeline.moveTo(timeline.position + dx * unit * timeline.span / width);
     };
     window.addEventListener("wheel", wheel, { passive: false });
     return () => window.removeEventListener("wheel", wheel);

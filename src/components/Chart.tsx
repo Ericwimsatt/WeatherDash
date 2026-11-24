@@ -68,7 +68,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   let rainPeaks: RainPeak[] = [];
   let dailyPeaks: DailyPeak[] = [];
   let plot: Plot | undefined;
-  let width = 0, height = 0;
+  let width = 0, height = 0, builtSpan = 1;
   let hover: { x: number; y: number } | undefined;
   let pointer: { id: number; x: number; y: number; dragging: boolean } | undefined;
   let frame: number | undefined;
@@ -147,8 +147,8 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     const plotWidth = right - left;
     if (plotWidth <= 0) return;
     const start = timeline.position;
-    const end = start + 1;
-    const x = (value: number) => left + (value - start) * plotWidth;
+    const end = start + timeline.span;
+    const x = (value: number) => left + (value - start) * plotWidth / timeline.span;
     const stripStart = scales.x.getPixelForValue(start);
     const stripEnd = scales.x.getPixelForValue(end);
     ctx.clearRect(0, 0, width, height);
@@ -323,6 +323,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     const nextWidth = element.clientWidth, nextHeight = element.clientHeight;
     if (!nextWidth || !nextHeight || disposed) return;
     stripDirty = false;
+    builtSpan = timeline.span;
     width = nextWidth;
     height = nextHeight;
     const deviceRatio = Math.min(window.devicePixelRatio || 1, 2);
@@ -448,7 +449,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     });
 
     const { left, right } = plot.chartArea;
-    const stripWidth = Math.round(width + (right - left) * (domainMax - hourlyChartX(domainMin) - 1));
+    const stripWidth = Math.round(width + (right - left) * (domainMax - hourlyChartX(domainMin) - timeline.span) / timeline.span);
     plot.options.devicePixelRatio = Math.min(deviceRatio, 8192 / stripWidth);
     plot.resize(stripWidth, height);
     if (inView) drawViewport();
@@ -462,7 +463,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   function moveByPixels(pixels: number) {
     if (!plot) return;
     const plotWidth = width - plot.width + plot.chartArea.right - plot.chartArea.left;
-    if (plotWidth > 0) timeline.moveTo(timeline.position + pixels / plotWidth);
+    if (plotWidth > 0) timeline.moveTo(timeline.position + pixels * timeline.span / plotWidth);
   }
 
   function pointerDown(event: PointerEvent) {
@@ -503,10 +504,10 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   }
 
   function keydown(event: KeyboardEvent) {
-    const day = forecastDayAt(timeline.position);
+    const day = forecastDayAt(timeline.position, timeline.span);
     switch (event.key) {
-      case "ArrowLeft": timeline.moveTo(positionForForecastDay(day - 1), true); break;
-      case "ArrowRight": timeline.moveTo(positionForForecastDay(day + 1), true); break;
+      case "ArrowLeft": timeline.moveTo(positionForForecastDay(day - 1, timeline.span), true); break;
+      case "ArrowRight": timeline.moveTo(positionForForecastDay(day + 1, timeline.span), true); break;
       case "Home": timeline.moveTo(0, true); break;
       case "End": timeline.moveTo(MAX_FORECAST_SCROLL, true); break;
       default: return;
@@ -529,7 +530,8 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
 
   const unsubscribe = timeline.subscribe(() => {
     hover = undefined;
-    if (inView) drawViewport();
+    if (builtSpan !== timeline.span) invalidateStrip();
+    else if (inView) drawViewport();
   });
   const visibility = new IntersectionObserver(([entry]) => {
     inView = entry.isIntersecting;

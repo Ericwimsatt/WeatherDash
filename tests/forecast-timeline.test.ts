@@ -29,3 +29,12 @@ test("keyboard navigation can select all three past dates and all ten forecast d
   assert.equal(positionForForecastDay(0), 0);
   assert.equal(positionForForecastDay(FORECAST_DAYS + 1), MAX_FORECAST_SCROLL);
 });
+
+test("wide timelines keep forecast edges reachable", () => {
+  const span = 2;
+  const lastPosition = MAX_FORECAST_SCROLL + 1 - span;
+  assert.equal(positionForForecastDay(0, span), 0);
+  assert.equal(positionForForecastDay(FORECAST_DAYS, span), lastPosition);
+  assert.equal(forecastDayAt(lastPosition, span), FORECAST_DAYS);
+  assert.equal(forecastDayAt(MIN_FORECAST_SCROLL, span), -HISTORY_DAYS);
+});

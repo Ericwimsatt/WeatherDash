@@ -12,77 +12,51 @@
     <link rel="stylesheet" href="/src/design-tokens.css" />
     <link rel="stylesheet" href="/src/themes/christmas-lights.css" />
     <style>
-      body {
-        margin: 0;
-        background: var(--color-page);
-        color: var(--color-ink);
-        font-family: system-ui, sans-serif;
-      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--color-page); color: var(--color-ink); font-family: system-ui, sans-serif; }
       .boot-header {
-        padding: 24px 16px;
-        background: var(--color-header-end);
+        height: 67px;
+        background: linear-gradient(90deg, var(--color-header-art-scrim), transparent 60%), url('/src/assets/holiday/village-header.jpg') center 63% / auto 170px repeat-x, var(--color-header-art-base);
+        position: relative;
       }
-      .boot-header h1 {
-        font-size: 1.55rem;
-        margin: 0;
-      }
-      .boot-section {
-        padding: 26px 16px;
-      }
-      .boot-section:nth-child(2) {
-        background: var(--color-water-surface);
-      }
-      .boot-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        max-width: 1200px;
-        margin: auto;
-      }
-      .boot-block {
-        height: 80px;
-        background: var(--color-border-warm);
-        border-radius: 16px;
-      }
-      .boot-chart {
-        height: 180px;
-        background: var(--color-surface-inset);
-        grid-column: 1/-1;
-        border-radius: 16px;
-      }
-      .boot-section h2 {
-        max-width: 1200px;
-        margin: 0 auto 16px;
+      .boot-header img { position: absolute; left: 16px; top: 0; width: 190px; height: 64px; object-fit: contain; }
+      .boot-region { height: 48px; padding: 14px 16px; background: var(--color-ink); }
+      .boot-region span { display: block; width: 150px; height: 19px; border-radius: 3px; background: #476d5c; }
+      .boot-dates { height: 35px; padding: 0 60px 0 50px; border-bottom: 1px solid #b8cbbf; background: #fff; }
+      .boot-ruler { height: 100%; display: flex; }
+      .boot-ruler span { flex: 1; border-left: 1px solid #b8cbbf; background: #f0f1f0; }
+      .boot-ruler span:nth-child(even) { background: #e5e8e6; }
+      .boot-ruler span:last-child { border-right: 1px solid #b8cbbf; }
+      .boot-chart { height: 200px; padding: 18px 26px; background: var(--color-page); }
+      .boot-chart-water { background: linear-gradient(180deg, var(--color-water-surface), var(--color-water-end)); box-shadow: 0 12px 0 var(--color-water-divider); }
+      .boot-chart-fill { height: 100%; background: var(--color-skeleton-highlight); }
+      .boot-chart-water .boot-chart-fill { background: var(--color-water-skeleton-highlight); }
+      .boot-regions { max-width: 1232px; margin: auto; padding: 28px 16px; }
+      .boot-regions h2 { margin: 0 0 12px; font-size: 1.35rem; }
+      .boot-group-label { width: 110px; height: 10px; margin: 12px 0 6px; background: var(--color-skeleton); }
+      .boot-region-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+      .boot-region-grid span { height: 60px; background: var(--color-skeleton); }
+      .boot-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      @media (max-width: 639px) {
+        .boot-header { height: 63px; }
+        .boot-header img { width: 170px; height: 57px; }
+        .boot-region-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       }
     </style>
   </head>
   <body>
     <div id="root">
-      <div class="boot-header">
-        <h1>EricWeather</h1>
-        <p role="status">Loading weather…</p>
-      </div>
+      <p class="boot-status" role="status">Loading weather…</p>
       <div aria-hidden="true">
-        <section class="boot-section">
-          <h2>Daylight</h2>
-          <div class="boot-grid">
-            <div class="boot-block"></div>
-            <div class="boot-block"></div>
-            <div class="boot-block"></div>
-            <div class="boot-block"></div>
-            <div class="boot-chart"></div>
-          </div>
-        </section>
-        <section class="boot-section">
-          <h2>Swim Conditions</h2>
-          <div class="boot-grid"><div class="boot-chart"></div></div>
-        </section>
-        <section class="boot-section">
+        <div class="boot-header"><img src="/src/assets/holiday/ericweather-wordmark.png" alt="" /></div>
+        <div class="boot-region"><span></span></div>
+        <div class="boot-dates"><div class="boot-ruler"><span></span><span></span><span></span><span></span></div></div>
+        <div class="boot-chart"><div class="boot-chart-fill"></div></div>
+        <div class="boot-chart boot-chart-water"><div class="boot-chart-fill"></div></div>
+        <section class="boot-regions">
           <h2>Regional Temps</h2>
-          <div class="boot-grid">
-            <div class="boot-block"></div>
-            <div class="boot-block"></div>
-          </div>
+          <div class="boot-group-label"></div>
+          <div class="boot-region-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         </section>
       </div>
     </div>
