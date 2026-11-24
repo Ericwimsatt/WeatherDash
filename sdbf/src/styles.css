@@ -8,11 +8,9 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .data-scroll th[scope=row] { position:static; border-right:0 }
 .rating-column { width:19% }
 .site-column { width:22% }
-.map-visual { width:100%; min-height:34rem }
-@media (min-width:52.001rem) {
-  .map { grid-template-columns:minmax(0,1fr) }
-  .map-visual { height:max(34rem, calc(100svh - 10rem)); aspect-ratio:auto }
-}
+.map { grid-template-columns:minmax(0,1fr) }
+.map-figure { position:relative; left:50%; transform:translateX(-50%); width:min(100vw, 81rem, (100svh - 2rem) * .75) }
+.map-visual { width:100%; min-height:0; aspect-ratio:.75 }
 .station { position:absolute; left:var(--x); top:var(--y); width:0; height:0 }
 .station:focus-within,.station:hover { z-index:2 }
 .station-dot,.evidence-dot { display:inline-block; width:.68rem; height:.68rem; border-radius:50%; background:var(--rating); border:1px solid #fff }
@@ -38,11 +36,9 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
   .rating-column { width:7.3rem }
   .site-column { width:8.2rem }
   .sample-column { width:7rem }
-  .map-visual { min-height:35.5rem }
   .station-name { font-size:.67rem; min-height:1.45rem }
 }
 @media(max-width:26rem) {
-  .map-visual { min-height:37rem }
   .station-name { font-size:.61rem; padding-inline:.18rem }
   .station[data-short] .station-name { max-width:7rem; white-space:normal }
 }
@@ -65,7 +61,7 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .score-number span { font-size:.73rem; font-weight:550 }
 .score small { margin-top:.14rem }
 .hazard,.hazard small { color:var(--avoid); font-weight:750 }
-.score-legend { display:flex; align-items:center; flex-wrap:wrap; gap:.22rem; margin:.25rem 0 .7rem }
+.score-legend { display:flex; align-items:center; flex-wrap:wrap; gap:.22rem; margin:.25rem 0 .7rem; padding-inline:1rem }
 .score-legend span { min-width:1.3rem; padding:.12rem .2rem; text-align:center; background:var(--score-color); color:#fff; border-radius:.18rem; font-size:.68rem; font-weight:750 }
 .score-legend small { margin-left:.35rem }
 .station-dot { min-height:0; width:1.55rem; height:1.55rem; padding:0; background:transparent; border:0; box-shadow:none; isolation:isolate }
@@ -114,6 +110,7 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
   .data-scroll { --beach-width:8rem; --safety-width:7rem }
   .data-scroll .sample-column { width:9rem }
 }
+@media(max-width:27rem) { .score-legend { padding-inline:.7rem } }
 @media(max-width:25rem) {
   .data-scroll { --beach-width:7.6rem; --safety-width:6.7rem }
   .score small { font-size:.68rem }

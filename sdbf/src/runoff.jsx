@@ -29,6 +29,8 @@ export default function RunoffChart({site,now}) {
         {label:"Inland daily rain",data:values.inlandDaily,backgroundColor:inland,order:2},
         {type:"line",label:"Local rolling 3-day rain",data:edgeLine(values.local3,values.local3Before,values.local3After),xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:0,pointHoverRadius:3,borderWidth:2,borderCapStyle:"round",borderJoinStyle:"round",tension:.35,cubicInterpolationMode:"monotone",spanGaps:true,clip:false,order:1},
         {type:"line",label:"Inland rolling 4-day rain",data:edgeLine(values.inland4,values.inland4Before,values.inland4After),xAxisID:"xLine",borderColor:inland,backgroundColor:inland,pointRadius:0,pointHoverRadius:3,borderWidth:2,borderCapStyle:"round",borderJoinStyle:"round",tension:.35,cubicInterpolationMode:"monotone",spanGaps:true,clip:false,order:1},
+        {type:"line",label:"Local rolling 3-day rain now",data:[{x:values.currentX,y:values.localCurrent}],xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:5,showLine:false,order:0},
+        {type:"line",label:"Inland rolling 4-day rain now",data:[{x:values.currentX,y:values.inlandCurrent}],xAxisID:"xLine",borderColor:inland,backgroundColor:inland,pointRadius:5,showLine:false,order:0},
       ]},
       options:{
         responsive:false,maintainAspectRatio:false,animation:false,interaction:{mode:"nearest",intersect:false},
@@ -57,6 +59,6 @@ export default function RunoffChart({site,now}) {
   return <section className="runoff-chart"><div className="runoff-heading"><h3>Rainfall and runoff</h3></div>
     <div className="runoff-plot-scroll" ref={scroller} tabIndex={0} role="region" aria-label="Scrollable rainfall and runoff chart">
       <div className="runoff-plot" style={{width:`${Math.max(880,values.starts.length*76)}px`}}><canvas ref={canvas} width={Math.max(880,values.starts.length*76)} height={240} role="img" aria-label="Daily local and inland rainfall with rolling three- and four-day totals for the past 4 days and next 10 days" /></div>
-    </div>
+    </div><p className="runoff-hint">Dots show current rolling totals; lines show totals at the end of each day. The safety score may also consider a separate rain gauge.</p>
   </section>;
 }

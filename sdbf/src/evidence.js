@@ -25,11 +25,8 @@ export function reading(sample) {
 
 export function rainDisplay(site, inland = false, now = Date.now()) {
   const point = inland ? site.inlandRain : site.coastal;
-  const gauge = inland ? null : site.rain;
   const fresh = time => Number.isFinite(Date.parse(time)) && now >= Date.parse(time) && now - Date.parse(time) <= 3 * 3600000;
-  const estimates = [fresh(point?.verifiedAt) ? point?.total : null,
-    fresh(gauge?.verifiedAt) ? gauge?.lowerBound : null].filter(Number.isFinite);
-  return estimates.length ? `${Math.max(...estimates).toFixed(2)}″` : "Unavailable";
+  return fresh(point?.verifiedAt) && Number.isFinite(point?.total) ? `${point.total.toFixed(2)}″` : "Unavailable";
 }
 
 export function postingText(site) {
@@ -72,7 +69,8 @@ export function scoreFactors(site, now) {
     if (Number.isFinite(signal.amount)) {
       const local = signal.field === "local";
       const window = signal.field === "local" ? "in the past 72 hours" : signal.field === "inland" ? "in the past 4 days" : "in the past 72 hours";
-      const label = signal.field === "local" ? "Local rain" : signal.field === "inland" ? "Inland rain" : "Regional rain";
+      const gaugeDriven = local && signal.amount > (site.coastal?.total ?? -1);
+      const label = signal.field === "local" ? (gaugeDriven ? "Local rain gauge" : "Local rain") : signal.field === "inland" ? "Inland rain" : "Regional rain";
       const text = `${label}: ${signal.amount.toFixed(2)}″ ${window}`;
       const warning = signal.score >= 6 && local ? "Potential pollutants from local runoff" : undefined;
       return [{ score:signal.score, text, warning, why: local ? FACTOR_WHY.local : FACTOR_WHY.inland }];

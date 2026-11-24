@@ -489,9 +489,13 @@ main::before {
   position: relative;
   margin-inline: auto;
 }
+@media (max-width: 639px) {
+  #irCard .daylight-chart .forecast-chart { height: 260px !important; }
+  #irCard .daylight-chart .forecast-chart canvas { height: 260px !important; max-height: 260px; }
+}
 .rain-radar {
   position: absolute;
-  top: 24px;
+  top: 30px;
   right: 44px;
   padding: 2px 7px;
   border-radius: 4px;
@@ -824,27 +828,17 @@ footer a {
 #bbCard .chart-wrap { display: block; width: 100%; }
 #irCard { padding-top: 8px; }
 .forecast-chart { position: relative; }
-.chart-overlay-heading {
-  position: absolute;
-  z-index: 1;
-  top: 12px;
-  left: 46px;
-  right: 54px;
+.chart-heading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
-  pointer-events: none;
-}
-.chart-overlay-heading h3,
-.chart-overlay-heading .runoff-summary {
-  background: color-mix(in srgb, var(--chart-title-surface, var(--color-water-surface)) 60%, transparent);
-  padding: 2px 5px;
+  text-align: center;
+  gap: 0;
+  margin: 0;
   color: var(--color-water-ink);
 }
-#irCard { --chart-title-surface: var(--color-page); }
-.runoff-section { --chart-title-surface: #eefdfe; }
-.chart-overlay-heading h3 { font-size: .85rem; line-height: 1.2; }
-.chart-overlay-heading .runoff-summary { font-size: .7rem; text-align: center; }
-.swim-chart { margin-block: 4px 8px; }
-.runoff-section { padding-block: 4px; margin-bottom: 6px; }
+.chart-heading h3 { margin: 0; font-size: .85rem; line-height: 1.2; }
+.chart-heading .runoff-summary { font-size: .7rem; line-height: 1.2; }
+.chart-heading + .chart-wrap { margin-top: 0; }
+.swim-chart { margin-block: 2px 4px; }
+.runoff-section { padding-block: 2px; margin-bottom: 2px; }

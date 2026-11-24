@@ -129,7 +129,7 @@ export function withPointRain(site, points, now, rainHistory=[]) {
   };
   const coastalPoint = withObservedRain(local, rainHistory, now);
   const inlandPoint = withObservedRain(inland, rainHistory, now);
-  const coastal = summarize(local,rainPeriods.local);
+  const coastal = summarize(coastalPoint,rainPeriods.local);
   if (coastal?.total >= rainLimits.local) {
     // Qualifying rain must fall in one rolling 24-hour period.
     const cutoff = Math.min(now,Date.parse(local.verifiedAt));
@@ -140,5 +140,5 @@ export function withPointRain(site, points, now, rainHistory=[]) {
       }
     }
   }
-  return { ...site, coastal, inlandRain:summarize(inland,rainPeriods.inland), localPoint:coastalPoint, inlandPoint };
+  return { ...site, coastal, inlandRain:summarize(inlandPoint,rainPeriods.inland), localPoint:coastalPoint, inlandPoint };
 }

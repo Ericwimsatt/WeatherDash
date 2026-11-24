@@ -24,6 +24,9 @@ export function runoffHorizon(site,now) {
   const rolling=(point,hours)=>ends.map(end=>{const value=pointTotal(point,end-hours*hour,end);return value.hours?value.total:null;});
   const rollingAt=(point,hours,end)=>{const value=pointTotal(point,end-hours*hour,end);return value.hours?value.total:null;};
   return {starts,ends,localDaily,inlandDaily,
+    currentX:4+(Math.floor(now/hour)*hour-today)/day-.5,
+    localCurrent:rollingAt(site.localPoint,rainPeriods.local,Math.min(now,Date.parse(site.localPoint?.verifiedAt))),
+    inlandCurrent:rollingAt(site.inlandPoint,rainPeriods.inland,Math.min(now,Date.parse(site.inlandPoint?.verifiedAt))),
     local3:rolling(site.localPoint,rainPeriods.local),inland4:rolling(site.inlandPoint,rainPeriods.inland),
     local3Before:rollingAt(site.localPoint,rainPeriods.local,starts[0]),
     inland4Before:rollingAt(site.inlandPoint,rainPeriods.inland,starts[0]),

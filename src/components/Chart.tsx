@@ -582,8 +582,9 @@ export function Chart(props: Props) {
   }, [props.samples, props.datasets, props.thresholds, props.sunMarkers, props.today]);
 
   return (
-    <div className="chart-wrap forecast-chart" style={{ height: props.height || 180 }}>
-      {props.title && <div className="chart-overlay-heading"><h3>{props.title}</h3>{props.summary && <span className="runoff-summary">{props.summary}</span>}</div>}
+    <>
+      {props.title && <div className="chart-heading"><h3>{props.title}</h3>{props.summary && <span className="runoff-summary">{props.summary}</span>}</div>}
+      <div className="chart-wrap forecast-chart" style={{ height: props.height || 180 }}>
       {props.description && <span className="visually-hidden" id={descriptionId}>{props.description}</span>}
       <canvas
         ref={canvas}
@@ -594,6 +595,7 @@ export function Chart(props: Props) {
       >
         {props.label}
       </canvas>
-    </div>
+      </div>
+    </>
   );
 }

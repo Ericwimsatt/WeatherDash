@@ -89,7 +89,6 @@ function MapView({ sites, now, open }) {
             </div>;
           })}
         </div>
-        <figcaption>Geography from <a href="https://tigerweb.geo.census.gov/tigerweb/">U.S. Census TIGERweb</a></figcaption>
         <div className="score-legend" aria-label="Safety scores from 1, lowest observed concern, to 10, dangerous">
           {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color}}>{index+1}</span>)}
           <small>Lower concern → higher risk</small>
@@ -262,7 +261,7 @@ function App() {
       <section aria-label="Beach water quality evidence">
         <MapView sites={sites} now={now} open={open} />
       </section>
-      <footer><a href="/methodology.html">How water quality is rated</a></footer>
+      <footer><a href="/methodology.html">How water quality is rated</a><p>Geography from <a href="https://tigerweb.geo.census.gov/tigerweb/">U.S. Census TIGERweb</a></p></footer>
     </main>
     {detail && <Detail site={detail} snapshot={snapshot} now={now} dismiss={dismiss} />}
   </>;
