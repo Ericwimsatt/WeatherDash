@@ -1,15 +1,15 @@
 @import "./design-tokens.css";
 
 @font-face {
-  font-family: "Barlow Condensed";
-  src: url("./assets/fonts/barlow-condensed.woff2") format("woff2");
+  font-family: "Atkinson Hyperlegible";
+  src: url("./assets/fonts/atkinson-hyperlegible-bold.ttf") format("truetype");
   font-style: normal;
-  font-weight: 800;
+  font-weight: 700;
   font-display: swap;
 }
 @font-face {
-  font-family: "Source Sans 3";
-  src: url("./assets/fonts/source-sans-3.woff2") format("woff2");
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("./assets/fonts/atkinson-hyperlegible-next-variable.woff2") format("woff2");
   font-style: normal;
   font-weight: 400 800;
   font-display: swap;
@@ -274,8 +274,8 @@ header h1 {
   color-scheme: light;
 }
 body {
-  --font-body: "Source Sans 3", system-ui, sans-serif;
-  --font-heading: "Barlow Condensed", var(--font-body);
+  --font-body: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --font-heading: "Atkinson Hyperlegible", var(--font-body);
   font-family: var(--font-body);
   color: var(--color-ink);
 }
@@ -685,7 +685,7 @@ footer a {
 
 .region-heading h2,
 #regions-heading {
-  font: 700 1rem/1.35 var(--font-body);
+  font: 700 1rem/1.35 var(--font-heading);
   letter-spacing: 0.005em;
 }
 
@@ -795,4 +795,10 @@ body { padding-bottom: calc(36px + env(safe-area-inset-bottom)); }
   color: #FFFFFF;
   text-align: center;
   padding-block: 6px;
+}
+
+/* Original Hyperlegible headings pair with Next for compact labels and data. */
+h2, h3, .card > :is(h2, h3):first-child {
+  font-family: var(--font-heading);
+  font-weight: 700;
 }

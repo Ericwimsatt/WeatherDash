@@ -110,6 +110,7 @@ export function DateRuler({ today, timeline, markers = NO_MARKERS, fixed = false
         element.setAttribute("aria-valuetext", label);
       }
     };
+    if (document.fonts.status === "loading") void document.fonts.ready.then(draw);
     redraw.current = draw;
     const resize = new ResizeObserver(() => { if (!fixed) timeline.setViewportWidth(element.clientWidth); draw(); });
     resize.observe(element);
