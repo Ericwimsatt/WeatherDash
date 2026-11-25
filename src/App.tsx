@@ -1,15 +1,12 @@
 import { colorToken, colorWithAlpha } from "./color-tokens.ts";
-import { useEffect, useMemo, useRef, useState } from "octane";
+import { useEffect, useMemo, useState } from "octane";
 import { Chart } from "./components/Chart.tsx";
+import { DateRuler } from "./components/DateRuler.tsx";
+import { timeMarkers, uvCrossingMarkers } from "./data/chart-axis.ts";
 import {
   createForecastTimeline,
-  forecastDateLabel,
-  forecastDayAt,
   FORECAST_DAYS,
   HISTORY_DAYS,
-  hourlyChartX,
-  positionForForecastDay,
-  TODAY_START_HOUR,
   type ForecastTimeline,
 } from "./data/forecast-timeline.ts";
 import { LOCATIONS, SWIM_SPOTS, INLAND, type Location } from "./config.ts";
@@ -123,7 +120,6 @@ function hourlySamples<T extends { hour: string }>(days: T[][]) {
       ...row,
       x: day + (index + .5) / rows.length,
       label: displayHour(row.hour),
-      tick: day === 0 ? (index - TODAY_START_HOUR) % 2 === 0 : index % 4 === 0,
     }));
   });
 }
@@ -134,14 +130,7 @@ function Daylight({ location, today, range, timeline }: ForecastProps) {
   const pending = query.isFetching;
   const date = useSummaryDate(today, timeline);
   const selectedSun = bundle && sunForDay(bundle, date);
-  const sunMarkers = useMemo(() => forecastDates(today).flatMap((date, index) => {
-    const sun = bundle && sunForDay(bundle, date);
-    return ([sun?.sunrise_pst, sun?.sunset_pst]).flatMap((time) => {
-      if (!time) return [];
-      const hour = (Date.parse(time) - Date.parse(midnight(date))) / HOUR;
-      return hour >= 0 && hour < 24 ? [{ label: sunTime(time), x: index - HISTORY_DAYS + hour / 24 }] : [];
-    });
-  }), [bundle, today]);
+  const sunMarkers = useMemo(() => timeMarkers(bundle, today), [bundle, today]);
   const days = useMemo(() => {
     const data = bundle ?? emptyBundle();
     const now = Date.now();
@@ -156,6 +145,7 @@ function Daylight({ location, today, range, timeline }: ForecastProps) {
     });
   }, [bundle, today]);
   const uvHours = useMemo(() => hourlySamples(days.map((day) => day.uv)), [days]);
+  const daylightMarkers = useMemo(() => [...sunMarkers, ...uvCrossingMarkers(uvHours, today)].sort((a, b) => a.x - b.x), [sunMarkers, uvHours, today]);
   const uvSeries = useMemo(() => [
     line(
       "UV index",
@@ -200,7 +190,7 @@ function Daylight({ location, today, range, timeline }: ForecastProps) {
             title="UV Index, Temperature, and Precipitation"
             label="Hourly UV index, temperature, and rainfall"
             description={`Sunrise ${sunTime(selectedSun?.sunrise_pst)}, sunset ${sunTime(selectedSun?.sunset_pst)}`}
-            sunMarkers={sunMarkers}
+            markers={daylightMarkers}
             samples={uvHours}
             today={today}
             timeline={timeline}
@@ -234,6 +224,7 @@ function Swim({ location, inland, today, range, timeline }: ForecastProps & { in
     inlandQuery = useLocation(inland, range);
   const bundle = query.data?.bundle;
   const inlandBundle = inlandQuery.data?.bundle;
+  const markers = useMemo(() => timeMarkers(bundle, today, true).filter((marker) => marker.kind === "high" || marker.kind === "low"), [bundle, today]);
   const pending = query.isFetching;
   const swimHours = useMemo(() => {
     const data = bundle ?? emptyBundle();
@@ -346,6 +337,7 @@ function Swim({ location, inland, today, range, timeline }: ForecastProps & { in
             label="Local and inland rain, rolling totals and runoff thresholds"
             tooltipUnit="in"
             daily
+            visibleScale
             samples={samples}
             today={today}
             timeline={timeline}
@@ -363,7 +355,8 @@ function Swim({ location, inland, today, range, timeline }: ForecastProps & { in
           <Chart
             title={`${location.name} Tides and Wind`}
             label="Hourly tide height and wind speed"
-            description="Tide height in feet relative to MLLW. Wind speed in miles per hour."
+            description="Tide height in feet relative to MLLW. Wind speed in miles per hour. High and low tide times are estimated from hourly readings."
+            markers={markers}
             samples={swimHours}
             today={today}
             timeline={timeline}
@@ -377,6 +370,7 @@ function Swim({ location, inland, today, range, timeline }: ForecastProps & { in
         )}
       </div>
       <WaterTemperature bundle={bundle} today={today} timeline={timeline} pending={pending} />
+      <DateRuler today={today} timeline={timeline} fixed />
     </section>
   );
 }
@@ -464,91 +458,10 @@ function ForecastHeading({ location, today, timeline }: {
   today: string;
   timeline: ForecastTimeline;
 }) {
-  const [, refresh] = useState(0);
-  const position = timeline.position;
-  const span = timeline.span;
-  const day = forecastDayAt(position, span);
-  const dates = useRef<HTMLDivElement | null>(null);
-  useEffect(() => timeline.subscribe(() => refresh((value) => value + 1)), [timeline]);
-  useEffect(() => {
-    const strip = dates.current;
-    if (!strip) return;
-    const resize = new ResizeObserver(() => timeline.setViewportWidth(strip.clientWidth));
-    resize.observe(strip);
-    return () => resize.disconnect();
-  }, [timeline]);
-  useEffect(() => {
-    const strip = dates.current;
-    if (!strip) return;
-    const frame = strip.parentElement?.parentElement;
-    if (!frame) return;
-    let pointer: { id: number; x: number; startX: number; startY: number; dragging: boolean } | undefined;
-    let suppressClick = false;
-    const down = (event: PointerEvent) => {
-      if (!event.isPrimary || event.button !== 0) return;
-      pointer = { id: event.pointerId, x: event.clientX, startX: event.clientX, startY: event.clientY, dragging: false };
-    };
-    const move = (event: PointerEvent) => {
-      if (!pointer || pointer.id !== event.pointerId) return;
-      if (!pointer.dragging) {
-        if (Math.abs(event.clientX - pointer.startX) < 5 || Math.abs(event.clientX - pointer.startX) < Math.abs(event.clientY - pointer.startY)) return;
-        pointer.dragging = true;
-        frame.setPointerCapture(event.pointerId);
-        frame.classList.add("dragging");
-      }
-      timeline.moveTo(timeline.position - (event.clientX - pointer.x) * timeline.span / strip.clientWidth);
-      pointer.x = event.clientX;
-    };
-    const end = () => {
-      suppressClick = !!pointer?.dragging;
-      pointer = undefined;
-      frame.classList.remove("dragging");
-    };
-    const click = (event: MouseEvent) => {
-      if (suppressClick) { event.preventDefault(); event.stopPropagation(); suppressClick = false; }
-    };
-    frame.addEventListener("pointerdown", down);
-    frame.addEventListener("pointermove", move);
-    frame.addEventListener("pointerup", end);
-    frame.addEventListener("pointercancel", end);
-    frame.addEventListener("click", click, true);
-    return () => {
-      frame.removeEventListener("pointerdown", down);
-      frame.removeEventListener("pointermove", move);
-      frame.removeEventListener("pointerup", end);
-      frame.removeEventListener("pointercancel", end);
-      frame.removeEventListener("click", click, true);
-    };
-  }, [timeline]);
-
   return (
     <div className="region-heading">
       <h2>{location.name}</h2>
-      <div className="date-ruler-frame"><div className="date-ruler-inner"><div className="date-slider" ref={dates} role="group" aria-label="Forecast dates">
-        {Array.from({ length: HISTORY_DAYS + FORECAST_DAYS + 1 }, (_, index) => {
-          const offset = index - HISTORY_DAYS;
-          const start = hourlyChartX(offset);
-          const end = hourlyChartX(offset + 1);
-          const visibleStart = Math.max(start, position);
-          const visibleEnd = Math.min(end, position + span);
-          const visibleWidth = visibleEnd - visibleStart;
-          return <div key={offset}>
-          {offset !== 0 && <span aria-hidden="true" className={`date-shade ${Math.abs(offset) % 2 ? "date-shade-odd" : "date-shade-even"}`}
-            style={{ left: `${(start - position) / span * 100}%`, width: `${(end - start) / span * 100}%` }} />}
-          {Array.from({ length: 24 }, (_, hour) => <span key={hour} aria-hidden="true"
-            className={`date-tick ${hour === 0 ? "day-tick" : hour % 6 === 0 ? "major-tick" : ""}`}
-            style={{ left: `${(hourlyChartX(offset + hour / 24) - position) / span * 100}%` }} />)}
-          <button
-            key={offset}
-            className={`date-option ${offset === 0 ? "date-option-today" : Math.abs(offset) % 2 ? "date-option-odd" : "date-option-even"}`}
-            style={{ left: `${(visibleStart - position) / span * 100}%`, width: `${Math.max(0, visibleWidth) / span * 100}%`, visibility: visibleWidth / span >= .09 ? "visible" : "hidden" }}
-            aria-label={forecastDateLabel(today, offset)}
-            aria-current={day === offset ? "date" : undefined}
-            onClick={() => timeline.moveTo(positionForForecastDay(offset, span), true)}
-          >{forecastDateLabel(today, offset, visibleWidth / span < .3)}</button></div>;
-        })}
-        <span aria-hidden="true" className="date-tick day-tick" style={{ left: `${(hourlyChartX(FORECAST_DAYS + 1) - position) / span * 100}%` }} />
-      </div></div></div>
+      <DateRuler today={today} timeline={timeline} />
     </div>
   );
 }
@@ -611,7 +524,7 @@ export function App() {
       if (!dx || (!event.shiftKey && Math.abs(dx) < Math.abs(event.deltaY))) return;
       event.preventDefault();
       const chart = document.querySelector<HTMLElement>(".forecast-chart canvas");
-      const width = Math.max(1, (chart?.clientWidth ?? window.innerWidth) - 94);
+      const width = Math.max(1, (chart?.clientWidth ?? window.innerWidth));
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? width : 1;
       timeline.moveTo(timeline.position + dx * unit * timeline.span / width);
     };

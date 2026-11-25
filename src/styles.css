@@ -65,8 +65,8 @@ header h1 {
   gap: 12px;
 }
 .card {
+  padding: 0;
   border-radius: 4px;
-  padding: 16px;
 }
 .card h2 {
   font-size: 1.05rem;
@@ -87,11 +87,11 @@ header h1 {
 .chart-wrap {
   position: relative;
   width: 100%;
-  margin-top: 4px;
+  margin-top: 0;
 }
 .chart-wrap canvas {
   width: 100% !important;
-  max-height: 180px;
+  max-height: none;
 }
 
 /* Tide times */
@@ -214,14 +214,14 @@ header h1 {
   border-radius: 0;
 }
 .chart-wrap {
-  height: 180px;
-  min-height: 180px;
+  height: var(--chart-height, 270px);
+  min-height: 0;
 }
 .chart-wrap canvas {
   display: block !important;
   width: 100% !important;
-  height: 180px !important;
-  max-height: 180px;
+  height: 100% !important;
+  max-height: none;
 }
 .water-temp {
   border-radius: 0;
@@ -311,7 +311,6 @@ header h1 {
   border: 0;
   border-radius: 24px;
   background: var(--color-surface);
-  padding: 18px;
 }
 .card > :is(h2, h3):first-child {
   font-family: var(--font-heading);
@@ -337,7 +336,6 @@ header h1 {
   grid-column: 1/-1;
   box-shadow: none;
   border-radius: 0;
-  padding: 22px 0 26px;
   border-bottom: 1px solid var(--color-water-divider);
 }
 #bbCard .water-temp {
@@ -385,9 +383,6 @@ header h1 {
     width: 40px;
     height: 40px;
   }
-  #bbCard {
-    padding: 18px 0 22px;
-  }
   #bbCard .chart-wrap {
     display: block;
     width: 100%;
@@ -425,16 +420,13 @@ main::before {
 #bbCard,
 #regCard {
   width: 100%;
-  padding: 26px var(--content-gutter, 16px) 30px;
 }
 #irCard {
   position: relative;
   background: var(--color-page);
-  padding-bottom: 12px;
 }
 #irCard h2,
 #regCard h2 {
-  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -446,16 +438,14 @@ main::before {
 }
 #bbCard {
   background: linear-gradient(180deg, var(--color-water-surface) 0, var(--color-water-end) 100%);
-  box-shadow: 0 12px 0 var(--color-water-divider);
+  box-shadow: none;
   border-radius: 0;
-  padding-block: 0 8px;
 }
 #regCard {
   background: var(--color-page);
-  padding-top: 16px;
 }
 #regCard h2 {
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 #regCard {
   box-shadow: none;
@@ -464,25 +454,9 @@ main::before {
   header {
     padding-top: 20px;
   }
-  #irCard,
-#bbCard,
-#regCard {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-  #irCard {
-    padding-top: 22px;
-  }
-  #regCard {
-    padding-bottom: 26px;
-  }
   #bbCard {
-    box-shadow: 0 10px 0 var(--color-water-divider);
+    box-shadow: none;
   }
-}
-#regCard {
-  padding-left: 6px;
-  padding-right: 6px;
 }
 
 .daylight-chart {
@@ -490,8 +464,7 @@ main::before {
   margin-inline: auto;
 }
 @media (max-width: 639px) {
-  #irCard .daylight-chart .forecast-chart { height: 260px !important; }
-  #irCard .daylight-chart .forecast-chart canvas { height: 260px !important; max-height: 260px; }
+  .daylight-chart { --chart-height: 390px; }
 }
 .rain-radar {
   position: absolute;
@@ -523,20 +496,13 @@ main::before {
 
 /* Runoff chart */
 .runoff-section {
-  margin-inline: calc(-1 * var(--content-gutter, 16px));
-  margin-bottom: 14px;
-  padding: 12px var(--content-gutter, 16px);
+  margin-bottom: 0;
+  padding: 0;
   background: #eefdfe;
 }
 #bbCard .runoff-section .chart-wrap {
   display: block;
   width: 100%;
-  height: 240px;
-  min-height: 240px;
-}
-#bbCard .runoff-section .chart-wrap canvas {
-  height: 240px !important;
-  max-height: 240px;
 }
 
 /* Component states retain the incumbent Sunline dashboard. */
@@ -607,7 +573,7 @@ h3 {
   margin: 14px auto;
 }
 .swim-chart h3 {
-  color: var(--color-water-ink);
+  color: inherit;
 }
 #bbCard .water-temp {
   color: var(--color-water-muted-strong);
@@ -620,10 +586,6 @@ h3 {
 }
 #bbCard .skeleton-wide {
   background: var(--color-water-skeleton-highlight);
-}
-#regCard {
-  padding-left: var(--content-gutter, 16px);
-  padding-right: var(--content-gutter, 16px);
 }
 .region-item {
   text-decoration: none;
@@ -689,7 +651,7 @@ footer a {
 }
 
 .region-heading {
-  --location-ink: #e0ebde;
+  --location-ink: #FFFFFF;
   display: grid;
   grid-template-columns: minmax(0, auto) 1fr auto;
   align-items: center;
@@ -751,13 +713,13 @@ footer a {
   }
 }
 
-/* The ruler shares the charts' plot gutters and horizontal scale. */
+/* Shared edge-to-edge canvas rulers. Only the bottom ruler is fixed. */
 .region-heading {
   display: block;
   min-height: 0;
   padding: 0;
   background: #fff;
-  color: #164c3b;
+  color: var(--color-ink);
   border-bottom: 1px solid #b8cbbf;
 }
 .region-heading h2 {
@@ -767,78 +729,70 @@ footer a {
   color: var(--location-ink);
 }
 .date-ruler-frame {
-  overflow: hidden;
-  padding: 0 8px;
-  cursor: grab;
-  touch-action: pan-y pinch-zoom;
-  user-select: none;
-}
-.date-ruler-frame.dragging { cursor: grabbing; }
-.date-ruler-inner {
-  margin: 0 auto;
-  padding: 0 52px 0 42px;
-}
-.date-slider {
   position: relative;
-  height: 34px;
+  overflow: hidden;
+  background: var(--color-surface);
 }
-.date-shade { position: absolute; top: 0; bottom: 0; pointer-events: none; }
-.date-shade-odd { background: #f0f1f0; }
-.date-shade-even { background: #e5e8e6; }
-.date-tick {
+/* Static center pointers add no timeline subscriptions or render work. */
+.date-ruler-frame::after {
+  content: "";
   position: absolute;
-  z-index: 1;
-  bottom: 0;
-  width: 1px;
-  height: 7px;
-  background: rgba(22, 76, 59, .32);
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  border-inline: 4px solid transparent;
+  border-top: 5px solid var(--color-ink);
   pointer-events: none;
 }
-.date-tick.major-tick { height: 15px; }
-.date-tick.day-tick { height: 26px; width: 2px; }
-.date-option {
-  position: absolute;
-  z-index: 4;
-  top: 5px;
-  height: 19px;
-  padding: 0 4px;
-  overflow: hidden;
-  border: 0;
-  background: transparent;
-  color: #092f23;
-  font: 600 .78rem/1.2 var(--font-body);
-  font-variant-numeric: tabular-nums;
-  -webkit-text-stroke: 3px var(--date-background);
-  paint-order: stroke fill;
-  white-space: nowrap;
-  cursor: pointer;
+.date-ruler-bottom::after {
+  top: 0;
+  bottom: auto;
+  border-top: 0;
+  border-bottom: 5px solid var(--color-ink);
 }
-.date-option-today { --date-background: #fff; }
-.date-option-odd { --date-background: #f0f1f0; }
-.date-option-even { --date-background: #e5e8e6; }
-.date-option[aria-current="date"] { font-weight: 800; }
-.date-option:hover { text-decoration: underline; text-underline-offset: 3px; }
-.date-option:focus-visible { outline: 2px solid #164c3b; outline-offset: -2px; }
-#irCard,
-#bbCard {
-  --content-gutter: 8px;
-  padding-left: var(--content-gutter);
-  padding-right: var(--content-gutter);
+.date-ruler-frame canvas {
+  display: block;
+  width: 100%;
+  height: 32px;
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
 }
+.date-ruler-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 8;
+  border-top: 1px solid var(--color-water-divider);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.date-ruler-bottom canvas { height: 32px; }
+body { padding-bottom: calc(36px + env(safe-area-inset-bottom)); }
 #bbCard .chart-wrap { display: block; width: 100%; }
-#irCard { padding-top: 8px; }
 .forecast-chart { position: relative; }
 .chart-heading {
+  position: sticky;
+  /* Location line + its vertical padding + top ticker + divider. */
+  top: calc(1.35rem + 20px + 32px + 1px);
+  z-index: 4;
+  background: var(--color-ink);
+  padding-block: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 0;
   margin: 0;
-  color: var(--color-water-ink);
+  color: #FFFFFF;
 }
 .chart-heading h3 { margin: 0; font-size: .85rem; line-height: 1.2; }
 .chart-heading .runoff-summary { font-size: .7rem; line-height: 1.2; }
 .chart-heading + .chart-wrap { margin-top: 0; }
-.swim-chart { margin-block: 2px 4px; }
-.runoff-section { padding-block: 2px; margin-bottom: 2px; }
+.swim-chart { margin-block: 0; }
+
+#regCard > h2 {
+  background: var(--color-ink);
+  color: #FFFFFF;
+  text-align: center;
+  padding-block: 6px;
+}

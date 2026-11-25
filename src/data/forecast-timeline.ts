@@ -26,7 +26,7 @@ export function forecastDayAt(position: number, span = 1) {
   // Favor the outer day at each edge, where a compressed day can't be centered.
   if (position <= MIN_FORECAST_SCROLL) return -HISTORY_DAYS;
   if (position >= MAX_FORECAST_SCROLL + 1 - span) return FORECAST_DAYS;
-  const center = position + .5;
+  const center = position + span / 2;
   for (let day = FORECAST_DAYS; day > -HISTORY_DAYS; day--) {
     if (center >= hourlyChartX(day)) return day;
   }
@@ -35,7 +35,7 @@ export function forecastDayAt(position: number, span = 1) {
 
 export function positionForForecastDay(day: number, span = 1) {
   if (day === 0) return 0;
-  return Math.max(MIN_FORECAST_SCROLL, Math.min(MAX_FORECAST_SCROLL + 1 - span, hourlyChartX(day + .5) - .5));
+  return Math.max(MIN_FORECAST_SCROLL, Math.min(MAX_FORECAST_SCROLL + 1 - span, hourlyChartX(day + .5) - span / 2));
 }
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {

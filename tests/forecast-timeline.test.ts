@@ -38,3 +38,14 @@ test("wide timelines keep forecast edges reachable", () => {
   assert.equal(forecastDayAt(lastPosition, span), FORECAST_DAYS);
   assert.equal(forecastDayAt(MIN_FORECAST_SCROLL, span), -HISTORY_DAYS);
 });
+
+
+test("wide summaries and navigation follow the physical viewport center", () => {
+  const span = 1.4;
+  // The viewport center is in tomorrow, while the old fixed .5 anchor is today.
+  const position = hourlyChartX(1) - .6;
+  assert.equal(forecastDayAt(position, span), 1);
+  const target = positionForForecastDay(3, span);
+  assert(Math.abs(target + span / 2 - hourlyChartX(3.5)) < 1e-12);
+  assert.equal(forecastDayAt(target, span), 3);
+});

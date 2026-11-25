@@ -1,6 +1,8 @@
 import { colorToken, colorWithAlpha } from "../color-tokens.ts";
 import { useEffect, useId, useRef } from "octane";
 import ChartJS from "chart.js/auto";
+import { drawDateRuler, rulerPalette, RULER_HEIGHT } from "./DateRuler.tsx";
+import { visibleMaximum, visibleTemperatureRange, type TimeMarker } from "../data/chart-axis.ts";
 import type { BarElement, ChartDataset, ChartType, Plugin } from "chart.js";
 import {
   FORECAST_DAYS,
@@ -12,7 +14,7 @@ import {
   type ForecastTimeline,
 } from "../data/forecast-timeline.ts";
 
-type ChartSample = { x: number; label: string; tick?: boolean; windDirection?: number | null };
+type ChartSample = { x: number; label: string; windDirection?: number | null };
 type Threshold = { value: number; label?: string; color: string };
 type Dataset = ChartDataset<"line" | "bar", (number | null)[]> & { atDayStart?: boolean };
 type Plot = ChartJS<ChartType, { x: number; y: number | null }[]>;
@@ -41,7 +43,8 @@ type Props = {
   height?: number;
   temperatureAxis?: boolean;
   thresholds?: Threshold[];
-  sunMarkers?: { x: number; label: string }[];
+  markers?: TimeMarker[];
+  visibleScale?: boolean;
   daily?: boolean;
 };
 
@@ -54,6 +57,8 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   const ink = colorToken("ink");
   const muted = colorToken("muted-strong");
   const surface = colorToken("surface");
+  const rulerColors = rulerPalette();
+  const windInk = colorToken("chart-today"), temperatureInk = colorToken("chart-temperature");
   const tooltipBorder = colorToken("tooltip-border");
   const divider = colorWithAlpha("ink", .16);
   const todayFill = colorWithAlpha("chart-today", .025);
@@ -63,7 +68,17 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   const domainMin = -HISTORY_DAYS;
   const domainMax = hourlyChartX(FORECAST_DAYS + 1);
   let props = initial;
-  let ticks: { x: number; label: string }[] = [];
+  // Separate event layers once per data change, rather than on scroll frames.
+  let tickerMarkers: TimeMarker[] = [];
+  let crossingMarkers: TimeMarker[] = [];
+  function cacheMarkers() {
+    tickerMarkers = [];
+    crossingMarkers = [];
+    for (const marker of props.markers ?? []) {
+      (marker.kind === "uv-rising" || marker.kind === "uv-falling" ? crossingMarkers : tickerMarkers).push(marker);
+    }
+  }
+  cacheMarkers();
   let readings: { x: number; index: number }[] = [];
   let rainPeaks: RainPeak[] = [];
   let dailyPeaks: DailyPeak[] = [];
@@ -75,6 +90,16 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
   let disposed = false;
   let inView = false;
   let stripDirty = true;
+  let scaleSignature = "";
+  function viewportScales() {
+    return {
+      maximum: props.visibleScale ? visibleMaximum(props.samples, props.datasets, timeline.position, timeline.span) : props.maximum,
+      wind: props.datasets.some((dataset) => dataset.yAxisID === "wind")
+        ? visibleMaximum(props.samples, props.datasets.filter((dataset) => dataset.yAxisID === "wind"), timeline.position, timeline.span, 20, 5) : undefined,
+      temperature: props.temperatureAxis ? visibleTemperatureRange(props.samples, props.datasets.filter((dataset) => dataset.yAxisID === "temperature"), timeline.position, timeline.span) : undefined,
+    };
+  }
+  let scaleTimer: ReturnType<typeof setTimeout> | undefined;
 
   const plotDecorations: Plugin = {
     id: "weatherPlotDecorations",
@@ -169,39 +194,6 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     ctx.fillStyle = ink;
     ctx.textBaseline = "middle";
 
-    if (!daily) {
-      ctx.fillStyle = muted;
-      ctx.font = `11px ${font}`;
-      let lastRight = left - 14;
-      for (const { x: value, label } of ticks) {
-        if (value <= start || value >= end) continue;
-        const labelWidth = ctx.measureText(label).width;
-        const labelLeft = Math.max(left, x(value) - labelWidth / 2);
-        if (labelLeft < lastRight + 14 || labelLeft + labelWidth > right) continue;
-        ctx.fillText(label, labelLeft, bottom + 13);
-        lastRight = labelLeft + labelWidth;
-      }
-      ctx.strokeStyle = muted;
-      ctx.lineWidth = 1.2;
-      for (const marker of props.sunMarkers ?? []) {
-        const sunX = x(hourlyChartX(marker.x));
-        if (sunX < left - 8 || sunX > right + 8) continue;
-        const horizon = bottom - 4;
-        ctx.beginPath();
-        ctx.moveTo(sunX - 6, horizon);
-        ctx.lineTo(sunX + 6, horizon);
-        ctx.moveTo(sunX - 4, horizon);
-        ctx.arc(sunX, horizon, 4, Math.PI, 2 * Math.PI);
-        ctx.moveTo(sunX, horizon - 6);
-        ctx.lineTo(sunX, horizon - 8);
-        ctx.moveTo(sunX - 6, horizon - 5);
-        ctx.lineTo(sunX - 5, horizon - 4);
-        ctx.moveTo(sunX + 6, horizon - 5);
-        ctx.lineTo(sunX + 5, horizon - 4);
-        ctx.stroke();
-        ctx.fillText(marker.label, sunX + 8, bottom - 8);
-      }
-    }
 
     for (const { value, label, color } of props.thresholds ?? []) {
       const y = scales.y.getPixelForValue(value);
@@ -212,6 +204,29 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       ctx.fillRect(right - labelWidth - 10, y - 17, labelWidth + 10, 15);
       ctx.fillStyle = color;
       ctx.fillText(label, right - labelWidth - 4, y - 9);
+      if (value === 2 && crossingMarkers.length) {
+        ctx.save();
+        ctx.strokeStyle = surface;
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        for (const marker of crossingMarkers) {
+          const markerX = hourlyChartX(marker.x);
+          if (markerX < start || markerX > end) continue;
+          const pixel = x(markerX);
+          const time = `~${marker.label}`;
+          const timeWidth = ctx.measureText(time).width;
+          // The lower-UV side lies before a rising crossing and after a falling
+          // crossing. Never clamp a label back inside the filled UV shape.
+          const labelX = marker.kind === "uv-rising" ? pixel - timeWidth - 8 : pixel + 8;
+          if (labelX < left + 4 || labelX + timeWidth > right - 4) continue;
+          ctx.strokeText(time, labelX, y);
+          ctx.fillText(time, labelX, y);
+          ctx.beginPath();
+          ctx.arc(pixel, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
     }
 
     if (dailyPeaks.length) {
@@ -264,6 +279,34 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       ctx.fillStyle = muted;
       ctx.textAlign = "center";
       ctx.fillText("No readings in this view", (left + right) / 2, (top + bottom) / 2);
+    }
+    ctx.restore();
+
+    // Tickers are drawn over the cached data, so they reserve no plot space.
+    drawDateRuler(ctx, width, bottom - RULER_HEIGHT, props.today, timeline, tickerMarkers, font, rulerColors, { overlay: true });
+
+    // The data reaches both screen edges; haloed labels sit above the plot.
+    ctx.save();
+    ctx.font = `11px ${font}`;
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = surface;
+    for (const id of ["y", "wind", "temperature"]) {
+      const axis = scales[id];
+      if (!axis) continue;
+      ctx.textAlign = id === "y" ? "left" : "right";
+      ctx.fillStyle = id === "wind" ? windInk : id === "temperature" ? temperatureInk : muted;
+      for (const tick of axis.ticks) {
+        const y = axis.getPixelForValue(tick.value);
+        // Keep the label and its halo at least 4px below the plot top.
+        if (y < top + 10 || y > bottom) continue;
+        const label = `${tick.value}${id === "wind" ? " mph" : id === "temperature" ? "°" : scales.wind ? " ft" : ""}`;
+        const inset = width < 640 ? 8 : 4;
+        const pixel = id === "y" ? inset : width - inset;
+        ctx.strokeText(label, pixel, Math.max(top + 6, Math.min(bottom - 6, y)));
+        ctx.fillText(label, pixel, Math.max(top + 6, Math.min(bottom - 6, y)));
+      }
     }
     ctx.restore();
 
@@ -335,7 +378,6 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     source.width = width;
     source.height = height;
     const samples = props.samples.map((sample) => ({ ...sample, x: hourlyChartX(sample.x) }));
-    ticks = samples.filter((sample) => sample.tick);
     readings = samples.flatMap(({ x }, index) =>
       props.datasets.some((dataset) => dataset.data[index] != null) ? [{ x, index }] : [],
     );
@@ -366,6 +408,8 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       return [...peaks.values()];
     });
     const highestRain = Math.max(0, ...rainPeaks.map((peak) => peak.value));
+    const bounds = viewportScales();
+    scaleSignature = JSON.stringify(bounds);
     plot = new ChartJS(source, {
       type: props.type || "line",
       data: {
@@ -386,7 +430,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
         animation: false,
         parsing: false,
         events: [],
-        layout: { padding: { top: 4, bottom: daily ? 4 : 20, right: wind || props.temperatureAxis ? 0 : 52 } },
+        layout: { autoPadding: false, padding: { top: 0, bottom: 0, right: 0 } },
         font: { family: font },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         scales: {
@@ -401,13 +445,14 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
             },
           } : {}),
           y: {
-            afterFit: (scale) => { scale.width = 42; },
+            afterFit: (scale) => { scale.width = 0; },
             min: props.minimum,
-            max: props.maximum,
-            suggestedMax: props.thresholds?.length
+            max: bounds.maximum,
+            suggestedMax: !props.visibleScale && props.thresholds?.length
               ? Math.max(...props.thresholds.map((threshold) => threshold.value)) * 1.15
               : undefined,
             ticks: {
+              display: false,
               color: wind ? colorToken("water-ink") : muted,
               font: { family: font },
               ...(wind ? { callback: (value: string | number) => `${value} ft` } : {}),
@@ -416,13 +461,14 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
           },
           ...(wind ? {
             wind: {
-              afterFit: (scale) => { scale.width = 52; },
+              afterFit: (scale) => { scale.width = 0; },
               type: "linear" as const,
               position: "right" as const,
               min: 0,
-              grace: "15%",
+              max: bounds.wind,
               grid: { drawOnChartArea: false },
               ticks: {
+                display: false,
                 color: colorToken("chart-today"),
                 font: { family: font },
                 callback: (value: string | number) => `${value} mph`,
@@ -432,11 +478,14 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
           ...(props.temperatureAxis
             ? {
                 temperature: {
-                  afterFit: (scale) => { scale.width = 52; },
+                  min: bounds.temperature?.min,
+                  max: bounds.temperature?.max,
+                  afterFit: (scale) => { scale.width = 0; },
                   type: "linear" as const,
                   position: "right" as const,
                   grid: { drawOnChartArea: false },
                   ticks: {
+                    display: false,
                     color: colorToken("chart-temperature"),
                     font: { family: font },
                     callback: (value: string | number) => `${value}°`,
@@ -532,6 +581,12 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     hover = undefined;
     if (builtSpan !== timeline.span) invalidateStrip();
     else if (inView) drawViewport();
+    // Re-scale only after a drag settles, and only if the visible value bucket
+    // changes. Panning itself remains bitmap-only with no Chart.js updates.
+    clearTimeout(scaleTimer);
+    if (props.visibleScale || props.temperatureAxis || props.datasets.some((dataset) => dataset.yAxisID === "wind")) scaleTimer = setTimeout(() => {
+      if (scaleSignature !== JSON.stringify(viewportScales())) invalidateStrip();
+    }, 140);
   });
   const visibility = new IntersectionObserver(([entry]) => {
     inView = entry.isIntersecting;
@@ -550,13 +605,15 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     update(next: Props) {
       const dataChanged = props.samples !== next.samples || props.datasets !== next.datasets || props.thresholds !== next.thresholds;
       const dateChanged = props.today !== next.today;
-      const markersChanged = props.sunMarkers !== next.sunMarkers;
+      const markersChanged = props.markers !== next.markers;
       props = next;
+      if (markersChanged) cacheMarkers();
       if (dataChanged) invalidateStrip();
       else if (inView && (dateChanged || markersChanged)) drawViewport();
     },
     destroy() {
       disposed = true;
+      clearTimeout(scaleTimer);
       events.abort();
       unsubscribe();
       resize.disconnect();
@@ -579,12 +636,12 @@ export function Chart(props: Props) {
 
   useEffect(() => {
     renderer.current?.update(props);
-  }, [props.samples, props.datasets, props.thresholds, props.sunMarkers, props.today]);
+  }, [props.samples, props.datasets, props.thresholds, props.markers, props.today]);
 
   return (
     <>
       {props.title && <div className="chart-heading"><h3>{props.title}</h3>{props.summary && <span className="runoff-summary">{props.summary}</span>}</div>}
-      <div className="chart-wrap forecast-chart" style={{ height: props.height || 180 }}>
+      <div className="chart-wrap forecast-chart" style={props.height ? { "--chart-height": `${props.height * 1.5}px` } : undefined}>
       {props.description && <span className="visually-hidden" id={descriptionId}>{props.description}</span>}
       <canvas
         ref={canvas}
