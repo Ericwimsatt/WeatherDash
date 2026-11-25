@@ -55,7 +55,7 @@ export function drawMap(canvas, geography) {
   function caption(text, point, type) {
     const [x,y] = pixel(...point);
     if (type === "route") {
-      ctx.font = "700 9px system-ui";
+      ctx.font = "700 9px \"Atkinson Hyperlegible\", sans-serif";
       const labelWidth = ctx.measureText(text).width + 8;
       ctx.fillStyle = "#fcfbf5";
       ctx.strokeStyle = "#849098";
@@ -63,7 +63,7 @@ export function drawMap(canvas, geography) {
       ctx.fillRect(x - labelWidth/2,y - 7,labelWidth,14);
       ctx.strokeRect(x - labelWidth/2,y - 7,labelWidth,14);
     } else {
-      ctx.font = type === "town" ? "650 12px system-ui" : "italic 11px system-ui";
+      ctx.font = type === "town" ? "650 12px \"Atkinson Hyperlegible\", sans-serif" : "italic 11px \"Atkinson Hyperlegible\", sans-serif";
       ctx.strokeStyle = type === "town" ? "#f0ede1" : "#dceff5";
       ctx.lineWidth = 3;
       ctx.strokeText(text,x,y);

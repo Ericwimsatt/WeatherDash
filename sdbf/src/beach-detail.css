@@ -1,11 +1,3 @@
-@font-face {
-  font-family: "Beach Source Sans";
-  src: url("./assets/fonts/source-sans-3.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 200 900;
-  font-display: swap;
-}
-
 /* Everyday Japanese: the approved modal treatment, scoped to beach detail. */
 dialog.beach-detail {
   --detail-paper: #f8f6f0;
@@ -23,7 +15,7 @@ dialog.beach-detail {
   background: var(--detail-paper);
   color: var(--detail-ink);
   box-shadow: 0 16px 52px #112b3940;
-  font: 15px/1.45 "Beach Source Sans", system-ui, sans-serif;
+  font: 15px/1.45 "Atkinson Hyperlegible", system-ui, sans-serif;
   scrollbar-color: var(--detail-accent) var(--detail-soft);
 }
 .beach-detail::backdrop { background: #183c4a36; }
@@ -50,7 +42,7 @@ dialog.beach-detail {
 }
 .beach-detail h2 {
   margin: 0;
-  font: 650 27px/1.15 "Beach Source Sans", system-ui, sans-serif;
+  font: 650 27px/1.15 "Atkinson Hyperlegible", system-ui, sans-serif;
   letter-spacing: .005em;
 }
 .beach-detail .dialog-heading form { margin: 0; }
@@ -95,7 +87,7 @@ dialog.beach-detail {
   color: var(--muted);
 }
 .beach-detail .runoff-chart { margin-top: 20px; }
-.beach-detail .runoff-chart h3 { font: 650 15px/1.45 "Beach Source Sans", system-ui, sans-serif; }
+.beach-detail .runoff-chart h3 { font: 650 15px/1.45 "Atkinson Hyperlegible", system-ui, sans-serif; }
 .beach-detail .runoff-plot-scroll { border-color: var(--line); border-radius: 2px; background: var(--detail-paper); }
 .beach-detail .no-rain { background: var(--detail-soft); border-radius: 2px; }
 .beach-detail .quick-evidence {

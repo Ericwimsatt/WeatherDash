@@ -73,9 +73,17 @@ function MapView({ sites, now, open }) {
   const timer = useRef(null);
   useEffect(() => {
     const target = canvas.current;
+    let active = true;
     const observer = new ResizeObserver(() => drawMap(target, geography));
     observer.observe(target);
-    return () => { observer.disconnect(); clearTimeout(timer.current); };
+    // Canvas text needs an explicit redraw when the self-hosted faces arrive.
+    Promise.all([
+      document.fonts.load('400 16px "Atkinson Hyperlegible"'),
+      document.fonts.load('700 16px "Atkinson Hyperlegible"'),
+      document.fonts.load('italic 400 16px "Atkinson Hyperlegible"'),
+    ]).then(() => { if (active) drawMap(target, geography); })
+      .catch(error => console.warn("Map font unavailable", error));
+    return () => { active = false; observer.disconnect(); clearTimeout(timer.current); };
   }, []);
   function hover(event, id) {
     if (event.pointerType !== "mouse") return;

@@ -1,7 +1,8 @@
 @import "../preview/preview.css";
 @import "./beach-detail.css";
+@import "./fonts.css";
 
-:root { scrollbar-color:#95adba #eff5f6 }
+:root { font-family:"Atkinson Hyperlegible", system-ui, sans-serif; scrollbar-color:#95adba #eff5f6 }
 button:disabled { cursor:default; color:var(--muted); background:#edf3f5 }
 footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .data-scroll tbody td:first-child { position:sticky; left:0; z-index:1; border-right:1px solid var(--line); background:var(--panel) }

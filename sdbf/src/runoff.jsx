@@ -5,6 +5,7 @@ import { rainBands } from "../data/rating.mjs";
 import { regionalRainLabel } from "./evidence.js";
 import { runoffHorizon } from "../data/runoff-forecast.mjs";
 
+Chart.defaults.font.family = '"Atkinson Hyperlegible", system-ui, sans-serif';
 Chart.register(BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Tooltip);
 const shortDate = new Intl.DateTimeFormat("en-US",{month:"short",day:"numeric",timeZone:"UTC"});
 const coastal = "#247184";
@@ -54,7 +55,7 @@ export default function RunoffChart({site,sites,now}) {
         }
         ctx.strokeStyle="#496271";ctx.beginPath();ctx.moveTo(x,chartArea.top);ctx.lineTo(x,chartArea.bottom);ctx.stroke();
         ctx.translate(x+6,chartArea.top+6);ctx.rotate(Math.PI/2);
-        ctx.setLineDash([]);ctx.font="600 12px system-ui, sans-serif";ctx.textBaseline="top";
+        ctx.setLineDash([]);ctx.font="600 12px \"Atkinson Hyperlegible\", sans-serif";ctx.textBaseline="top";
         const labelWidth=ctx.measureText("Today").width;
         ctx.fillStyle="#fff";ctx.fillRect(-3,-3,labelWidth+6,20);
         ctx.fillStyle="#496271";ctx.fillText("Today",0,0);ctx.restore();
