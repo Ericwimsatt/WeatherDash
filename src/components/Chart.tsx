@@ -325,7 +325,8 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
       if (!axis) continue;
       ctx.textAlign = id === "y" ? "left" : "right";
       ctx.fillStyle = id === "wind" ? windInk : id === "temperature" ? temperatureInk : muted;
-      for (const tick of axis.ticks) {
+      // Leave the lowest tick unlabeled so scrolling text has room below.
+      for (const tick of axis.ticks.slice(1)) {
         const y = axis.getPixelForValue(tick.value);
         // Keep the label and its halo at least 4px below the plot top.
         if (y < top + 10 || y > bottom) continue;
