@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
-import { age, contributionClass, date, evidenceLimitations, mapCauses, regionalRainWhy, postingText, rainDisplay, rainDrivesScore, reading, sampleSummary } from "./evidence.js";
+import { age, contributionClass, date, evidenceLimitations, mapCauses, regionalRainLabel, regionalRainWhy, postingText, rainDisplay, rainDrivesScore, reading, sampleSummary } from "./evidence.js";
 import { safeEstimate } from "../data/runoff-forecast.mjs";
 import { drawMap, project } from "./map.js";
 
@@ -129,14 +129,14 @@ function Detail({ site, sites, snapshot, now, dismiss }) {
   const estimate = safeEstimate(site,now,snapshot,sites);
   const limitations = evidenceLimitations(site,now);
   const notes = [...new Set([...limitations, ...site.rating.notes.filter(note =>
-    note !== "The last test was more than 4 days ago." || !limitations.includes("No bacteria sample from the past 4 days."))])];
+    note !== "The last test was more than 4 days ago.")])];
   const weather = snapshot.context?.[site.rainGauge];
   const hazardous = field => contributionClass(Math.max(0,...site.rating.signals.filter(signal =>
     signal.field===field && (field !== "regional" || Number.isFinite(signal.amount))).map(signal => signal.contribution ?? 0)));
   const hazardFields = ["bacteria","county"].filter(field=>site.rating.signals.some(signal=>signal.field===field && signal.score>=7));
   const evidenceRows = {
     local: <><dt>Local rain in the past 72 hours</dt><dd className={hazardous("local")}><Rain site={site} now={now} /></dd></>,
-    regional: <><dt>Regional rain <button type="button" className="factor-help-button" aria-label="What does regional rain mean?" aria-expanded={regionalHelpOpen} aria-controls="regional-rain-explainer" onClick={() => setRegionalHelpOpen(open => !open)}><span aria-hidden="true">?</span></button></dt><dd className={hazardous("regional")}><Rain site={site} regional now={now} /></dd>{regionalHelpOpen && <dd id="regional-rain-explainer" className="factor-help-text regional-rain-explainer">{regionalRainWhy} <a href="/methodology.html">How the score is calculated</a></dd>}</>,
+    regional: <><dt>{regionalRainLabel} <button type="button" className="factor-help-button" aria-label="What does regional rain mean?" aria-expanded={regionalHelpOpen} aria-controls="regional-rain-explainer" onClick={() => setRegionalHelpOpen(open => !open)}><span aria-hidden="true">?</span></button></dt><dd className={hazardous("regional")}><Rain site={site} regional now={now} /></dd>{regionalHelpOpen && <dd id="regional-rain-explainer" className="factor-help-text regional-rain-explainer">{regionalRainWhy} <a href="/methodology.html">How the score is calculated</a></dd>}</>,
     bacteria: <><dt>Latest bacteria test <button type="button" className="factor-help-button" aria-label="What do bacteria tests mean?" aria-expanded={bacteriaHelpOpen} aria-controls="bacteria-explainer" onClick={() => setBacteriaHelpOpen(open => !open)}><span aria-hidden="true">?</span></button></dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} /></dd>{bacteriaHelpOpen && <dd id="bacteria-explainer" className="factor-help-text bacteria-explainer"><BacteriaHelp /></dd>}</>,
     county: <><dt>County status</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong>{["advisory","warning","closure","rain advisory"].includes(site.posting?.status) && <small><a href="https://cosdapps.sandiegocounty.gov/sdbeachinfo/" target="_blank" rel="noopener noreferrer">View County notices</a></small>}<small>Updated {date(site.posting?.observedAt)} Pacific</small></dd></>,
   };

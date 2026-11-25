@@ -1,5 +1,8 @@
 import { rainScore, sampleEvidence } from "../data/rating.mjs";
 
+export const regionalRainWindow = "in last 96 hours";
+export const regionalRainLabel = `Regional rain ${regionalRainWindow}`;
+
 const pacific = new Intl.DateTimeFormat("en-US", {
   month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
   timeZone: "America/Los_Angeles",
@@ -54,7 +57,6 @@ export function evidenceLimitations(site, now) {
   else {
     const sampleAge = now - Date.parse(site.sample.collectedAt);
     if (!Number.isFinite(sampleAge) || sampleAge < 0) limitations.push("Bacteria collection time is unavailable.");
-    else if (sampleAge > 96 * 3600000) limitations.push("No bacteria sample from the past 4 days.");
   }
   const missingRain = ["local", "regional"].filter(field => rainDisplay(site, field === "regional", now) === "Unavailable");
   if (missingRain.length) limitations.push(`Recent ${missingRain.join(" and ")} rain data are unavailable.`);
@@ -112,7 +114,7 @@ export function scoreFactors(site, now) {
     }
     if (Number.isFinite(signal.amount)) {
       const local = signal.field === "local";
-      const window = local ? "in the past 72 hours" : "in last 96 hours";
+      const window = local ? "in the past 72 hours" : regionalRainWindow;
       const gaugeDriven = local && signal.amount > (site.coastal?.total ?? -1);
       const label = signal.field === "local" ? (gaugeDriven ? "Local rain gauge" : "Local rain") : "Regional rain";
       const text = `${label}: ${signal.amount.toFixed(2)}″ ${window}`;

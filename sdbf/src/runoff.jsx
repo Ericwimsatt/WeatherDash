@@ -2,6 +2,7 @@ import React, { useEffect,useRef } from "react";
 import { Chart,BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Tooltip } from "chart.js";
 import { hour } from "../data/point-rain.mjs";
 import { rainBands } from "../data/rating.mjs";
+import { regionalRainLabel } from "./evidence.js";
 import { runoffHorizon } from "../data/runoff-forecast.mjs";
 
 Chart.register(BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Tooltip);
@@ -29,8 +30,8 @@ export default function RunoffChart({site,sites,now}) {
       data:{labels,datasets:[
         {label:"Local daily rain",data:values.localDaily,backgroundColor:coastal,order:2},
         {type:"line",label:"Cumulative local rain last 3 days",data:edgeLine(values.local3,values.local3Before,values.local3After),xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:0,pointHoverRadius:3,borderWidth:2,borderCapStyle:"round",borderJoinStyle:"round",tension:.35,cubicInterpolationMode:"monotone",spanGaps:true,clip:false,order:1},
-        {type:"line",label:"Cumulative regional rain last 4 days",data:edgeLine(values.regional,values.regionalBefore,values.regionalAfter),xAxisID:"xLine",borderColor:regional,backgroundColor:regional,borderDash:[6,3],pointRadius:0,pointHoverRadius:3,borderWidth:2,tension:.35,spanGaps:false,order:1},
-        {type:"line",label:"Cumulative regional rain last 4 days now",data:[{x:values.currentX,y:values.regionalCurrent}],xAxisID:"xLine",borderColor:regional,backgroundColor:regional,pointRadius:5,showLine:false,order:0},
+        {type:"line",label:regionalRainLabel,data:edgeLine(values.regional,values.regionalBefore,values.regionalAfter),xAxisID:"xLine",borderColor:regional,backgroundColor:regional,borderDash:[6,3],pointRadius:0,pointHoverRadius:3,borderWidth:2,tension:.35,spanGaps:false,order:1},
+        {type:"line",label:`${regionalRainLabel} now`,data:[{x:values.currentX,y:values.regionalCurrent}],xAxisID:"xLine",borderColor:regional,backgroundColor:regional,pointRadius:5,showLine:false,order:0},
         {type:"line",label:"Cumulative local rain last 3 days now",data:[{x:values.currentX,y:values.localCurrent}],xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:5,showLine:false,order:0},
       ]},
       options:{

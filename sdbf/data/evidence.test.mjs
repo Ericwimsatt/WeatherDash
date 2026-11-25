@@ -65,10 +65,10 @@ test("sample summaries respect test method and reported bounds", () => {
   assert.equal(sampleSummary(null), "Unavailable");
 });
 
-test("limitations distinguish old samples and unavailable rain without repeating low risk", () => {
+test("limitations omit old sample explanations and retain unavailable rain", () => {
   assert.deepEqual(evidenceLimitations(base, now), []);
   assert.deepEqual(evidenceLimitations({...base, sample:{...sample, collectedAt:"2026-10-19T20:00:00Z"}, coastal:null, inlandRain:null,regionalEstimate:null}, now),
-    ["No bacteria sample from the past 4 days.", "Recent local and regional rain data are unavailable."]);
+    ["Recent local and regional rain data are unavailable."]);
   assert.deepEqual(mapCauses(assessed(), now), []);
 });
 

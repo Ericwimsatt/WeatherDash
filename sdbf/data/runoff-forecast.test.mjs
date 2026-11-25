@@ -67,7 +67,7 @@ test("rain outlook uses the revised low-risk bands rather than the runoff limits
 test("dry forecasts cannot clear spills, bacteria, or missing County evidence", () => {
   for (const field of ["runoff","bacteria","evidence","county"]) {
     const site = {...outlookSite(),rating:{score:6,signals:[{field,score:6}]}};
-    assert.equal(safeEstimate(site,outlookNow,{}),"Cannot estimate when it will be safe to swim.");
+    assert.equal(safeEstimate(site,outlookNow,{}),null);
   }
   assert.equal(safeEstimate({...outlookSite(),rating:{score:2,signals:[]}},outlookNow,{}),null);
 });

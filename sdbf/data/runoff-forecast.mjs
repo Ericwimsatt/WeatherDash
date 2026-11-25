@@ -59,7 +59,7 @@ export function safeEstimate(site,now,snapshot,regionalSites=[]) {
   const persistent=site.rating.signals.filter(signal=>!rainFields.has(signal.field) && signal.score>=3);
   if(persistent.every(signal=>signal.field==="bacteria") && persistent.length && site.rating.score<=5)
     return "Safety at this beach will be reassessed when bacteria levels are re-tested.";
-  if(persistent.length)return "Cannot estimate when it will be safe to swim.";
+  if(persistent.length)return null;
   const county=site.rating.signals.some(signal=>signal.field==="regional" && /countywide rain advisory/i.test(signal.reason));
   if(county){
     const regional=snapshot?.regionalRain;
