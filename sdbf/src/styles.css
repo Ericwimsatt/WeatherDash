@@ -11,6 +11,9 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .site-column { width:22% }
 .map { grid-template-columns:minmax(0,1fr) }
 .map-figure { position:relative; left:50%; transform:translateX(-50%); width:min(100vw, 81rem, (100svh - 2rem) * .75) }
+@media (width > 52rem) {
+  .page-heading,.map-list { position:relative; left:50%; transform:translateX(-50%); width:min(100vw, 81rem, (100svh - 2rem) * .75) }
+}
 .map-visual { width:100%; min-height:0; aspect-ratio:.75 }
 .station { position:absolute; left:var(--x); top:var(--y); width:0; height:0 }
 .station:focus-within,.station:hover { z-index:2 }
