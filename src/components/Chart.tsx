@@ -1,6 +1,7 @@
 import { colorToken, colorWithAlpha } from "../color-tokens.ts";
 import { useEffect, useId, useRef } from "octane";
 import ChartJS from "chart.js/auto";
+import { DAY, midnight } from "../../shared/time.ts";
 import { drawDateRuler, rulerPalette, RULER_HEIGHT } from "./DateRuler.tsx";
 import { visibleMaximum, visibleTemperatureRange, type TimeMarker } from "../data/chart-axis.ts";
 import type { BarElement, ChartDataset, ChartType, Plugin } from "chart.js";
@@ -284,6 +285,33 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
 
     // Tickers are drawn over the cached data, so they reserve no plot space.
     drawDateRuler(ctx, width, bottom - RULER_HEIGHT, props.today, timeline, tickerMarkers, font, rulerColors, { overlay: true });
+
+    // Draw live time over the cached strip so it stays accurate while panning.
+    const now = hourlyChartX((Date.now() - Date.parse(midnight(props.today))) / DAY);
+    if (now >= start && now <= end) {
+      const pixel = x(now);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(left, top, plotWidth, bottom - top);
+      ctx.clip();
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(pixel, top);
+      ctx.lineTo(pixel, bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = `600 11px ${font}`;
+      ctx.textBaseline = "top";
+      const labelWidth = ctx.measureText("Now").width;
+      const labelX = Math.max(left + 4, Math.min(right - labelWidth - 4, pixel + 5));
+      ctx.fillStyle = surface;
+      ctx.fillRect(labelX - 3, top + 2, labelWidth + 6, 16);
+      ctx.fillStyle = ink;
+      ctx.fillText("Now", labelX, top + 4);
+      ctx.restore();
+    }
 
     // The data reaches both screen edges; haloed labels sit above the plot.
     ctx.save();
@@ -595,6 +623,9 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     else drawViewport();
   });
   visibility.observe(element);
+  const nowTimer = setInterval(() => {
+    if (inView) scheduleDraw();
+  }, 30_000);
   const resize = new ResizeObserver(() => {
     if (width !== element.clientWidth || height !== element.clientHeight) invalidateStrip();
   });
@@ -614,6 +645,7 @@ function mountChart(element: HTMLCanvasElement, initial: Props) {
     destroy() {
       disposed = true;
       clearTimeout(scaleTimer);
+      clearInterval(nowTimer);
       events.abort();
       unsubscribe();
       resize.disconnect();
