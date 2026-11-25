@@ -7,9 +7,8 @@ import { runoffHorizon } from "../data/runoff-forecast.mjs";
 Chart.register(BarController,BarElement,CategoryScale,LinearScale,LineController,LineElement,PointElement,Tooltip);
 const shortDate = new Intl.DateTimeFormat("en-US",{month:"short",day:"numeric",timeZone:"UTC"});
 const coastal = "#247184";
-const inland = "#ba723a";
 const regional = "#76559a";
-const chartBands = {local:[{amount:.1}],inland:[{amount:.25}]};
+const chartBands = {local:[{amount:.1}],regional:[{amount:.35}]};
 
 export default function RunoffChart({site,sites,now}) {
   const canvas = useRef(null);
@@ -21,7 +20,7 @@ export default function RunoffChart({site,sites,now}) {
     ...series.map((y,x)=>({x,y})),
     {x:series.length,y:after},
   ];
-  const skip=values.localKnown && values.inlandKnown && Math.max(values.localTotal,values.inlandTotal,values.regionalCurrent ?? 0,...values.regional3.filter(Number.isFinite))<rainBands.local[0].amount;
+  const skip=values.localKnown && values.regionalKnown && Math.max(values.localTotal,values.regionalTotal,values.regionalCurrent ?? 0,...values.regional.filter(Number.isFinite))<rainBands.local[0].amount;
   useEffect(() => {
     if (!canvas.current || skip) return;
     const labels=values.starts.map(time=>shortDate.format(time));
@@ -29,13 +28,10 @@ export default function RunoffChart({site,sites,now}) {
       type:"bar",
       data:{labels,datasets:[
         {label:"Local daily rain",data:values.localDaily,backgroundColor:coastal,order:2},
-        {label:"Inland daily rain",data:values.inlandDaily,backgroundColor:inland,order:2},
-        {type:"line",label:"Local rolling 3-day rain",data:edgeLine(values.local3,values.local3Before,values.local3After),xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:0,pointHoverRadius:3,borderWidth:2,borderCapStyle:"round",borderJoinStyle:"round",tension:.35,cubicInterpolationMode:"monotone",spanGaps:true,clip:false,order:1},
-        {type:"line",label:"Inland rolling 4-day rain",data:edgeLine(values.inland4,values.inland4Before,values.inland4After),xAxisID:"xLine",borderColor:inland,backgroundColor:inland,pointRadius:0,pointHoverRadius:3,borderWidth:2,borderCapStyle:"round",borderJoinStyle:"round",tension:.35,cubicInterpolationMode:"monotone",spanGaps:true,clip:false,order:1},
-        {type:"line",label:"Regional rolling 3-day rain",data:edgeLine(values.regional3,values.regional3Before,values.regional3After),xAxisID:"xLine",borderColor:regional,backgroundColor:regional,borderDash:[6,3],pointRadius:0,pointHoverRadius:3,borderWidth:2,tension:.35,spanGaps:false,order:1},
-        {type:"line",label:"Regional rolling 3-day rain now",data:[{x:values.currentX,y:values.regionalCurrent}],xAxisID:"xLine",borderColor:regional,backgroundColor:regional,pointRadius:5,showLine:false,order:0},
-        {type:"line",label:"Local rolling 3-day rain now",data:[{x:values.currentX,y:values.localCurrent}],xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:5,showLine:false,order:0},
-        {type:"line",label:"Inland rolling 4-day rain now",data:[{x:values.currentX,y:values.inlandCurrent}],xAxisID:"xLine",borderColor:inland,backgroundColor:inland,pointRadius:5,showLine:false,order:0},
+        {type:"line",label:"Cumulative local rain last 3 days",data:edgeLine(values.local3,values.local3Before,values.local3After),xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:0,pointHoverRadius:3,borderWidth:2,borderCapStyle:"round",borderJoinStyle:"round",tension:.35,cubicInterpolationMode:"monotone",spanGaps:true,clip:false,order:1},
+        {type:"line",label:"Cumulative regional rain last 4 days",data:edgeLine(values.regional,values.regionalBefore,values.regionalAfter),xAxisID:"xLine",borderColor:regional,backgroundColor:regional,borderDash:[6,3],pointRadius:0,pointHoverRadius:3,borderWidth:2,tension:.35,spanGaps:false,order:1},
+        {type:"line",label:"Cumulative regional rain last 4 days now",data:[{x:values.currentX,y:values.regionalCurrent}],xAxisID:"xLine",borderColor:regional,backgroundColor:regional,pointRadius:5,showLine:false,order:0},
+        {type:"line",label:"Cumulative local rain last 3 days now",data:[{x:values.currentX,y:values.localCurrent}],xAxisID:"xLine",borderColor:coastal,backgroundColor:coastal,pointRadius:5,showLine:false,order:0},
       ]},
       options:{
         responsive:false,maintainAspectRatio:false,animation:false,interaction:{mode:"nearest",intersect:false},
@@ -52,7 +48,7 @@ export default function RunoffChart({site,sites,now}) {
         const x=(scales.x.getPixelForValue(3)+scales.x.getPixelForValue(4))/2;
         ctx.save();ctx.fillStyle="#eaf3f577";ctx.fillRect(x,chartArea.top,chartArea.right-x,chartArea.bottom-chartArea.top);
         ctx.setLineDash([4,4]);ctx.lineWidth=1;
-        for (const [value,color] of Object.entries(chartBands).flatMap(([field,bands])=>bands.map(band=>[band.amount,{local:coastal,inland,regional}[field]]))) {
+        for (const [value,color] of Object.entries(chartBands).flatMap(([field,bands])=>bands.map(band=>[band.amount,{local:coastal,regional}[field]]))) {
           const y=scales.y.getPixelForValue(value);ctx.strokeStyle=color;ctx.beginPath();ctx.moveTo(chartArea.left,y);ctx.lineTo(chartArea.right,y);ctx.stroke();
         }
         ctx.strokeStyle="#496271";ctx.beginPath();ctx.moveTo(x,chartArea.top);ctx.lineTo(x,chartArea.bottom);ctx.stroke();
@@ -63,15 +59,17 @@ export default function RunoffChart({site,sites,now}) {
         ctx.fillStyle="#496271";ctx.fillText("Today",0,0);ctx.restore();
       }}],
     });
-    return ()=>chart.destroy();
+    // Wait until the parent dialog is open so its viewport can be measured.
+    const frame = requestAnimationFrame(() => {
+      if (!scroller.current) return;
+      const todayX = (chart.scales.x.getPixelForValue(3)+chart.scales.x.getPixelForValue(4))/2;
+      scroller.current.scrollLeft = todayX-scroller.current.clientWidth/2;
+    });
+    return ()=>{ cancelAnimationFrame(frame);chart.destroy(); };
   },[site.localPoint,site.inlandPoint,sites,throughHour,skip]);
 
-  useEffect(() => {
-    if (scroller.current) scroller.current.scrollLeft = 4*76;
-  },[site.localPoint,site.inlandPoint]);
-
   if (!site.localPoint && !site.inlandPoint) return null;
-  if (skip) return <p className="runoff-hint no-rain">Rain totals stay below rating thresholds over this period.</p>;
+  if (skip) return null;
   return <section className="runoff-chart"><div className="runoff-heading"><h3>Rainfall and runoff</h3></div>
     <div className="runoff-plot-scroll" ref={scroller} tabIndex={0} role="region" aria-label="Scrollable rainfall and runoff chart">
       <div className="runoff-plot" style={{width:`${Math.max(880,values.starts.length*76)}px`}}><canvas ref={canvas} width={Math.max(880,values.starts.length*76)} height={240} role="img" aria-label="Rainfall and runoff chart" /></div>

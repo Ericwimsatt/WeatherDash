@@ -1,7 +1,57 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import sites from "./sites.json" with {type:"json"};
-import {hour,pointIds,pointLocations,pointTotal,withPointRain} from "./point-rain.mjs";
+import {hour,pointIds,pointLocations,pointTotal,withPointRain,withObservedRain} from "./point-rain.mjs";
+
+test("Oceanside keeps current coastal and inland rain when gauge history is days old", () => {
+  const now=Date.parse("2026-11-25T06:30:00Z");
+  const site=sites.find(site => site.name === "Oceanside Pier");
+  const points=Object.fromEntries(pointLocations([site]).map(point => [point.id,{
+    ...point,start:Math.floor(now/hour)*hour-192*hour,
+    values:Array(480).fill(.01),verifiedAt:new Date(now).toISOString(),
+  }]));
+  const rows=Object.values(points).map(point => ({
+    latitude_e6:Math.round(point.lat*1e6),longitude_e6:Math.round(point.lon*1e6),
+    data_kind:"observation",hour_pst:"2026-11-19T17:00:00-08:00",
+    rainfall_start_pst:"2026-11-19T17:52:00-08:00",
+    rainfall_end_pst:"2026-11-19T18:52:00-08:00",rainfall_in:0,
+  }));
+  const enriched=withPointRain(site,points,now,rows);
+  assert.equal(enriched.coastal.total,.72);
+  assert.equal(enriched.coastal.complete,true);
+  assert.equal(enriched.inlandRain.total,.96);
+  assert.equal(enriched.inlandRain.complete,true);
+});
+
+test("observations replace only matching hours, keeping model gaps and forecasts intact", () => {
+  const now=Date.parse("2026-11-25T06:30:00Z");
+  const start=Math.floor(now/hour)*hour-4*hour;
+  const point={lat:33,lon:-117,start,values:[.1,.1,null,.1,.1,9]};
+  const row={latitude_e6:33000000,longitude_e6:-117000000,data_kind:"observation",
+    hour_pst:new Date(start+2*hour).toISOString(),
+    rainfall_start_pst:new Date(start+2*hour).toISOString(),
+    rainfall_end_pst:new Date(start+3*hour).toISOString(),rainfall_in:.5};
+  const merged=withObservedRain(point,[row,{...row,hour_pst:"invalid"},
+    {...row,hour_pst:new Date(start+4*hour).toISOString(),
+      rainfall_start_pst:new Date(start+4*hour).toISOString(),
+      rainfall_end_pst:new Date(start+5*hour).toISOString()}],now);
+  assert.deepEqual(merged.values,[.1,.1,null,.5,.1,9]);
+  assert.deepEqual(point.values,[.1,.1,null,.1,.1,9]);
+});
+
+test("observed rain sets the qualifying storm flag in the displayed coastal series", () => {
+  const now=Date.parse("2026-11-25T06:30:00Z");
+  const site=sites[0];
+  const point={...pointLocations([site])[0],start:Math.floor(now/hour)*hour-100*hour,
+    values:Array(110).fill(0),verifiedAt:new Date(now).toISOString()};
+  const end=Math.floor(now/hour)*hour;
+  const row={latitude_e6:Math.round(point.lat*1e6),longitude_e6:Math.round(point.lon*1e6),
+    data_kind:"observation",hour_pst:new Date(end-hour).toISOString(),
+    rainfall_start_pst:new Date(end-hour).toISOString(),rainfall_end_pst:new Date(end).toISOString(),rainfall_in:.3};
+  const enriched=withPointRain(site,{[point.id]:point},now,[row]);
+  assert.equal(enriched.coastal.total,.3);
+  assert.equal(enriched.coastal.qualifying,true);
+});
 
 test("coordinate accumulation uses preceding-hour values and preserves missing data", () => {
   const start=Date.parse("2026-11-21T00:00:00Z");

@@ -42,8 +42,9 @@ export function pointTotal(point, from, through) {
   return { total:hours ? Number(total.toFixed(3)) : null, complete:hours===expected, hours, endedAt };
 }
 
-// NWS hourly observation intervals replace the modeled past in the chart.
-// Keep forecast hours untouched so the historical/forecast seam is explicit.
+// Replace matching past hours with NWS observations. Retain modeled estimates
+// where the gauge has gaps; sparse history must not erase the entire series.
+// Keep forecast hours untouched.
 export function withObservedRain(point, rows, now) {
   if (!point || !Array.isArray(rows)) return point;
   const lat = Math.round(point.lat * 1e6), lon = Math.round(point.lon * 1e6);
@@ -55,10 +56,7 @@ export function withObservedRain(point, rows, now) {
   });
   if (!pointRows.length) return point;
   const values = [...point.values];
-  const first = Math.max(0, Math.floor((historyStart - point.start) / hour) + 1);
-  const last = Math.min(values.length - 1, Math.floor((now - point.start) / hour));
-  for (let index = first; index <= last; index++) values[index] = null;
-  let changed = last >= first;
+  let changed = false;
   const observed = new Set();
   for (const row of pointRows) {
     const start = Date.parse(row.rainfall_start_pst), end = Date.parse(row.rainfall_end_pst);
@@ -66,7 +64,7 @@ export function withObservedRain(point, rows, now) {
         !Number.isFinite(start) || !Number.isFinite(end) || end > now || end - start !== hour ||
         !Number.isFinite(row.rainfall_in) || row.rainfall_in < 0) continue;
     const index = Math.round((Date.parse(row.hour_pst) - point.start) / hour) + 1;
-    if (index < 0 || index >= values.length || observed.has(index)) continue;
+    if (!Number.isInteger(index) || index < 0 || index >= values.length || observed.has(index)) continue;
     values[index] = row.rainfall_in;
     observed.add(index);
     changed = true;
@@ -134,7 +132,7 @@ export function withPointRain(site, points, now, rainHistory=[]) {
     // Qualifying rain must fall in one rolling 24-hour period.
     const cutoff = Math.min(now,Date.parse(local.verifiedAt));
     for (let end=cutoff; end>now-rainPeriods.local*hour; end-=hour) {
-      if (pointTotal(local,Math.max(now-rainPeriods.local*hour,end-24*hour),end).total >= rainLimits.local) {
+      if (pointTotal(coastalPoint,Math.max(now-rainPeriods.local*hour,end-24*hour),end).total >= rainLimits.local) {
         coastal.qualifying = true;
         break;
       }

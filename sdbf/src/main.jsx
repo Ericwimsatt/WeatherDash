@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { assessCoast, sampleEvidence, scoreColors } from "../data/rating.mjs";
-import { age, date, mapCauses, postingText, rainDisplay, reading } from "./evidence.js";
+import { age, contributionClass, date, evidenceLimitations, mapCauses, regionalRainWhy, postingText, rainDisplay, rainDrivesScore, reading, sampleSummary } from "./evidence.js";
 import { safeEstimate } from "../data/runoff-forecast.mjs";
 import { drawMap, project } from "./map.js";
 
@@ -15,7 +15,7 @@ const initial = window.beachSnapshot;
 const mapScore = site => `${site.rating.score}/10 · ${site.rating.label}`;
 
 function Sample({ sample, now }) {
-  return <><strong>{reading(sample)}</strong>{sample && <small>{sample.units} · {age(sample.collectedAt, now)}</small>}</>;
+  return <><strong>{sampleSummary(sample)}</strong>{sample && <small>Sample collected {age(sample.collectedAt, now)}</small>}</>;
 }
 
 function Rating({ rating }) {
@@ -31,32 +31,38 @@ function FactorHelp({ why, label = "Why does this matter?" }) {
     <button type="button" className="factor-help-button" aria-expanded={open} aria-label={label} onClick={() => setOpen(open => !open)}>
       <span aria-hidden="true">?</span>
     </button>
-    {open && <div className="factor-help-text" role="note">{why}</div>}
+    {open && <div className="factor-help-text" role="note">{why} <a href="/methodology.html">How the score is calculated</a></div>}
   </>;
 }
 
 function BacteriaHelp() {
   return <>
     <strong>What the bacteria test tells you</strong>
-    <p>Beach tests look for Enterococcus, a sign that human or animal waste may be in the water. Some programs also test coliform bacteria. These are clues that germs may be present, including viruses and bacteria that can cause stomach illness, rashes, or ear and breathing infections.</p>
-    <p>The County uses ddPCR, a test that counts bacterial DNA. Results are usually ready the same day. Its advisory level is 1,413 DNA copies per 100 mL of water. Culture tests grow live bacteria and use a different limit: 104 MPN or CFU per 100 mL. Those limits serve a similar purpose; the readings cannot be compared number for number.</p>
-    <p>We check tests from the past 4 days. A reading at 25% of its test’s advisory level raises the score to at least 3: sensitive groups should use caution. At 40%, it scores at least 4. At 75%, it scores at least 5, and sensitive groups should avoid water contact. Swimming may still be possible below the limit, but some risk remains. “Bacteria levels higher than normal” is our caution label, not a measured local average or a County advisory. Follow current County postings.</p>
-    <a href="https://www.sandiegocounty.gov/content/sdc/deh/lwqd/beachandbay.html">County testing and current beach status</a>{" · "}
-    <a href="https://www.epa.gov/newsreleases/epa-approves-rapid-test-assess-beach-water-quality-san-diego-county">How the DNA test works</a>
+    <p>Bacteria can indicate human or animal waste and germs that may cause illness. A below-limit result does not guarantee current water quality: samples are snapshots, and conditions can change. Follow current County postings.</p>
+    <details>
+      <summary>How bacteria testing works</summary>
+      <p>The County uses ddPCR to count bacterial DNA, with an advisory level of 1,413 DNA copies per 100 mL. Culture tests grow live bacteria and use a limit of 104 MPN or CFU per 100 mL. Compare each reading with its own test’s limit; the numbers are not interchangeable.</p>
+      <a href="https://www.epa.gov/newsreleases/epa-approves-rapid-test-assess-beach-water-quality-san-diego-county">How the DNA test works</a>
+    </details>
+    <p><a href="/methodology.html#bacteria-scoring">How bacteria affects the score</a></p>
   </>;
 }
 
-function ScoreFactors({ site, now }) {
-  const factors = mapCauses(site,now);
+function ScoreFactors({ site, now, detail = false }) {
+  const directNotice = ["advisory", "warning", "closure"].includes(site.posting?.status);
+  const factors = mapCauses(site,now).filter(factor => !detail ||
+    (!["local", "county"].includes(factor.field) && !factor.text.startsWith("Regional rain:") || factor.text.startsWith("Local rain gauge:")) &&
+      !(directNotice && factor.field === "nearbyCounty"));
+  if (!factors.length) return null;
   return <ul className="score-factors" aria-label="Contributing factors">
-    {factors.map(({score,text,warning,why,href}) => <li key={text} className={score>=7 ? "hazard" : undefined}>
+    {factors.map(({contribution,text,warning,why,href}) => <li key={text} className={contributionClass(contribution)}>
       {href ? <a href={href} target="_blank" rel="noopener noreferrer" aria-label={`${text} — view County notices (opens in a new tab)`}>{text}</a> : text}{why && <FactorHelp why={why} />}{warning && <strong className="runoff-warning hazard">{warning}</strong>}
     </li>)}
   </ul>;
 }
 
-function Rain({site,inland=false,now}) {
-  return <strong>{rainDisplay(site,inland,now)}</strong>;
+function Rain({site,regional=false,now}) {
+  return <strong>{rainDisplay(site,regional,now)}</strong>;
 }
 
 const westLabels = new Set([381, 373, 351, 644, 461, 455]);
@@ -101,7 +107,7 @@ function MapView({ sites, now, open }) {
           })}
         </div>
         <div className="score-legend" aria-label="Safety scores from 1, lowest observed concern, to 10, dangerous">
-          {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color,"--score-ink":index >= 1 && index <= 6 ? "#182a26" : "#fff"}}>{index+1}</span>)}
+          {scoreColors.map((color,index) => <span key={color} style={{"--score-color":color,"--score-ink":index >= 2 && index <= 6 ? "#101010" : "#fff"}}>{index+1}</span>)}
           <small>Lower concern → higher risk</small>
         </div>
       </figure>
@@ -117,34 +123,46 @@ function Detail({ site, sites, snapshot, now, dismiss }) {
   const dialog = useRef(null);
   useEffect(() => { dialog.current.showModal(); }, []);
   const [bacteriaHelpOpen, setBacteriaHelpOpen] = useState(false);
+  const [regionalHelpOpen, setRegionalHelpOpen] = useState(false);
   const sample = site.sample;
-  const evidence = sampleEvidence(sample);
+  const rainFirst = rainDrivesScore(site);
+  const estimate = safeEstimate(site,now,snapshot,sites);
+  const limitations = evidenceLimitations(site,now);
+  const notes = [...new Set([...limitations, ...site.rating.notes.filter(note =>
+    note !== "The last test was more than 4 days ago." || !limitations.includes("No bacteria sample from the past 4 days."))])];
   const weather = snapshot.context?.[site.rainGauge];
-  const hazardous = field => site.rating.signals.some(signal => signal.field===field && signal.score>=5) ? "hazard" : undefined;
+  const hazardous = field => contributionClass(Math.max(0,...site.rating.signals.filter(signal =>
+    signal.field===field && (field !== "regional" || Number.isFinite(signal.amount))).map(signal => signal.contribution ?? 0)));
   const hazardFields = ["bacteria","county"].filter(field=>site.rating.signals.some(signal=>signal.field===field && signal.score>=7));
   const evidenceRows = {
     local: <><dt>Local rain in the past 72 hours</dt><dd className={hazardous("local")}><Rain site={site} now={now} /></dd></>,
-    inland: <><dt>Inland rain in the past 4 days</dt><dd className={hazardous("inland")}><Rain site={site} inland now={now} /></dd></>,
-    bacteria: <><dt>Latest bacteria test <button type="button" className="factor-help-button" aria-label="What do bacteria tests mean?" aria-expanded={bacteriaHelpOpen} aria-controls="bacteria-explainer" onClick={() => setBacteriaHelpOpen(open => !open)}><span aria-hidden="true">?</span></button></dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} />{evidence?.difference != null && <small>{Math.abs(evidence.difference).toLocaleString("en-US")} {evidence.difference >= 0 ? "at or above" : "below"} the limit</small>}</dd>{bacteriaHelpOpen && <dd id="bacteria-explainer" className="factor-help-text bacteria-explainer"><BacteriaHelp /></dd>}</>,
+    regional: <><dt>Regional rain <button type="button" className="factor-help-button" aria-label="What does regional rain mean?" aria-expanded={regionalHelpOpen} aria-controls="regional-rain-explainer" onClick={() => setRegionalHelpOpen(open => !open)}><span aria-hidden="true">?</span></button></dt><dd className={hazardous("regional")}><Rain site={site} regional now={now} /></dd>{regionalHelpOpen && <dd id="regional-rain-explainer" className="factor-help-text regional-rain-explainer">{regionalRainWhy} <a href="/methodology.html">How the score is calculated</a></dd>}</>,
+    bacteria: <><dt>Latest bacteria test <button type="button" className="factor-help-button" aria-label="What do bacteria tests mean?" aria-expanded={bacteriaHelpOpen} aria-controls="bacteria-explainer" onClick={() => setBacteriaHelpOpen(open => !open)}><span aria-hidden="true">?</span></button></dt><dd className={hazardous("bacteria")}><Sample sample={sample} now={now} /></dd>{bacteriaHelpOpen && <dd id="bacteria-explainer" className="factor-help-text bacteria-explainer"><BacteriaHelp /></dd>}</>,
     county: <><dt>County status</dt><dd className={hazardous("county")}><strong>{postingText(site)}</strong>{["advisory","warning","closure","rain advisory"].includes(site.posting?.status) && <small><a href="https://cosdapps.sandiegocounty.gov/sdbeachinfo/" target="_blank" rel="noopener noreferrer">View County notices</a></small>}<small>Updated {date(site.posting?.observedAt)} Pacific</small></dd></>,
   };
   const orderedHazards = [...hazardFields].sort((a,b) => Math.max(...site.rating.signals.filter(signal=>signal.field===b).map(signal=>signal.score))-Math.max(...site.rating.signals.filter(signal=>signal.field===a).map(signal=>signal.score)));
-  const remaining = ["local","inland","bacteria","county"].filter(field=>!orderedHazards.includes(field));
-  const rows = fields => <dl className="quick-evidence">{fields.map(field=><React.Fragment key={field}>{evidenceRows[field]}</React.Fragment>)}</dl>;
+  const remaining = ["bacteria","county"].filter(field=>!orderedHazards.includes(field));
+  const rows = fields => fields.length > 0 && <dl className="quick-evidence">{fields.map(field=><React.Fragment key={field}>{evidenceRows[field]}</React.Fragment>)}</dl>;
+  const runoff = <>
+    {rows(["local","regional"])}
+    <Suspense fallback={<p className="timeline-note">Loading runoff forecast…</p>}><RunoffChart site={site} sites={sites} now={now} /></Suspense>
+  </>;
 
   return <dialog className="beach-detail" ref={dialog} onClose={dismiss} aria-labelledby="detail-title">
     <header className="dialog-heading"><h2 id="detail-title">{site.name}</h2><form method="dialog"><button autoFocus>Close</button></form></header>
-    <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} /><p className="safe-estimate">{safeEstimate(site,now,snapshot,sites)}</p></div>
-    {site.rating.notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
+    <div className="modal-score"><Rating rating={site.rating} /><ScoreFactors site={site} now={now} detail />{estimate && <p className="safe-estimate">{estimate}</p>}</div>
+    {notes.map(note => <p key={note} className="timeline-note">{note}</p>)}
     {orderedHazards.length>0 && rows(orderedHazards)}
-    <Suspense fallback={<p className="timeline-note">Loading runoff forecast…</p>}><RunoffChart site={site} sites={sites} now={now} /></Suspense>
+    {rainFirst && runoff}
     {rows(remaining)}
+    {!rainFirst && runoff}
     <details className="monitoring-details">
       <summary>Monitoring details and recent tests</summary>
       <dl>
         <dt>Sampling point</dt><dd>{site.location} · {site.monitor}</dd>
         <dt>Sample time</dt><dd>{date(sample?.collectedAt)} Pacific · {sample?.method || "Method unavailable"}</dd>
-        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}{site.inlandRain?.name && <small>Inland · {site.inlandRain.name}</small>}</dd>
+        <dt>Latest test reading</dt><dd>{reading(sample)}{sample && ` ${sample.units}`}</dd>
+        <dt>Rain points</dt><dd>{site.coastal?.name ?? site.rainGauge}</dd>
         <dt>Spill reports</dt><dd><a href="https://www.sandiegocounty.gov/content/sdc/hhsa/programs/phs/community_epidemiology/south-region-health-concerns/Environmental-Dashboard.html">County environmental dashboard</a></dd>
         {weather?.river && <><dt>River discharge</dt><dd>{weather.river.cfs} ft³/s · {weather.river.station}<small>{date(weather.river.observedAt)} Pacific · USGS</small></dd></>}
         {weather?.air != null && <><dt>Air temperature</dt><dd>{weather.air} °F · Open-Meteo<small>{date(weather.airAt)} Pacific{weather.wind != null && ` · Wind ${weather.wind} mph`}</small></dd></>}
@@ -259,7 +277,7 @@ function App() {
 
   const enriched = snapshot.sites.map(site => withPointRain(site,snapshot.pointRain,now,snapshot.rainHistory));
   const result = assessCoast(enriched,{regionalRain:snapshot.regionalRain},now);
-  const sites = enriched.map((site,index) => ({...site,rating:result.results[index].water}));
+  const sites = enriched.map((site,index) => ({...site,regionalEstimate:result.results[index].regionalEstimate,rating:result.results[index].water}));
   const detail = sites.find(site => site.id === detailId);
 
   return <>

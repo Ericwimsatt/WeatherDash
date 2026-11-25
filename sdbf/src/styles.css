@@ -61,6 +61,7 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
 .score-number span { font-size:.73rem; font-weight:550 }
 .score small { margin-top:.14rem }
 .hazard,.hazard small { color:var(--avoid); font-weight:750 }
+.factor-caution,.factor-caution small { color:#806000; font-weight:750 }
 .score-legend { display:flex; align-items:center; flex-wrap:wrap; gap:.22rem; margin:.25rem 0 .7rem; padding-inline:1rem }
 .score-legend span { min-width:1.3rem; padding:.12rem .2rem; text-align:center; background:var(--score-color); color:var(--score-ink,#fff); border-radius:.18rem; font-size:.68rem; font-weight:750 }
 .score-legend small { margin-left:.35rem }
@@ -117,5 +118,5 @@ footer { margin:1.25rem 0 .5rem; color:var(--muted); font-size:.82rem }
   .score-legend small { margin-left:0 }
 }
 
-.quick-evidence .bacteria-explainer { grid-column:1 / -1; font-weight:400; border-left-width:1px; margin:0 0 .6rem; }
+.quick-evidence :is(.bacteria-explainer,.regional-rain-explainer) { grid-column:1 / -1; font-weight:400; border-left-width:1px; margin:0 0 .6rem; }
 .bacteria-explainer p { margin:.6rem 0; }

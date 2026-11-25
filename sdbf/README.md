@@ -2,7 +2,7 @@
 
 An independent React and Vite PWA on Cloudflare Workers at [sdbeachfinder.gingernet.net](https://sdbeachfinder.gingernet.net/). The project uses its own package, Worker, install scope, and D1 binding. WeatherDash runs from the repository root as before.
 
-Evidence Matrix pins the Beach and Safety score columns, followed by local rain, inland rain, bacteria results and age, and the County posting. The map includes named monitoring points, towns, bays, and highways. Select a marker or select or hover a beach name to open the detail and runoff chart. The build includes the geographic basemap and can reopen with saved data offline.
+Evidence Matrix pins the Beach and Safety score columns, followed by local rain, regional rain in last 96 hours, bacteria results and age, and the County posting. The map includes named monitoring points, towns, bays, and highways. Select a marker or select or hover a beach name to open the detail and runoff chart. The build includes the geographic basemap and can reopen with saved data offline.
 
 ## Run locally
 
