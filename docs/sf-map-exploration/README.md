@@ -2,6 +2,8 @@
 
 Branch: `codex/sf-regional-map-exploration`.
 
+The latest user-directed revision is [Parks, bridges & hills](../../public/sf-map-lab/parks-study.html), documented in [REVISION.md](../../public/sf-map-lab/REVISION.md). Parks-first is now confirmed. The original lab below remains an archive. Revision 2 uses real USGS-derived terrain, four daily-label alternatives, and SVG-only symbol choice lists. Its browser script and evidence are `browser-qa-v2.cjs` and `review-v2/`.
+
 Open [the comparison lab](../../public/sf-map-lab/index.html), [morning report](../../public/sf-map-lab/report.html), or [all-option atlas](../../public/sf-map-lab/atlas.html) directly in a browser. They also work at `/sf-map-lab/` under `npm run dev`. A server is optional; there are no fetch calls.
 
 All UI and fixture code is isolated in `public/sf-map-lab/`. The working dashboard, providers, database, routing, and SD beach finder are untouched. No deploy or push was requested or performed.

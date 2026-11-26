@@ -1,0 +1,27 @@
+{
+  "study": "SF parks revision",
+  "version": 2,
+  "recipe": {
+    "terrain": "shade",
+    "label": "ticket",
+    "swim": "freestyle",
+    "jump": "compass-ring",
+    "location": "crosshair",
+    "sample": "mixed",
+    "selected": "innerSunset",
+    "located": false
+  },
+  "confirmed": {
+    "orientation": "parks",
+    "bridges": [
+      "Golden Gate Bridge",
+      "Bay Bridge"
+    ],
+    "roadNames": false,
+    "landmarks": false,
+    "regionNames": false,
+    "northCompass": false,
+    "beachLabels": false
+  },
+  "precipitationRule": "daily inches strictly greater than 0.05"
+}
