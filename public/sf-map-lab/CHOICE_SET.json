@@ -1,0 +1,1003 @@
+{
+  "FORCE_UI_CHOICE": {
+    "problem": "Orient people within SF while comparing all-weather neighborhood point forecasts and independent beach conditions",
+    "goal": "Preserve SD beach finder map materials; show materially different complete systems before choosing one",
+    "matrix_count": 12,
+    "selected_count": 4,
+    "score_scale": "1 weak to 5 strong; max 20. Scores are design judgments, not user-study measurements.",
+    "matrix": [
+      {
+        "id": "parks",
+        "label": "Parks are the structure",
+        "scores": {
+          "orientation": 5,
+          "weatherClarity": 4,
+          "feasibility": 5,
+          "lowClutter": 4
+        },
+        "total": 18,
+        "selected": true,
+        "rationale": "Strong west / center / south anchors; weaker eastern address context."
+      },
+      {
+        "id": "streets",
+        "label": "A few streets, well chosen",
+        "scores": {
+          "orientation": 4,
+          "weatherClarity": 5,
+          "feasibility": 5,
+          "lowClutter": 4
+        },
+        "total": 18,
+        "selected": true,
+        "rationale": "Corridors explain journeys; needs real road geometry for production."
+      },
+      {
+        "id": "landmarks",
+        "label": "Recognize the skyline",
+        "scores": {
+          "orientation": 4,
+          "weatherClarity": 4,
+          "feasibility": 5,
+          "lowClutter": 4
+        },
+        "total": 17,
+        "selected": true,
+        "rationale": "Visitor recognition; more icon vocabulary and less neighborhood precision."
+      },
+      {
+        "id": "hybrid",
+        "label": "Parks + three corridors",
+        "scores": {
+          "orientation": 5,
+          "weatherClarity": 5,
+          "feasibility": 5,
+          "lowClutter": 4
+        },
+        "total": 19,
+        "selected": true,
+        "rationale": "Most complete SF frame while preserving quiet SD map materials."
+      },
+      {
+        "id": "highway-only",
+        "label": "Highways alone",
+        "scores": {
+          "orientation": 2,
+          "weatherClarity": 2,
+          "feasibility": 5,
+          "lowClutter": 5
+        },
+        "total": 14,
+        "selected": false,
+        "rationale": "Sparse SF central and western orientation; SD mechanism does not transfer alone."
+      },
+      {
+        "id": "all-boundaries",
+        "label": "Every neighborhood outlined",
+        "scores": {
+          "orientation": 3,
+          "weatherClarity": 3,
+          "feasibility": 4,
+          "lowClutter": 2
+        },
+        "total": 12,
+        "selected": false,
+        "rationale": "Existing names do not align with public polygons; implies false region precision."
+      },
+      {
+        "id": "street-atlas",
+        "label": "Full local street atlas",
+        "scores": {
+          "orientation": 4,
+          "weatherClarity": 3,
+          "feasibility": 3,
+          "lowClutter": 1
+        },
+        "total": 11,
+        "selected": false,
+        "rationale": "Street texture overwhelms the weather and needs a zoom-dependent label engine."
+      },
+      {
+        "id": "tourist-pictograms",
+        "label": "Tourist symbols everywhere",
+        "scores": {
+          "orientation": 3,
+          "weatherClarity": 3,
+          "feasibility": 3,
+          "lowClutter": 1
+        },
+        "total": 10,
+        "selected": false,
+        "rationale": "Icon collisions with sky, beach and location semantics."
+      },
+      {
+        "id": "temperature-field",
+        "label": "Continuous temperature surface",
+        "scores": {
+          "orientation": 3,
+          "weatherClarity": 2,
+          "feasibility": 2,
+          "lowClutter": 3
+        },
+        "total": 10,
+        "selected": false,
+        "rationale": "Requires interpolation and uncertainty absent from the current point model."
+      },
+      {
+        "id": "radar-first",
+        "label": "Radar-first orientation",
+        "scores": {
+          "orientation": 2,
+          "weatherClarity": 2,
+          "feasibility": 2,
+          "lowClutter": 3
+        },
+        "total": 9,
+        "selected": false,
+        "rationale": "Precipitation-specific; does not satisfy all-weather orientation."
+      },
+      {
+        "id": "terrain-3d",
+        "label": "3D terrain and buildings",
+        "scores": {
+          "orientation": 4,
+          "weatherClarity": 3,
+          "feasibility": 1,
+          "lowClutter": 2
+        },
+        "total": 10,
+        "selected": false,
+        "rationale": "Adds implementation weight and perspective-dependent label comparison."
+      },
+      {
+        "id": "transit",
+        "label": "Transit skeleton",
+        "scores": {
+          "orientation": 3,
+          "weatherClarity": 3,
+          "feasibility": 4,
+          "lowClutter": 3
+        },
+        "total": 13,
+        "selected": false,
+        "rationale": "Useful for some journeys but uneven citywide and coastal context."
+      }
+    ],
+    "selected": [
+      {
+        "id": "parks",
+        "title": "Parks are the structure",
+        "tag": "For locals on foot",
+        "description": "Presidio, Golden Gate Park, Twin Peaks and Lake Merced organize the city. Green footprints and park names lead; streets recede.",
+        "benefit": "Fast recognition of west-side neighborhoods and the city’s green spine.",
+        "cost": "Weaker east-side address context. Small parks cannot carry the whole orientation system.",
+        "mobile": "Retain the four largest anchors; avoid adding every park name.",
+        "config": {
+          "orientation": "parks"
+        },
+        "hierarchy_and_interaction": "Presidio, Golden Gate Park, Twin Peaks and Lake Merced organize the city. Green footprints and park names lead; streets recede.",
+        "strengths": [
+          "Fast recognition of west-side neighborhoods and the city’s green spine."
+        ],
+        "weaknesses": [
+          "Weaker east-side address context. Small parks cannot carry the whole orientation system."
+        ],
+        "responsive_notes": "Retain the four largest anchors; avoid adding every park name.",
+        "rationale": "Strong west / center / south anchors; weaker eastern address context."
+      },
+      {
+        "id": "streets",
+        "title": "A few streets, well chosen",
+        "tag": "Closest to the SD map",
+        "description": "Geary, 19th Avenue, Market, Van Ness, Sunset Boulevard and the Embarcadero supplement US 101 and I-280.",
+        "benefit": "Useful for people thinking about a route across town.",
+        "cost": "Highways alone leave the center unexplained. Streets are schematic here, not route geometry.",
+        "mobile": "Keep Geary, Market and 19th; reveal the others on a closer view.",
+        "config": {
+          "orientation": "streets"
+        },
+        "hierarchy_and_interaction": "Geary, 19th Avenue, Market, Van Ness, Sunset Boulevard and the Embarcadero supplement US 101 and I-280.",
+        "strengths": [
+          "Useful for people thinking about a route across town."
+        ],
+        "weaknesses": [
+          "Highways alone leave the center unexplained. Streets are schematic here, not route geometry."
+        ],
+        "responsive_notes": "Keep Geary, Market and 19th; reveal the others on a closer view.",
+        "rationale": "Corridors explain journeys; needs real road geometry for production."
+      },
+      {
+        "id": "landmarks",
+        "title": "Recognize the skyline",
+        "tag": "For visitors",
+        "description": "Golden Gate Bridge, Sutro Tower, Twin Peaks, Coit Tower and the Ferry Building anchor a sparse city map.",
+        "benefit": "Recognizable places provide east–west and hill–water relationships.",
+        "cost": "A visitor may know the icons but not their positions. Symbols compete with weather and beach pins.",
+        "mobile": "Three landmarks maximum at city scale; text is still needed.",
+        "config": {
+          "orientation": "landmarks"
+        },
+        "hierarchy_and_interaction": "Golden Gate Bridge, Sutro Tower, Twin Peaks, Coit Tower and the Ferry Building anchor a sparse city map.",
+        "strengths": [
+          "Recognizable places provide east–west and hill–water relationships."
+        ],
+        "weaknesses": [
+          "A visitor may know the icons but not their positions. Symbols compete with weather and beach pins."
+        ],
+        "responsive_notes": "Three landmarks maximum at city scale; text is still needed.",
+        "rationale": "Visitor recognition; more icon vocabulary and less neighborhood precision."
+      },
+      {
+        "id": "hybrid",
+        "title": "Parks + three corridors",
+        "tag": "Recommended starting point",
+        "description": "Use major park footprints, Geary / 19th / Market, bridge gateways and just a few landmark names. Neighborhood forecasts remain the strongest labels.",
+        "benefit": "A complete system for west, center, waterfront and south without a street-map texture.",
+        "cost": "Needs a strict label budget or it will become a combination of every option.",
+        "mobile": "Four green anchors, three corridors; hide secondary landmarks before weather.",
+        "config": {
+          "orientation": "hybrid"
+        },
+        "hierarchy_and_interaction": "Use major park footprints, Geary / 19th / Market, bridge gateways and just a few landmark names. Neighborhood forecasts remain the strongest labels.",
+        "strengths": [
+          "A complete system for west, center, waterfront and south without a street-map texture."
+        ],
+        "weaknesses": [
+          "Needs a strict label budget or it will become a combination of every option."
+        ],
+        "responsive_notes": "Four green anchors, three corridors; hide secondary landmarks before weather.",
+        "rationale": "Most complete SF frame while preserving quiet SD map materials."
+      }
+    ],
+    "rejected": [
+      {
+        "id": "highway-only",
+        "reason": "Sparse SF central and western orientation; SD mechanism does not transfer alone."
+      },
+      {
+        "id": "all-boundaries",
+        "reason": "Existing names do not align with public polygons; implies false region precision."
+      },
+      {
+        "id": "street-atlas",
+        "reason": "Street texture overwhelms the weather and needs a zoom-dependent label engine."
+      },
+      {
+        "id": "tourist-pictograms",
+        "reason": "Icon collisions with sky, beach and location semantics."
+      },
+      {
+        "id": "temperature-field",
+        "reason": "Requires interpolation and uncertainty absent from the current point model."
+      },
+      {
+        "id": "radar-first",
+        "reason": "Precipitation-specific; does not satisfy all-weather orientation."
+      },
+      {
+        "id": "terrain-3d",
+        "reason": "Adds implementation weight and perspective-dependent label comparison."
+      },
+      {
+        "id": "transit",
+        "reason": "Useful for some journeys but uneven citywide and coastal context."
+      }
+    ],
+    "diversity_check": "Park area structure, sparse street network, recognizable point landmarks, and a strictly budgeted hybrid differ in orientation grammar, hierarchy, density and audience; not palette swaps.",
+    "recommendation": {
+      "id": "hybrid",
+      "why": "Covers west, center, waterfront and south with a restrained map language.",
+      "what_would_change_it": "Driving-first use favors streets; visitor-first use favors landmarks; repeated metric comparison favors uniform information."
+    }
+  },
+  "CHOICE_DISPLAY": {
+    "path": "index.html",
+    "mode": "Responsive component grid switching to horizontal carousel above half-viewport height",
+    "controls": [
+      "Try on map",
+      "Keep option",
+      "Minimize / Expand",
+      "Hide",
+      "Restore one",
+      "Restore all",
+      "Previous / Next",
+      "h / l",
+      "Home / End"
+    ],
+    "atlas": "atlas.html",
+    "standalone": [
+      "parks.html",
+      "streets.html",
+      "landmarks.html",
+      "hybrid.html"
+    ]
+  },
+  "chapters": [
+    {
+      "id": "orientation",
+      "title": "How do you recognize SF?",
+      "short": "Map systems",
+      "intro": "Four complete systems, on the same geography and weather. These change what the base map teaches you, not the forecast values.",
+      "key": "orientation",
+      "recommended": "hybrid",
+      "options": [
+        {
+          "id": "parks",
+          "title": "Parks are the structure",
+          "tag": "For locals on foot",
+          "description": "Presidio, Golden Gate Park, Twin Peaks and Lake Merced organize the city. Green footprints and park names lead; streets recede.",
+          "benefit": "Fast recognition of west-side neighborhoods and the city’s green spine.",
+          "cost": "Weaker east-side address context. Small parks cannot carry the whole orientation system.",
+          "mobile": "Retain the four largest anchors; avoid adding every park name.",
+          "config": {
+            "orientation": "parks"
+          }
+        },
+        {
+          "id": "streets",
+          "title": "A few streets, well chosen",
+          "tag": "Closest to the SD map",
+          "description": "Geary, 19th Avenue, Market, Van Ness, Sunset Boulevard and the Embarcadero supplement US 101 and I-280.",
+          "benefit": "Useful for people thinking about a route across town.",
+          "cost": "Highways alone leave the center unexplained. Streets are schematic here, not route geometry.",
+          "mobile": "Keep Geary, Market and 19th; reveal the others on a closer view.",
+          "config": {
+            "orientation": "streets"
+          }
+        },
+        {
+          "id": "landmarks",
+          "title": "Recognize the skyline",
+          "tag": "For visitors",
+          "description": "Golden Gate Bridge, Sutro Tower, Twin Peaks, Coit Tower and the Ferry Building anchor a sparse city map.",
+          "benefit": "Recognizable places provide east–west and hill–water relationships.",
+          "cost": "A visitor may know the icons but not their positions. Symbols compete with weather and beach pins.",
+          "mobile": "Three landmarks maximum at city scale; text is still needed.",
+          "config": {
+            "orientation": "landmarks"
+          }
+        },
+        {
+          "id": "hybrid",
+          "title": "Parks + three corridors",
+          "tag": "Recommended starting point",
+          "description": "Use major park footprints, Geary / 19th / Market, bridge gateways and just a few landmark names. Neighborhood forecasts remain the strongest labels.",
+          "benefit": "A complete system for west, center, waterfront and south without a street-map texture.",
+          "cost": "Needs a strict label budget or it will become a combination of every option.",
+          "mobile": "Four green anchors, three corridors; hide secondary landmarks before weather.",
+          "config": {
+            "orientation": "hybrid"
+          }
+        }
+      ]
+    },
+    {
+      "id": "overlay",
+      "title": "What does one region look like?",
+      "short": "Region labels",
+      "intro": "Same point coordinates and values; four different containers. Select a region on the large map to compare its expanded state.",
+      "key": "overlay",
+      "recommended": "ticket",
+      "options": [
+        {
+          "id": "ticket",
+          "title": "A small weather ticket",
+          "tag": "Recommended",
+          "description": "Name, condition icon and temperature are always visible. One short line appears only when the information pattern calls for it.",
+          "benefit": "Strong reading order; holds a missing value or an important exception naturally.",
+          "cost": "Uses more area than a dot or chip. Needs collision handling before production.",
+          "mobile": "Keep four representative tickets plus the selected point; all ten remain in the picker.",
+          "config": {
+            "overlay": "ticket"
+          }
+        },
+        {
+          "id": "chip",
+          "title": "One-line label",
+          "tag": "Maximum map visibility",
+          "description": "Neighborhood name, condition and temperature share a compact capsule. Extra facts move to the selection dock.",
+          "benefit": "The geography remains legible and labels feel close to the SD map.",
+          "cost": "Cannot carry all exceptions. A map-wide notice and selected detail must preserve important missing or stale status.",
+          "mobile": "The capsule stacks to avoid tiny text; selected detail remains below the map.",
+          "config": {
+            "overlay": "chip"
+          }
+        },
+        {
+          "id": "strip",
+          "title": "A two-reading strip",
+          "tag": "For comparison",
+          "description": "Neighborhood name sits above a compact row: condition, temperature and wind. A third line is available for a rain or UV exception.",
+          "benefit": "Wind is comparable without opening every region.",
+          "cost": "Ten labels become crowded; this is the densest option and the first one to fail on a phone.",
+          "mobile": "Show only four representative strips. Do not shrink ten strips to fit.",
+          "config": {
+            "overlay": "strip"
+          }
+        },
+        {
+          "id": "bare",
+          "title": "Type directly on the map",
+          "tag": "Least chrome",
+          "description": "Region name, icon and temperature sit on the land with a light text halo. Selection gets a solid backing.",
+          "benefit": "The map feels continuous and generous.",
+          "cost": "Legibility changes over roads, parks and coastline; important text needs a real backing.",
+          "mobile": "A selected label becomes a ticket. Avoid stacking bare text over beach names.",
+          "config": {
+            "overlay": "bare"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pattern",
+      "title": "What deserves map space?",
+      "short": "Information patterns",
+      "intro": "Every point keeps a temperature and a name unless the quiet pattern deliberately withholds the name. Additional fields answer a specific comparison question.",
+      "key": "pattern",
+      "recommended": "exceptions",
+      "options": [
+        {
+          "id": "exceptions",
+          "title": "Shared core, local exceptions",
+          "tag": "Recommended default",
+          "description": "Show name, sky and temperature everywhere. Add one line for rain, exposed wind, high UV, fog or missing evidence only where it matters.",
+          "benefit": "Communicates SF’s differences while keeping most labels quiet.",
+          "cost": "You cannot assume an absent wind line means no wind. The legend and selected dock must explain the hierarchy.",
+          "mobile": "Show the strongest exception at each visible point; never suppress missing-data status.",
+          "config": {
+            "pattern": "exceptions"
+          }
+        },
+        {
+          "id": "uniform",
+          "title": "The same three facts everywhere",
+          "tag": "For comparing all regions",
+          "description": "Every ticket gets temperature, wind and UV, regardless of significance. The selection dock adds rain and timing.",
+          "benefit": "Stable spatial memory: the same field is in the same place at every point.",
+          "cost": "Dense even on a benign day. Equal visual weight makes important changes harder to spot.",
+          "mobile": "Representative regions only, with an optional accessible list for all ten.",
+          "config": {
+            "pattern": "uniform"
+          }
+        },
+        {
+          "id": "lens",
+          "title": "One question at a time",
+          "tag": "Wind / UV / rain lens",
+          "description": "Choose a metric and promote it to the large number at every point. Here the initial lens is wind; the inspector also offers UV and rain chance.",
+          "benefit": "The cleanest answer to “where is it less windy?” without ten full dashboards.",
+          "cost": "A large 19 can be mistaken for temperature. Units and a persistent lens label are mandatory.",
+          "mobile": "A sticky metric selector sits above the map; no unlabeled color scale.",
+          "config": {
+            "pattern": "lens",
+            "metric": "wind"
+          }
+        },
+        {
+          "id": "dayplan",
+          "title": "Tell me what changes",
+          "tag": "For deciding when to go",
+          "description": "The second line is a short temporal statement: fog until 2, rain arriving, wind after 3, sunny through 4.",
+          "benefit": "Makes a weather map useful for planning, not just observing.",
+          "cost": "Needs a real forecast-derived rule and a time window. Do not generate confident prose from sparse data.",
+          "mobile": "One concise time phrase; open the dock for the hourly sequence.",
+          "config": {
+            "pattern": "dayplan"
+          }
+        },
+        {
+          "id": "quiet",
+          "title": "Numbers first; detail on selection",
+          "tag": "Calmest overview",
+          "description": "All points retain temperature. The selected point gets a named ticket; the four mobile representatives retain enough context to be chosen.",
+          "benefit": "Makes the microclimate contrast obvious with very little ink.",
+          "cost": "Poor discoverability for users who do not know neighborhood geography. Not a strong first-visit default.",
+          "mobile": "Pair with the named region picker; never rely on hover.",
+          "config": {
+            "pattern": "quiet"
+          }
+        }
+      ]
+    },
+    {
+      "id": "scene",
+      "title": "Put the system under pressure",
+      "short": "Weather & data states",
+      "intro": "These are authored fixtures, not live forecasts or calibrated weather simulations. Each state applies to the complete SF map.",
+      "key": "scene",
+      "recommended": "marine",
+      "options": [
+        {
+          "id": "marine",
+          "title": "Marine layer, sunny Mission",
+          "tag": "Baseline",
+          "description": "Fog and stronger wind on the west; warmer sun in the Mission. Different regions earn different secondary facts.",
+          "benefit": "Tests the reason to have a regional map at all.",
+          "cost": "A point forecast does not define the edge of the fog.",
+          "config": {
+            "scene": "marine"
+          }
+        },
+        {
+          "id": "clear",
+          "title": "The whole city clears",
+          "tag": "Benign weather",
+          "description": "Temperatures increase, coastal fog icons disappear and rain chances become zero in this fixture.",
+          "benefit": "Tests whether the default stays calm when there is little to warn about.",
+          "cost": "Do not invent an attention-grabbing exception just to fill every label.",
+          "config": {
+            "scene": "clear"
+          }
+        },
+        {
+          "id": "rain",
+          "title": "Rain arrives from the west",
+          "tag": "Wet-weather priority",
+          "description": "Rain chances are higher on the coast. Beach markers switch to a separate runoff-concern state.",
+          "benefit": "Shows that rain affects both regional planning and beach evidence, through separate rules.",
+          "cost": "A rain probability is not a rainfall total or a measured runoff advisory.",
+          "config": {
+            "scene": "rain"
+          }
+        },
+        {
+          "id": "wind",
+          "title": "Windy coast, sheltered inland",
+          "tag": "Wind takes the second line",
+          "description": "Exposed points get larger wind values and gust text; the base map still has no fake continuous wind field.",
+          "benefit": "Tests label capacity and the wind lens.",
+          "cost": "A “gust” must be modeled or observed as a gust; not derived by adding ten in production.",
+          "config": {
+            "scene": "wind"
+          }
+        },
+        {
+          "id": "uv",
+          "title": "A high-UV afternoon",
+          "tag": "UV earns visibility",
+          "description": "UV rises to 8 in the east and 5 in the west. Sky icons alone would not communicate the difference.",
+          "benefit": "Tests whether UV is findable without making it a beach-only field.",
+          "cost": "Requires modeled timestamp and basis: current hour vs daily maximum.",
+          "config": {
+            "scene": "uv"
+          }
+        },
+        {
+          "id": "night",
+          "title": "After dark",
+          "tag": "Time changes priority",
+          "description": "Cooler temperatures and moon icons replace the daytime emphasis; UV is zero in this fixture.",
+          "benefit": "Tests whether irrelevant daytime metrics can recede.",
+          "cost": "This is a subdued day palette, not a finished dark-mode proposal.",
+          "config": {
+            "scene": "night"
+          }
+        },
+        {
+          "id": "partial",
+          "title": "Only some fields arrive",
+          "tag": "Missing is visible",
+          "description": "Outer Richmond and Marina lose wind and UV. Aquatic Park has an unknown beach state.",
+          "benefit": "Shows a partial forecast without discarding the useful temperature.",
+          "cost": "The one-line chip cannot hold field-level absence. The banner and detail dock must carry it.",
+          "config": {
+            "scene": "partial"
+          }
+        },
+        {
+          "id": "stale",
+          "title": "An older forecast remains",
+          "tag": "Freshness is explicit",
+          "description": "Values remain readable with a map-wide warning and visible age. “Now” is a requested time, not a freshness claim.",
+          "benefit": "Avoids turning a failed refresh into an unexplained blank map.",
+          "cost": "Actual age thresholds are a product choice, not settled by this mock.",
+          "config": {
+            "scene": "stale"
+          }
+        },
+        {
+          "id": "loading",
+          "title": "First load",
+          "tag": "Places before values",
+          "description": "Location names stay in place while forecast numbers show a neutral loading state.",
+          "benefit": "The layout is stable and the user can recognize the city immediately.",
+          "cost": "A loading fixture is intentionally static. This mock does not fetch data.",
+          "config": {
+            "scene": "loading"
+          }
+        },
+        {
+          "id": "error",
+          "title": "Nothing could load",
+          "tag": "Recover in place",
+          "description": "The map and names remain; values show dashes and an explicit error. Try again returns to the baseline fixture.",
+          "benefit": "A recoverable state without replacing the entire map.",
+          "cost": "Real retry would need per-source and per-point results.",
+          "config": {
+            "scene": "error"
+          }
+        }
+      ]
+    },
+    {
+      "id": "icons",
+      "title": "Choose each icon independently",
+      "short": "Icon workshop",
+      "intro": "All symbols are original SVGs with the same stroke weight. Select an option to see it at beaches, in the UV reading, on the simulated location, or in navigation.",
+      "key": null,
+      "recommended": null,
+      "options": [
+        {
+          "id": "swim-swimmer",
+          "group": "Swimming conditions",
+          "key": "swim",
+          "value": "swimmer",
+          "title": "Swimmer + condition badge",
+          "symbol": "swimmer",
+          "tag": "Recommended for swimming",
+          "description": "A swimmer says what the condition concerns; the small square, diamond or circle says which evidence state is active.",
+          "benefit": "Most direct activity meaning. It stays distinct from generic water.",
+          "cost": "Most detail at small sizes. Always pair the expanded state with a word.",
+          "config": {
+            "swim": "swimmer"
+          }
+        },
+        {
+          "id": "swim-flag",
+          "group": "Swimming conditions",
+          "key": "swim",
+          "value": "flag",
+          "title": "Beach flag + condition badge",
+          "symbol": "flag",
+          "tag": "Strong state silhouette",
+          "description": "A flag is easy to recognize at the water and remains legible at 20 pixels.",
+          "benefit": "Simple silhouette and easy active-state changes.",
+          "cost": "Could imply an official lifeguard flag. Keep evidence text explicit.",
+          "config": {
+            "swim": "flag"
+          }
+        },
+        {
+          "id": "swim-waves",
+          "group": "Swimming conditions",
+          "key": "swim",
+          "value": "waves",
+          "title": "Waves + condition badge",
+          "symbol": "waves",
+          "tag": "Quietest visual",
+          "description": "Three waves carry the beach layer, with a persistent status badge.",
+          "benefit": "Clean and readable next to temperature.",
+          "cost": "Could mean tide or surf rather than swimming. The legend must name the layer.",
+          "config": {
+            "swim": "waves"
+          }
+        },
+        {
+          "id": "uv-sun",
+          "group": "UV index",
+          "key": "uv",
+          "value": "sun",
+          "title": "Sun + UV number",
+          "symbol": "sun",
+          "tag": "Familiar",
+          "description": "Use the sun only beside the written label “UV index” and its numeric value.",
+          "benefit": "Immediate recognition and good size reduction.",
+          "cost": "The same sun is also a sky condition. Context must distinguish them.",
+          "config": {
+            "uv": "sun"
+          }
+        },
+        {
+          "id": "uv-uv",
+          "group": "UV index",
+          "key": "uv",
+          "value": "uv",
+          "title": "Lettered UV symbol",
+          "symbol": "uv",
+          "tag": "Recommended for clarity",
+          "description": "A purpose-made UV letterform with a baseline. The text label remains for accessibility.",
+          "benefit": "No ambiguity with sunny weather.",
+          "cost": "More typographic than pictographic. Test the small U / V separation.",
+          "config": {
+            "uv": "uv"
+          }
+        },
+        {
+          "id": "uv-shade",
+          "group": "UV index",
+          "key": "uv",
+          "value": "shade",
+          "title": "Shade / umbrella symbol",
+          "symbol": "shade",
+          "tag": "Action-oriented",
+          "description": "An umbrella suggests shade as a response to UV exposure.",
+          "benefit": "Connects the reading to an outdoor decision.",
+          "cost": "An umbrella often means rain. Weakest standalone choice.",
+          "config": {
+            "uv": "shade"
+          }
+        },
+        {
+          "id": "location-dot",
+          "group": "My current location",
+          "key": "location",
+          "value": "dot",
+          "title": "Blue dot with accuracy ring",
+          "symbol": "dot",
+          "tag": "Recommended",
+          "description": "A filled center and ring separate the user from hollow weather point markers. The mock location is simulated.",
+          "benefit": "Familiar “you are here” convention.",
+          "cost": "A real accuracy ring should represent GPS accuracy, not a decorative constant.",
+          "config": {
+            "location": "dot",
+            "located": true
+          }
+        },
+        {
+          "id": "location-crosshair",
+          "group": "My current location",
+          "key": "location",
+          "value": "crosshair",
+          "title": "Crosshair",
+          "symbol": "crosshair",
+          "tag": "Best for the locate button",
+          "description": "Use a target to recenter; the same symbol can mark the simulated user position for comparison.",
+          "benefit": "Clear action meaning in a toolbar.",
+          "cost": "As a map marker it can look like a selected forecast coordinate.",
+          "config": {
+            "location": "crosshair",
+            "located": true
+          }
+        },
+        {
+          "id": "location-arrow",
+          "group": "My current location",
+          "key": "location",
+          "value": "arrow",
+          "title": "Heading arrow",
+          "symbol": "arrow",
+          "tag": "Only when heading is known",
+          "description": "A directional arrow points along a known device heading.",
+          "benefit": "Helpful while walking and orienting the map.",
+          "cost": "This north-facing demo is not a heading measurement. A real arrow needs permission and a useful heading.",
+          "config": {
+            "location": "arrow",
+            "located": true
+          }
+        },
+        {
+          "id": "jump-edge",
+          "group": "Jump to adjacent region",
+          "key": "jump",
+          "value": "edge",
+          "title": "Leave this frame",
+          "symbol": "edge",
+          "tag": "Recommended for region exits",
+          "description": "An arrow leaving a rectangle distinguishes opening the neighboring regional map from selecting a forecast point.",
+          "benefit": "Conveys a change in geographic scope.",
+          "cost": "Can also suggest sign-out. Always write “Marin” or “East Bay.”",
+          "config": {
+            "jump": "edge"
+          }
+        },
+        {
+          "id": "jump-compass",
+          "group": "Jump to adjacent region",
+          "key": "jump",
+          "value": "compass",
+          "title": "Compass",
+          "symbol": "compass",
+          "tag": "Exploratory",
+          "description": "A compass accompanies the destination name at map edges and in nearby comparison controls.",
+          "benefit": "Suggests geographic exploration.",
+          "cost": "Does not itself communicate the destination or the scope change.",
+          "config": {
+            "jump": "compass"
+          }
+        },
+        {
+          "id": "jump-chevron",
+          "group": "Jump to adjacent region",
+          "key": "jump",
+          "value": "chevron",
+          "title": "Destination + chevron",
+          "symbol": "chevron",
+          "tag": "Best for nearby point links",
+          "description": "A simple chevron relies on the written destination. Minimal and familiar.",
+          "benefit": "Least visual noise inside a selected-region panel.",
+          "cost": "Weak geographic meaning when shown without the destination.",
+          "config": {
+            "jump": "chevron"
+          }
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "title": "Choices that change the product",
+      "short": "Other major choices",
+      "intro": "These choices affect what the map promises. Treat them separately from typography and icon taste.",
+      "key": null,
+      "recommended": null,
+      "options": [
+        {
+          "id": "coverage-existing",
+          "group": "How many weather points",
+          "key": "coverage",
+          "value": "existing",
+          "title": "The existing ten SF points",
+          "tag": "Recommended first integration",
+          "description": "Use exactly the ten SF coordinates already configured in the app. The south and southeast remain visibly sparse.",
+          "benefit": "Makes the first integration compatible with current data and region navigation.",
+          "cost": "The picture is not comprehensive SF coverage. Empty space must not imply identical weather.",
+          "config": {
+            "coverage": "existing",
+            "selected": "innerSunset"
+          }
+        },
+        {
+          "id": "coverage-six",
+          "group": "How many weather points",
+          "key": "coverage",
+          "value": "six",
+          "title": "Six anchors + your selection",
+          "tag": "An overview, not a new region model",
+          "description": "Keep west-coast contrast, Marina, Market, Mission and Lake Merced. Retain a seventh ticket if the user selects another existing point.",
+          "benefit": "Cuts clutter at the city scale without deleting any forecast location.",
+          "cost": "Inner / Outer neighborhood comparisons need selection or a closer view.",
+          "config": {
+            "coverage": "six",
+            "selected": "mission"
+          }
+        },
+        {
+          "id": "coverage-expanded",
+          "group": "How many weather points",
+          "key": "coverage",
+          "value": "expanded",
+          "title": "Fourteen points across SF",
+          "tag": "A future coverage study",
+          "description": "Add proposed Noe Valley, Potrero Hill, Bayview and Excelsior coordinates to expose the coverage gap and label-density tradeoff.",
+          "benefit": "Makes the southern and southeastern city part of the conversation.",
+          "cost": "These four points and their weather are only proposals. Needs source-grid resolution and a stronger collision policy.",
+          "config": {
+            "coverage": "expanded",
+            "overlay": "chip",
+            "selected": "bayview"
+          }
+        },
+        {
+          "id": "boundary-points",
+          "group": "What a forecast represents",
+          "key": "boundary",
+          "value": "points",
+          "title": "Forecast points",
+          "tag": "Recommended for existing data",
+          "description": "A visible dot anchors every ticket to one coordinate. No filled region claims uniform weather between points.",
+          "benefit": "Matches the existing app’s location-based data model.",
+          "cost": "“Region” is a navigation label, not an area measurement.",
+          "config": {
+            "boundary": "points"
+          }
+        },
+        {
+          "id": "boundary-halo",
+          "group": "What a forecast represents",
+          "key": "boundary",
+          "value": "halo",
+          "title": "A soft selection area",
+          "tag": "A sense of vicinity",
+          "description": "A dashed, lightly filled ellipse around the selected forecast suggests the immediate vicinity without outlining neighborhoods.",
+          "benefit": "Selection is easy to locate.",
+          "cost": "A radius looks quantitative. Without a defined basis, this is a schematic selection aid only.",
+          "config": {
+            "boundary": "halo"
+          }
+        },
+        {
+          "id": "boundary-areas",
+          "group": "What a forecast represents",
+          "key": "boundary",
+          "value": "areas",
+          "title": "Neighborhood context outlines",
+          "tag": "Context, not weather regions",
+          "description": "Dashed public analysis-neighborhood boundaries provide orientation. Some do not match the app’s names, so they are not clickable forecast areas.",
+          "benefit": "Shows the cost of adding area boundaries before a weather-region model exists.",
+          "cost": "Can imply false precision and conflict with Inner / Outer Sunset or the Market Street point.",
+          "config": {
+            "boundary": "areas"
+          }
+        },
+        {
+          "id": "beach-independent",
+          "group": "How beaches appear",
+          "key": "beach",
+          "value": "independent",
+          "title": "Independent named beach layer",
+          "tag": "Recommended on desktop",
+          "description": "Show four named beach points along the water, with a fixed list in the dock. These are not attached to weather regions.",
+          "benefit": "A beach can be selected from any neighborhood.",
+          "cost": "The northern waterfront needs careful label placement.",
+          "config": {
+            "beach": "independent"
+          }
+        },
+        {
+          "id": "beach-symbols",
+          "group": "How beaches appear",
+          "key": "beach",
+          "value": "symbols",
+          "title": "Symbols on map, names in dock",
+          "tag": "Recommended on mobile",
+          "description": "The same independent beach points remain, but their names live in the beach list and the opened detail.",
+          "benefit": "Preserves the coastline and avoids cramming northern labels.",
+          "cost": "One more interaction to identify an unfamiliar beach.",
+          "config": {
+            "beach": "symbols"
+          }
+        },
+        {
+          "id": "beach-selected",
+          "group": "How beaches appear",
+          "key": "beach",
+          "value": "selected",
+          "title": "One suggested beach",
+          "tag": "Lower map density",
+          "description": "Show one sample suggested beach for the selected weather point, keeping all beaches in the dock.",
+          "benefit": "Cuts clutter and resembles the app’s current region-to-swim-spot shortcut.",
+          "cost": "Hides nearby alternatives and reintroduces a relationship the geography may not justify.",
+          "config": {
+            "beach": "selected"
+          }
+        },
+        {
+          "id": "time-now",
+          "group": "Time model",
+          "key": "time",
+          "value": "now",
+          "title": "A shared requested hour",
+          "tag": "Recommended",
+          "description": "Every point is compared at noon in the baseline. The selected dock previews the next few hours.",
+          "benefit": "Same-time comparisons are interpretable.",
+          "cost": "Must separately label forecast issuance and observations when connected.",
+          "config": {
+            "time": "now"
+          }
+        },
+        {
+          "id": "time-later",
+          "group": "Time model",
+          "key": "time",
+          "value": "later",
+          "title": "One citywide time step",
+          "tag": "Planning preview",
+          "description": "The whole map moves to 4 pm together. This fixture warms the coast slightly and cools the east slightly.",
+          "benefit": "Lets you compare where to go later without changing ten region views.",
+          "cost": "Hour changes need loading and freshness semantics for every field.",
+          "config": {
+            "time": "later"
+          }
+        }
+      ]
+    }
+  ],
+  "rejectedOverlays": [
+    {
+      "id": "always-expanded",
+      "reason": "Ten full forecast cards overwhelm the geography."
+    },
+    {
+      "id": "hover-only",
+      "reason": "Fails touch and keyboard discovery."
+    },
+    {
+      "id": "icon-only",
+      "reason": "Cannot identify neighborhoods or communicate a metric value."
+    },
+    {
+      "id": "large-bubble",
+      "reason": "Covers northern labels and prevents repeated multi-region comparison."
+    }
+  ]
+}

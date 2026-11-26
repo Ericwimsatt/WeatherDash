@@ -1,0 +1,36 @@
+{
+  "study": "San Francisco regional weather map",
+  "version": 1,
+  "exportedAt": "2026-11-26T11:38:57.353Z",
+  "weatherData": "synthetic design fixtures",
+  "branch": "codex/sf-regional-map-exploration",
+  "recipe": {
+    "orientation": "parks",
+    "overlay": "ticket",
+    "pattern": "exceptions",
+    "scene": "marine",
+    "swim": "swimmer",
+    "uv": "uv",
+    "location": "dot",
+    "jump": "edge",
+    "boundary": "points",
+    "beach": "independent",
+    "time": "later",
+    "selected": "mission",
+    "located": true,
+    "unit": "f",
+    "metric": "wind",
+    "coverage": "existing"
+  },
+  "keptOptions": [
+    {
+      "id": "parks",
+      "title": "Parks are the structure",
+      "chapter": "orientation",
+      "config": {
+        "orientation": "parks"
+      }
+    }
+  ],
+  "notes": "QA note: parks plus tickets."
+}
