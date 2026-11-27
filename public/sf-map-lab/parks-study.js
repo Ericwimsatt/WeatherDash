@@ -24,7 +24,7 @@ const polygon=polys=>polys.map(poly=>poly.map(r=>path(r)+'Z').join('')).join('')
   }
 const terrain=[['flat','Flat land'],['bands','Elevation bands'],['relief','Shaded relief'],['contours','Sparse contours'],['topographic','Full topographic'],['texture','Hill texture']];
 const parks=[['fill','Green fill'],['elevation','Green elevation'],['outline','Park outlines'],['trees','Repeating trees']];
-const weather=[['readings','High / low readings'],['gradient','Daily-high gradient'],['hybrid','Gradient + readings']];
+const weather=[['readings','High / low readings'],['gradient','Daily-high gradient'],['hybrid','Gradient + 11 readings'],['sparse-hybrid','Gradient + sparse high / low']];
 const options={terrain,parks,weather};
 const g=SF_GEOGRAPHY,land=g.neighborhoods.map(n=>polygon(n.polygons)).join('');
 const parkPath=g.neighborhoods.filter(n=>['Presidio','Lincoln Park'].includes(n.name)).map(n=>polygon(n.polygons)).join('')+g.parks.map(p=>polygon(p.polygons)).join('');
@@ -45,9 +45,10 @@ const wind=p=>p.wind>15?`<span class="wind-value"><svg viewBox="0 0 24 18" aria-
 function readings(s){
  const visible=points.filter(p=>s.density==='22'||F.overviewIds.includes(p.id));
  return visible.map(p=>{
-  const only=s.weather==='gradient',anchor=F.highLabelIds.includes(p.id);
-  if(only&&!anchor&&p.wind<=15)return '';
-  return `<button class="weather-label ${only?'high-only':''}" data-point="${p.id}" style="${position(p.lon,p.lat)}" aria-label="${p.name}: high ${p.high}, low ${p.low} degrees Fahrenheit, UV maximum ${p.uvMax}${p.precip>.05?`, rain ${p.precip.toFixed(2)} inches`:''}${p.wind>15?`, wind ${p.wind} miles per hour`:''}">${!only?`<span class="temperature-row"><b class="temp-high">${p.high}°</b><span class="divider">/</span><span class="temp-low">${p.low}°</span></span><span class="secondary-row"><span class="uv-value">UV${p.uvMax}</span>${p.precip>.05?`<span class="rain-value">${p.precip.toFixed(2)}″</span>`:''}</span>`:anchor?`<b class="temp-high">${p.high}°</b>`:''}${wind(p)}</button>`;
+  const only=s.weather==='gradient',sparse=s.weather==='sparse-hybrid',anchor=F.highLabelIds.includes(p.id);
+  if((only||sparse)&&!anchor&&p.wind<=15)return '';
+  const showReading=!only&&(!sparse||anchor);
+  return `<button class="weather-label ${only?'high-only':''}" data-point="${p.id}" style="${position(p.lon,p.lat)}" aria-label="${p.name}: high ${p.high}, low ${p.low} degrees Fahrenheit, UV maximum ${p.uvMax}${p.precip>.05?`, rain ${p.precip.toFixed(2)} inches`:''}${p.wind>15?`, wind ${p.wind} miles per hour`:''}">${showReading?`<span class="temperature-row"><b class="temp-high">${p.high}°</b><span class="divider">/</span><span class="temp-low">${p.low}°</span></span><span class="secondary-row"><span class="uv-value">UV${p.uvMax}</span>${p.precip>.05?`<span class="rain-value">${p.precip.toFixed(2)}″</span>`:''}</span>`:only&&anchor?`<b class="temp-high">${p.high}°</b>`:''}${wind(p)}</button>`;
  }).join('');
 }
 function markup(s){return `<div class="map-canvas"><div class="map-model">${geography(s)}<div class="weather-layer">${readings(s)}</div>${F.beaches.map(b=>`<button class="beach-marker" data-beach="${b.id}" style="${position(b.lon,b.lat)}" aria-label="${b.name}: beach conditions">${icons.svg('freestyle')}</button>`).join('')}<span class="person-marker" role="img" aria-label="Simulated personal location" style="${position(-122.448,37.730)}">${icons.svg('person-pin')}</span><div class="region-exits"><button data-destination="Marin">${icons.svg('compass-solid')} Marin</button><button data-destination="East Bay">East Bay ${icons.svg('compass-solid')}</button></div></div></div>`;}
@@ -56,7 +57,7 @@ let state={cards:[],columns:2,next:1,preset:'curated'},stored;
 try{stored=JSON.parse(localStorage.getItem(key));}catch{}
 const recipe=(t,p,w)=>({terrain:t,parks:p,weather:w,density:'11'});
 function recipes(mode){
- if(mode==='curated')return [recipe('bands','elevation','readings'),recipe('texture','trees','readings'),recipe('bands','outline','gradient'),recipe('relief','fill','hybrid'),recipe('flat','trees','gradient'),recipe('topographic','outline','readings'),recipe('contours','fill','gradient'),recipe('texture','elevation','hybrid'),recipe('relief','trees','gradient'),recipe('flat','fill','readings'),recipe('topographic','trees','hybrid'),recipe('contours','elevation','readings')];
+ if(mode==='curated')return [recipe('bands','outline','sparse-hybrid'),recipe('bands','elevation','readings'),recipe('texture','trees','readings'),recipe('bands','outline','gradient'),recipe('relief','fill','hybrid'),recipe('flat','trees','gradient'),recipe('topographic','outline','readings'),recipe('contours','fill','gradient'),recipe('texture','elevation','hybrid'),recipe('relief','trees','gradient'),recipe('topographic','trees','hybrid'),recipe('contours','elevation','readings')];
  const result=[];for(const[t]of terrain)for(const[p]of mode==='weather'?[[$('#builder-parks').value]]:parks)for(const[w]of mode==='all'||mode==='weather'?weather:[[$('#builder-weather').value]])result.push(recipe(t,p,w));return result;
 }
 function select(name,value,cls=''){return `<label>${name==='terrain'?'Hills':name==='parks'?'Parks':'Weather'}<select class="${cls}" data-setting="${name}">${options[name].map(([id,label])=>`<option value="${id}" ${id===value?'selected':''}>${label}</option>`).join('')}</select></label>`;}
@@ -67,7 +68,7 @@ function loadMap(target){if(target.dataset.loaded)return;const card=state.cards.
 const label=(name,id)=>options[name].find(o=>o[0]===id)?.[1]||id;
 function render(){
  lazy.disconnect();resizer.disconnect();$('#preset').value=state.preset||'curated';$('#board').style.setProperty('--columns',state.columns);
- $('#board').innerHTML=state.cards.filter(c=>!c.hidden).map(c=>`<article class="choice-card ${c.kept?'kept':''} ${c.minimized?'minimized':''}" data-card="${c.id}"><header><h2>${label('terrain',c.terrain)} <span>× ${label('parks',c.parks)}</span></h2><button data-action="keep" aria-pressed="${!!c.kept}">${c.kept?'Kept':'Keep'}</button></header><div class="card-controls">${select('terrain',c.terrain)}${select('parks',c.parks)}${select('weather',c.weather)}</div><div class="map-slot" data-map="${c.id}"></div><div class="map-key">${c.weather==='readings'?'<span>High / low °F · UV max · rain in</span>':'<span class="gradient-key">60° <i></i> 74° · daily high</span>'}<span>${c.weather==='gradient'?'5 temperature labels':c.density+' forecast points'} · wind &gt;15 mph</span></div><footer><button data-action="inspect">Inspect larger</button><button data-action="minimize">${c.minimized?'Expand':'Minimize'}</button><button data-action="hide">Hide</button></footer></article>`).join('');
+ $('#board').innerHTML=state.cards.filter(c=>!c.hidden).map(c=>`<article class="choice-card ${c.kept?'kept':''} ${c.minimized?'minimized':''}" data-card="${c.id}"><header><h2>${label('terrain',c.terrain)} <span>× ${label('parks',c.parks)}</span></h2><button data-action="keep" aria-pressed="${!!c.kept}">${c.kept?'Kept':'Keep'}</button></header><div class="card-controls">${select('terrain',c.terrain)}${select('parks',c.parks)}${select('weather',c.weather)}</div><div class="map-slot" data-map="${c.id}"></div><div class="map-key">${c.weather==='readings'?'<span>High / low °F · UV max · rain in</span>':'<span class="gradient-key">60° <i></i> 74° · daily high</span>'}<span>${c.weather==='gradient'?'5 temperature labels':c.weather==='sparse-hybrid'?'5 high / low labels · 22 gradient samples':c.density+' forecast points'} · wind &gt;15 mph</span></div><footer><button data-action="inspect">Inspect larger</button><button data-action="minimize">${c.minimized?'Expand':'Minimize'}</button><button data-action="hide">Hide</button></footer></article>`).join('');
  document.querySelectorAll('.map-slot').forEach(el=>lazy.observe(el));
  $('#board-count').textContent=`${state.cards.filter(c=>!c.hidden).length} of ${state.cards.length} maps shown · ${state.cards.filter(c=>c.kept).length} kept`;
  $('#restore').disabled=!state.cards.some(c=>c.hidden||c.minimized);
@@ -76,6 +77,13 @@ function render(){
 function preset(mode){state.preset=mode;state.cards=recipes(mode).map(r=>({...r,id:'c'+state.next++}));render();}
 for(const name of Object.keys(options))$('#builder-'+name).innerHTML=options[name].map(([id,label])=>`<option value="${id}" ${id===({terrain:'bands',parks:'elevation',weather:'readings'}[name])?'selected':''}>${label}</option>`).join('');
 if(stored&&Array.isArray(stored.cards)&&stored.cards.length&&stored.cards.length<=100&&stored.cards.every(c=>Object.keys(options).every(k=>options[k].some(o=>o[0]===c[k])))){state=stored;render();}else preset('curated');
+// A shareable link reveals the new comparison without replacing saved choices.
+if(new URLSearchParams(location.search).get('weather')==='sparse-hybrid'){
+ const existing=state.cards.find(c=>c.weather==='sparse-hybrid');
+ if(existing){existing.hidden=false;existing.minimized=false;state.cards=[existing,...state.cards.filter(c=>c!==existing)];}
+ else state.cards.unshift({...recipe('bands','outline','sparse-hybrid'),id:'c'+state.next++});
+ render();
+}
 $('#preset').onchange=e=>preset(e.target.value);
 $('#add').onclick=()=>{const r=recipe(...['terrain','parks','weather'].map(k=>$('#builder-'+k).value));const existing=state.cards.find(c=>Object.keys(r).every(k=>c[k]===r[k]));if(existing){existing.hidden=false;existing.minimized=false;render();document.querySelector(`[data-card="${existing.id}"]`).scrollIntoView({block:'center'});}else{const card={...r,id:'c'+state.next++};state.cards.unshift(card);render();}};
 $('#board').onchange=e=>{const el=e.target.closest('[data-card]');if(!el)return;const c=state.cards.find(c=>c.id===el.dataset.card);c[e.target.dataset.setting]=e.target.value;render();document.querySelector(`[data-card="${c.id}"] [data-setting="${e.target.dataset.setting}"]`)?.focus({preventScroll:true});};
@@ -84,7 +92,7 @@ $('#board').onclick=e=>{const b=e.target.closest('[data-action]');if(!b){const m
 $('#restore').onclick=()=>{state.cards.forEach(c=>{c.hidden=false;c.minimized=false;});render();};
 document.querySelectorAll('[data-columns]').forEach(b=>b.onclick=()=>{state.columns=Number(b.dataset.columns);render();});
 $('#inspector').onclick=e=>{const p=e.target.closest('[data-point]'),b=e.target.closest('[data-beach]'),d=e.target.closest('[data-destination]');if(p){const v=points.find(x=>x.id===p.dataset.point);$('#inspect-message').textContent=`${v.name} · high ${v.high}° / low ${v.low}°F · UV max ${v.uvMax}${v.precip>.05?' · rain '+v.precip.toFixed(2)+'″':''}${v.wind>15?' · wind '+v.wind+' mph':''} · demo forecast`;}if(b){const v=F.beaches.find(x=>x.id===b.dataset.beach);$('#inspect-message').textContent=`${v.name} · water ${v.water}°F · surf ${v.surf} · wind ${v.wind} · ${v.quality} · illustrative beach conditions`;}if(d)$('#inspect-message').textContent=`${d.dataset.destination} would open its regional map. This study covers SF.`;};
-$('#export').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({version:6,...state,windRule:'strictly >15 mph',rainRule:'strictly >0.05 inches',gradient:'Synthetic interpolated daily highs; not live weather'},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='sf-map-combinations.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('#export').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({version:7,...state,windRule:'strictly >15 mph',rainRule:'strictly >0.05 inches',gradient:'Synthetic interpolated daily highs; not live weather'},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='sf-map-combinations.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 const renderAll=()=>document.querySelectorAll('.map-slot').forEach(loadMap);window.addEventListener('beforeprint',renderAll);
 window.MapStudy={options,points,getState:()=>structuredClone(state),renderAll,preset,renderMap:markup,overviewIds:F.overviewIds};
 })();

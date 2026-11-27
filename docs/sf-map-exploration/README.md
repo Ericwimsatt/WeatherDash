@@ -2,7 +2,7 @@
 
 Branch: `codex/sf-regional-map-exploration`.
 
-The current [combination board](../../public/sf-map-lab/parks-study.html) compares six hill treatments, four park treatments and three weather displays in a simultaneous grid. It starts with twelve combinations, supports all 72 permutations, uses eleven overview locations and shows wind only above 15 mph. See [COMBINATION-STUDY.md](../../public/sf-map-lab/COMBINATION-STUDY.md), `browser-qa-v6.cjs`, and `qa-v6.json`. Revision 5’s high-led text and smaller teal swimmer treatment is preserved in [the selected-text archive](../../public/sf-map-lab/parks-study-v5.html).
+The current [combination board](../../public/sf-map-lab/parks-study.html) compares six hill treatments, four park treatments and four weather displays in a simultaneous grid. It starts with twelve combinations, supports all 96 permutations, uses eleven overview locations and shows wind only above 15 mph. Revision 7 adds five sparse high/low labels over a daily-high gradient informed by all 22 fixture samples; the eleven-label hybrid remains selectable. See [COMBINATION-STUDY.md](../../public/sf-map-lab/COMBINATION-STUDY.md), `browser-qa-v6.cjs`, and `qa-v6.json`. Revision 5’s high-led text and smaller teal swimmer treatment is preserved in [the selected-text archive](../../public/sf-map-lab/parks-study-v5.html).
 
 The earlier [density and style comparison](../../public/sf-map-lab/parks-study-v4.html), documented in [DENSITY-STUDY.md](../../public/sf-map-lab/DENSITY-STUDY.md), preserves six weather styles, five swimmer-button treatments and softer elevation bands. Its browser script and evidence are `browser-qa-v4.cjs` and `review-v4/`.
 
