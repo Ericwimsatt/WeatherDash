@@ -2,7 +2,7 @@
 
 Branch: `codex/sf-regional-map-exploration`.
 
-The current [selected preview](../../public/sf-map-lab/parks-study.html) uses 18 pt / 14 pt high-led weather, the solid teal swimmer button with a half-size glyph, and all 22 locations at every width. See [TYPE-SELECTION.md](../../public/sf-map-lab/TYPE-SELECTION.md), `browser-qa-v5.cjs` and `review-v5/`.
+The current [combination board](../../public/sf-map-lab/parks-study.html) compares six hill treatments, four park treatments and three weather displays in a simultaneous grid. It starts with twelve combinations, supports all 72 permutations, uses eleven overview locations and shows wind only above 15 mph. See [COMBINATION-STUDY.md](../../public/sf-map-lab/COMBINATION-STUDY.md), `browser-qa-v6.cjs`, and `qa-v6.json`. Revision 5’s high-led text and smaller teal swimmer treatment is preserved in [the selected-text archive](../../public/sf-map-lab/parks-study-v5.html).
 
 The earlier [density and style comparison](../../public/sf-map-lab/parks-study-v4.html), documented in [DENSITY-STUDY.md](../../public/sf-map-lab/DENSITY-STUDY.md), preserves six weather styles, five swimmer-button treatments and softer elevation bands. Its browser script and evidence are `browser-qa-v4.cjs` and `review-v4/`.
 
@@ -12,7 +12,7 @@ Open [the comparison lab](../../public/sf-map-lab/index.html), [morning report](
 
 All UI and fixture code is isolated in `public/sf-map-lab/`. The working dashboard, providers, database, routing, and SD beach finder are untouched. No deploy or push was requested or performed.
 
-The comparison uses a component grid that switches to a horizontal carousel when it would consume more than half the viewport height. Every option retains its own map preview and source configuration. Minimize, hide and restore are presentation state; keeping options and provisional recipe selections are saved locally and can be exported as JSON.
+The archived original comparison uses a component grid that can switch to a horizontal carousel. The current combination board keeps every map in a vertical grid. Every option retains its own map preview and source configuration. Minimize, hide and restore are presentation state; keeping options and provisional recipe selections are saved locally and can be exported as JSON.
 
 ## Source of truth
 

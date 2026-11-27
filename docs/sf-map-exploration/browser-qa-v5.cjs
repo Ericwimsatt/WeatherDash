@@ -8,7 +8,7 @@ const fs=require('node:fs/promises');
  const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1100},acceptDownloads:true});
  const errors=[],checks=[];page.on('pageerror',e=>errors.push(e.message));
  const check=(name,result)=>{assert.ok(result,name);checks.push(name)};
- const base=pathToFileURL(resolve(__dirname,'../../public/sf-map-lab/parks-study.html')).href;
+ const base=pathToFileURL(resolve(__dirname,'../../public/sf-map-lab/parks-study-v5.html')).href;
  const settle=()=>page.evaluate(async()=>{await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))});
  await page.goto(base);await page.evaluate(()=>{localStorage.removeItem('sf-parks-study-v5');localStorage.setItem('sf-parks-study-v4',JSON.stringify({weatherStyle:'compact',swimmerStyle:'disc',density:'10'}));});await page.reload();await settle();
  check('Selected weather direction is the new default',await page.evaluate(()=>ParksStudy.getConfig().weatherStyle==='high-led'));

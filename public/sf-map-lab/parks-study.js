@@ -1,52 +1,10 @@
 (() => {
-  const $ = selector => document.querySelector(selector), icons = ParksIcons, choices = DENSITY_CHOICES;
-  const bounds = { w: -122.522, e: -122.351, n: 37.820, s: 37.706 };
-  const project = (lon, lat) => [(lon - bounds.w) / (bounds.e - bounds.w) * 1000, (bounds.n - lat) / (bounds.n - bounds.s) * 900];
-  const position = (lon, lat) => { const [x,y] = project(lon,lat); return `left:${x/10}%;top:${y/9}%`; };
-  const path = points => points.map((p,i) => `${i ? 'L' : 'M'}${project(...p).map(v => v.toFixed(1)).join(',')}`).join('');
-  const polygon = polygons => polygons.map(poly => poly.map(r => path(r) + 'Z').join('')).join('');
-  const original = SFMap.locations.filter(p => !p.proposed).map((p,i) => ({...p,high:[61,65,60,66,70,67,64,73,68,62][i],low:[51,53,50,52,55,54,53,56,54,49][i],uvMax:[3,4,3,4,5,4,4,5,5,4][i],precip:[.12,.06,.09,.03,0,.05,.04,0,0,.05][i]}));
-  // Additional coordinates and values are illustrative study proposals, not new provider integrations.
-  const additions = [
-    ['presidio','Presidio',-122.468,37.795,61,50,4,.08],
-    ['haight','Haight-Ashbury',-122.447,37.770,66,52,4,.06],
-    ['castro','Castro',-122.435,37.761,69,53,5,.03],
-    ['noeValley','Noe Valley',-122.4335,37.7489,70,54,5,0],
-    ['glenPark','Glen Park',-122.433,37.736,67,52,4,.04],
-    ['bernal','Bernal Heights',-122.416,37.741,70,54,5,0],
-    ['potreroHill','Potrero Hill',-122.398,37.7572,71,55,5,0],
-    ['missionBay','Mission Bay',-122.392,37.773,70,55,5,.02],
-    ['bayview','Bayview',-122.3895,37.7347,69,53,5,.06],
-    ['excelsior','Excelsior',-122.429,37.722,65,51,4,.05],
-    ['westPortal','West Portal',-122.465,37.741,63,50,3,.08],
-    ['ingleside','Ingleside',-122.458,37.721,62,49,3,.06],
-  ].map(([id,name,lon,lat,high,low,uvMax,precip])=>({id,name,lon,lat,high,low,uvMax,precip,added:true}));
-  const points = [...original,...additions];
-  const pinned = {terrain:'bands',swim:'freestyle',jump:'compass-solid',location:'person-pin'};
-  const defaults = {...pinned,weatherStyle:'high-led',swimmerStyle:'filled',density:'22',sample:'mixed',selected:'innerSunset',located:true};
-  let stored = {};
-  try { stored = JSON.parse(localStorage.getItem('sf-parks-study-v5') || '{}') || {}; } catch {}
-  const query = Object.fromEntries(new URLSearchParams(location.search));
-  const config = {...defaults};
-  for (const [key,values] of Object.entries({weatherStyle:choices.weather.map(o=>o.id),swimmerStyle:choices.swimmer.map(o=>o.id),density:['22'],sample:['mixed','dry'],selected:points.map(p=>p.id)})) {
-    const value = query[key] ?? stored[key]; if (values.includes(value)) config[key] = value;
-  }
-  config.located = query.located !== undefined ? query.located === 'true' : stored.located !== undefined ? stored.located === true : true;
-  let kept = Array.isArray(stored.kept)?stored.kept:[], hidden={weather:[],swimmer:[]}, minimized=[], activeFamily='weather';
-  function visiblePoints() { return points; }
-  function normalizeSelection(){if(!visiblePoints(config).some(p=>p.id===config.selected))config.selected='innerSunset';}
-  const roads=[
-    {id:'101-north',highway:true,points:[[-122.4786,37.8324],[-122.4758,37.8077],[-122.473,37.800],[-122.460,37.7987],[-122.447,37.8003],[-122.424,37.799]]},
-    {id:'van-ness-connection',points:[[-122.424,37.799],[-122.420,37.775],[-122.417,37.769],[-122.407,37.769]]},
-    {id:'101-south',highway:true,points:[[-122.406,37.707],[-122.408,37.735],[-122.407,37.751],[-122.405,37.765],[-122.407,37.769]]},
-    {id:'80',highway:true,points:[[-122.407,37.769],[-122.400,37.774],[-122.391,37.784],[-122.386,37.789],[-122.365,37.808],[-122.348,37.815]]},
-    {id:'280',highway:true,points:[[-122.459,37.707],[-122.438,37.727],[-122.424,37.731],[-122.408,37.735],[-122.395,37.759],[-122.392,37.771]]},
-    {id:'19th-park-presidio',points:[[-122.477,37.707],[-122.476,37.742],[-122.477,37.764],[-122.477,37.773],[-122.472,37.787],[-122.473,37.800]]},
-    {id:'geary',points:[[-122.510,37.780],[-122.482,37.780],[-122.454,37.781],[-122.429,37.785],[-122.405,37.787]]},
-    {id:'market',points:[[-122.443,37.759],[-122.420,37.775],[-122.394,37.794]]},
-    {id:'sunset',points:[[-122.496,37.733],[-122.495,37.765]]},
-    {id:'waterfront',points:[[-122.419,37.808],[-122.407,37.809],[-122.397,37.802],[-122.394,37.794],[-122.388,37.785],[-122.391,37.784]]},
-  ];
+'use strict';
+const $=s=>document.querySelector(s), F=SF_COMPARISON_FIXTURES, bounds=F.bounds, points=F.points, roads=F.roads, icons=ParksIcons;
+const project=(lon,lat)=>[(lon-bounds.w)/(bounds.e-bounds.w)*1000,(bounds.n-lat)/(bounds.n-bounds.s)*900];
+const position=(lon,lat)=>{const [x,y]=project(lon,lat);return `left:${x/10}%;top:${y/9}%`;};
+const path=ps=>ps.map((p,i)=>`${i?'L':'M'}${project(...p).map(v=>v.toFixed(1)).join(',')}`).join('');
+const polygon=polys=>polys.map(poly=>poly.map(r=>path(r)+'Z').join('')).join('');
   function bridge(start,end,kind) {
     const [x,y]=project(...start),[ex,ey]=project(...end);
     const length=Math.hypot(ex-x,ey-y), angle=Math.atan2(ey-y,ex-x)*180/Math.PI;
@@ -64,87 +22,69 @@
   function bands(clip,colors) {
     return `<g clip-path="url(#${clip})"><g transform="${terrainTransform}">${SF_TERRAIN.contours.filter(l=>[60,120,180,240].includes(l.m)).map((l,i)=>`<path data-elevation="${l.m}" d="${l.paths.map(p=>p+'Z').join('')}" fill="${colors[i]}" fill-rule="evenodd"/>`).join('')}</g></g>`;
   }
-  let geographySerial=0;
-  function geography() {
-    const id=geographySerial++,landId=`sf-land-${id}`,parkId=`sf-parks-${id}`;
-    const g=SF_GEOGRAPHY;
-    const land=g.neighborhoods.map(n=>polygon(n.polygons)).join('');
-    const parks=g.neighborhoods.filter(n=>['Presidio','Lincoln Park'].includes(n.name)).map(n=>polygon(n.polygons)).join('')+g.parks.map(p=>polygon(p.polygons)).join('');
-    return `<svg class="geography-v3" viewBox="0 0 1000 900" aria-hidden="true"><defs><clipPath id="${landId}"><path d="${land}"/></clipPath><clipPath id="${parkId}"><path d="${parks}"/></clipPath></defs><rect width="1000" height="900" class="map-sea"/><path class="map-land" d="${land}"/>${bands(landId,bandColors.brown)}<path class="map-parks" d="${parks}"/>${bands(parkId,bandColors.green)}<path class="lake-water" d="${path([[-122.497,37.727],[-122.494,37.730],[-122.491,37.730],[-122.489,37.725],[-122.490,37.720],[-122.494,37.720],[-122.496,37.723]])}Z"/><g class="road-lines">${roads.map(r=>`<path data-road="${r.id}" class="${r.highway?'highway':''}" d="${path(r.points)}"/>`).join('')}</g>${bridge([-122.4758,37.8077],[-122.4786,37.8324],'golden-gate')}${bridge([-122.386,37.789],[-122.365,37.808],'bay-bridge')}</svg>`;
-  }
-  function weatherLabel(p,state) {
-    const rain=state.sample==='dry'?0:p.precip;
-    return `<button type="button" class="weather-label ${p.id===state.selected?'is-selected':''}" data-point="${p.id}" style="${position(p.lon,p.lat)}" title="${p.name}${p.added?' · added demo point':''}" aria-pressed="${p.id===state.selected}" aria-label="${p.name}: daily high ${p.high}, low ${p.low} degrees Fahrenheit, UV maximum ${p.uvMax}${rain>.05?`, precipitation ${rain.toFixed(2)} inches`:''}"><span class="weather-body"><span class="temperature-row"><span class="temp-high">${p.high}°</span><span class="temp-divider">/</span><span class="temp-low">${p.low}°</span></span><span class="secondary-row"><span class="uv-value">UV${p.uvMax}</span>${rain>.05?`<span class="rain-value">${rain.toFixed(2)}″</span>`:''}</span></span></button>`;
-  }
-  function markup(state=config) {
-    const selected=points.find(p=>p.id===state.selected)||original[3],visible=visiblePoints(state);
-    return `<article class="selected-map weather-${state.weatherStyle} swim-${state.swimmerStyle}"><header class="map-header"><div class="map-brand">Eric’s weather<span>San Francisco</span></div><div class="map-units">${visible.length} illustrative forecast points<br>High / low °F · UV max · rain in</div></header><div class="map-surface">${geography()}<div class="weather-layer">${visible.map(p=>weatherLabel(p,state)).join('')}</div><div class="beach-layer">${SFMap.beaches.map(b=>`<button type="button" class="beach-marker" data-beach="${b.id}" style="${position(b.lon,b.lat)}" aria-label="${b.name}: show beach conditions">${icons.svg(pinned.swim)}</button>`).join('')}</div>${state.located?`<div class="person-layer"><div class="person-marker" role="img" aria-label="Simulated personal location" style="${position(-122.448,37.730)}">${icons.svg(pinned.location)}</div></div>`:''}<div class="region-exits"><button type="button" data-destination="Marin">${icons.svg(pinned.jump)} Marin</button><button type="button" data-destination="East Bay">East Bay ${icons.svg(pinned.jump)}</button></div></div><div class="region-picker"><label>Forecast point<select data-point-picker>${visible.map(p=>`<option value="${p.id}" ${p.id===state.selected?'selected':''}>${p.name}${p.added?' · added':''}</option>`).join('')}</select></label><span>${selected.name}${selected.added?' · proposed demo location':''}</span></div><footer class="map-footer"><span>${visible.length} demo locations · ${visible.filter(p=>p.added).length} added for this study</span><span>Land / parks: DataSF · elevation: USGS · schematic roads</span></footer></article>`;
-  }
-  function save() {
-    try {localStorage.setItem('sf-parks-study-v5',JSON.stringify({...config,kept}));} catch {}
-    $('#choice-status').textContent=`${config.density} locations · ${kept.length} options kept · choices saved locally`;
-  }
-  function renderMain() {
-    normalizeSelection();const target=$('#main-map');target.innerHTML=markup();
-    target.querySelectorAll('[data-point]').forEach(b=>b.onclick=()=>{config.selected=b.dataset.point;renderMain();target.querySelector(`[data-point="${config.selected}"]`)?.focus({preventScroll:true});save();});
-    target.querySelector('[data-point-picker]').onchange=e=>{config.selected=e.target.value;renderMain();target.querySelector('[data-point-picker]').focus({preventScroll:true});save();};
-    target.querySelectorAll('[data-destination]').forEach(b=>b.onclick=()=>$('#map-message').textContent=`${b.dataset.destination} would open its regional map. This mockup covers SF only.`);
-    target.querySelectorAll('[data-beach]').forEach(b=>b.onclick=()=>{
-      const beach=SFMap.beaches.find(p=>p.id===b.dataset.beach);
-      $('#beach-content').innerHTML=`<h2>${beach.name}</h2><dl><dt>Water</dt><dd>${beach.water}°F</dd><dt>Surf</dt><dd>${beach.surf}</dd><dt>Wind</dt><dd>${beach.wind}</dd><dt>Quality</dt><dd>${beach.quality}</dd></dl><p>Illustrative beach conditions, independent of the selected weather region.</p>`;
-      $('#beach-detail').showModal();
-    });
-  }
-  const previewObserver=new ResizeObserver(entries=>entries.forEach(e=>scalePreview(e.target)));
-  function scalePreview(el) {
-    const map=el.querySelector('.selected-map');if(!map)return;
-    const beach=el.classList.contains('swimmer-crop'),scale=el.clientWidth/(beach?650:1000);
-    map.style.transform=beach?`translate(${-50*scale}px,${-80*scale}px) scale(${scale})`:`scale(${scale})`;
-  }
-  function renderDeck(family) {
-    const options=choices[family],el=$('#'+family+'-deck'),key=family==='weather'?'weatherStyle':'swimmerStyle';
-    el.classList.remove('carousel');
-    el.innerHTML=options.filter(o=>!hidden[family].includes(o.id)).map(o=>{
-      const identity=family+':'+o.id;
-      return `<article class="choice-card ${config[key]===o.id?'active':''} ${kept.includes(identity)?'kept':''} ${minimized.includes(identity)?'minimized':''}" data-card="${identity}"><header><h3>${o.title}</h3><span>${o.confirmed?'Selected direction':o.recommended?'Suggested starting point':o.id==='reference'||o.id==='bare'?'Reference treatment':'Alternative'}</span></header><div class="choice-map ${family==='swimmer'?'swimmer-crop':''}" data-preview="${o.id}"></div>${family==='swimmer'?`<div class="button-specimens swim-${o.id}" aria-hidden="true" inert>${['water','land','park'].map(surface=>`<div class="specimen-${surface}"><span class="button-sample"><button class="beach-marker" tabindex="-1">${icons.svg(pinned.swim)}</button></span><small>${surface}</small></div>`).join('')}</div>`:''}<p>${o.note}</p><p class="tradeoff">${o.tradeoff}</p><div class="choice-actions"><button type="button" data-try="${identity}" aria-pressed="${config[key]===o.id}">${config[key]===o.id?'On the map':'Try on map'}</button><button type="button" data-keep="${identity}" aria-pressed="${kept.includes(identity)}">${kept.includes(identity)?'Kept':'Keep option'}</button><button type="button" data-minimize="${identity}">${minimized.includes(identity)?'Expand':'Minimize'}</button><button type="button" data-hide="${identity}">Hide</button></div></article>`;
-    }).join('');
-    el.querySelectorAll('[data-preview]').forEach(preview=>{preview.innerHTML=markup({...config,[key]:preview.dataset.preview});preview.setAttribute('inert','');preview.setAttribute('aria-hidden','true');previewObserver.observe(preview);scalePreview(preview);});
-    el.querySelectorAll('[data-try]').forEach(b=>b.onclick=()=>{const[f,id]=b.dataset.try.split(':');activeFamily=f;config[f==='weather'?'weatherStyle':'swimmerStyle']=id;render();});
-    el.querySelectorAll('[data-keep]').forEach(b=>b.onclick=()=>{const id=b.dataset.keep;kept=kept.includes(id)?kept.filter(x=>x!==id):[...kept,id];save();renderDecks();});
-    el.querySelectorAll('[data-minimize]').forEach(b=>b.onclick=()=>{const id=b.dataset.minimize;minimized=minimized.includes(id)?minimized.filter(x=>x!==id):[...minimized,id];renderDecks();});
-    el.querySelectorAll('[data-hide]').forEach(b=>b.onclick=()=>{const[f,id]=b.dataset.hide.split(':');hidden[f].push(id);renderDecks();});
-    $('#'+family+'-restore').innerHTML=`<span>${options.length-hidden[family].length} of ${options.length} options visible</span>`+options.filter(o=>hidden[family].includes(o.id)).map(o=>`<button type="button" data-restore="${family}:${o.id}">Restore ${o.title}</button>`).join('');
-    $('#'+family+'-restore').querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>{const[f,id]=b.dataset.restore.split(':');hidden[f]=hidden[f].filter(x=>x!==id);renderDecks();});
-    requestAnimationFrame(()=>{el.classList.toggle('carousel',el.getBoundingClientRect().height>innerHeight*.5||innerWidth<700);el.querySelectorAll('.choice-map').forEach(scalePreview);});
-  }
-  function renderDecks(){
-    const active=document.activeElement,attr=['data-try','data-keep','data-minimize','data-hide','data-restore'].find(a=>active?.hasAttribute(a)),id=attr?active.getAttribute(attr):null;
-    previewObserver.disconnect();renderDeck('weather');renderDeck('swimmer');
-    if(id){const next=document.querySelector(`[${attr}="${id}"]`)||document.querySelector(`[data-restore="${id}"]`)||document.querySelector(`[data-try="${id}"]`);next?.focus({preventScroll:true});}
-  }
-  function renderControls() {
-    for(const [key,family]of [['weatherStyle','weather'],['swimmerStyle','swimmer']])$('#'+key).innerHTML=choices[family].map(o=>`<option value="${o.id}" ${config[key]===o.id?'selected':''}>${o.title}</option>`).join('');
-    $('#density').value=config.density;$('#sample-day').value=config.sample;
-    $('#demo-location').textContent=config.located?'Hide demo location':'Show demo location';$('#demo-location').setAttribute('aria-pressed',config.located);
-    $('#added-locations').textContent=additions.map(p=>p.name).join(' · ');
-  }
-  function render(){renderMain();renderControls();renderDecks();save();}
-  for(const key of ['weatherStyle','swimmerStyle','density'])$('#'+key).onchange=e=>{config[key]=e.target.value;activeFamily=key==='swimmerStyle'?'swimmer':'weather';render();};
-  $('#sample-day').onchange=e=>{config.sample=e.target.value;render();};
-  $('#demo-location').onclick=()=>{config.located=!config.located;render();};
-  $('#save-recipe').onclick=()=>{
-    const url=URL.createObjectURL(new Blob([JSON.stringify({version:5,recipe:config,kept,locationCount:visiblePoints(config).length,addedDemoLocations:additions.map(p=>({id:p.id,name:p.name,lon:p.lon,lat:p.lat})),terrainBlend:.7,precipitationRule:'daily inches strictly greater than 0.05'},null,2)],{type:'application/json'}));
-    const a=document.createElement('a');a.href=url;a.download='sf-density-choices.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  };
-  document.querySelectorAll('[data-scroll]').forEach(b=>b.onclick=()=>{const[f,direction]=b.dataset.scroll.split(':');activeFamily=f;$('#'+f+'-deck').scrollBy({left:Number(direction)*510,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});});
-  document.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>{const f=b.dataset.reset;hidden[f]=[];minimized=minimized.filter(id=>!id.startsWith(f+':'));renderDecks();});
-  document.addEventListener('keydown',e=>{
-    if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)||e.target.isContentEditable||$('#beach-detail').open||e.metaKey||e.ctrlKey||e.altKey)return;
-    if(!['h','l','Home','End'].includes(e.key))return;
-    const options=choices[activeFamily].filter(o=>!hidden[activeFamily].includes(o.id)),key=activeFamily==='weather'?'weatherStyle':'swimmerStyle';
-    const current=options.findIndex(o=>o.id===config[key]);const next=e.key==='Home'?0:e.key==='End'?options.length-1:Math.max(0,Math.min(options.length-1,current+(e.key==='h'?-1:1)));
-    if(options[next]){e.preventDefault();config[key]=options[next].id;render();document.querySelector(`[data-card="${activeFamily}:${options[next].id}"]`)?.scrollIntoView({block:'nearest',inline:'center',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});}
-  });
-  window.ParksStudy={getConfig:()=>({...config}),project,bounds,points,additions,visiblePoints,roads,bandColors,referenceBands,renderMap:markup};
-  render();
+const terrain=[['flat','Flat land'],['bands','Elevation bands'],['relief','Shaded relief'],['contours','Sparse contours'],['topographic','Full topographic'],['texture','Hill texture']];
+const parks=[['fill','Green fill'],['elevation','Green elevation'],['outline','Park outlines'],['trees','Repeating trees']];
+const weather=[['readings','High / low readings'],['gradient','Daily-high gradient'],['hybrid','Gradient + readings']];
+const options={terrain,parks,weather};
+const g=SF_GEOGRAPHY,land=g.neighborhoods.map(n=>polygon(n.polygons)).join('');
+const parkPath=g.neighborhoods.filter(n=>['Presidio','Lincoln Park'].includes(n.name)).map(n=>polygon(n.polygons)).join('')+g.parks.map(p=>polygon(p.polygons)).join('');
+let serial=0;
+function geography(s){
+ const id=serial++,l=`land${id}`,p=`parks${id}`,tree=`trees${id}`;
+ const raster=(file,opacity=1)=>`<g transform="${terrainTransform}"><image href="assets/${file}" width="1000" height="900" opacity="${opacity}"/></g>`;
+ let hills='';
+ if(s.terrain==='bands')hills=bands(l,bandColors.brown);
+ if(s.terrain==='relief')hills=raster('sf-hillshade.png',.4);
+ if(s.terrain==='texture')hills=raster('sf-hill-texture.png',.65);
+ if(['contours','topographic'].includes(s.terrain))hills=`<g transform="${terrainTransform}" fill="none" stroke="#9b8063" stroke-width="${s.terrain==='topographic'?.8:1.2}" opacity=".55">${SF_TERRAIN.contours.filter(c=>s.terrain==='topographic'||c.m%80===0).map(c=>`<path d="${c.paths.join('')}"/>`).join('')}</g>`;
+ const grad=s.weather!=='readings';
+ const parkFill=s.parks==='outline'?'none':s.parks==='trees'?'#e1e9d4':'#dce7ce';
+ return `<svg class="geography" viewBox="0 0 1000 900" aria-hidden="true"><defs><clipPath id="${l}"><path d="${land}"/></clipPath><clipPath id="${p}"><path d="${parkPath}"/></clipPath><pattern id="${tree}" width="31" height="34" patternUnits="userSpaceOnUse"><g fill="#5b7a50" opacity=".6"><path d="M8 4l-5 9h3l-5 7h6v5h2v-5h6l-5-7h3Z"/><path d="M24 17a4 4 0 0 1 3 7 4 4 0 0 1-7 0 4 4 0 0 1 4-7Z"/><path d="M23 23h2v7h-2Z"/></g></pattern></defs><rect width="1000" height="900" fill="#dceff5"/><path d="${land}" fill="#f0ede1"/><g clip-path="url(#${l})">${hills}${grad?'<image class="high-field" href="assets/sf-daily-high-gradient.png" width="1000" height="900"/>':''}</g><g class="park-treatment" ${grad?'opacity=".66"':''}><path d="${parkPath}" fill="${parkFill}" stroke="${s.parks==='outline'?'#608153':'#a9bf94'}" stroke-width="${s.parks==='outline'?2:1}"/>${s.parks==='elevation'?bands(p,bandColors.green):''}${s.parks==='trees'?`<path d="${parkPath}" fill="url(#${tree})"/>`:''}</g><path fill="#bcdfe6" d="${path([[-122.497,37.727],[-122.494,37.730],[-122.491,37.730],[-122.489,37.725],[-122.490,37.720],[-122.494,37.720],[-122.496,37.723]])}Z"/><g class="road-lines">${roads.map(r=>`<path data-road="${r.id}" class="${r.highway?'highway':''}" d="${path(r.points)}"/>`).join('')}</g>${bridge([-122.4758,37.8077],[-122.4786,37.8324],'golden-gate')}${bridge([-122.386,37.789],[-122.365,37.808],'bay-bridge')}</svg>`;
+}
+const wind=p=>p.wind>15?`<span class="wind-value"><svg viewBox="0 0 24 18" aria-hidden="true"><path d="M1 5h14c6 0 6-7 1-4M1 9h19M1 13h11c6 0 6 6 1 4"/></svg>${p.wind} mph</span>`:'';
+function readings(s){
+ const visible=points.filter(p=>s.density==='22'||F.overviewIds.includes(p.id));
+ return visible.map(p=>{
+  const only=s.weather==='gradient',anchor=F.highLabelIds.includes(p.id);
+  if(only&&!anchor&&p.wind<=15)return '';
+  return `<button class="weather-label ${only?'high-only':''}" data-point="${p.id}" style="${position(p.lon,p.lat)}" aria-label="${p.name}: high ${p.high}, low ${p.low} degrees Fahrenheit, UV maximum ${p.uvMax}${p.precip>.05?`, rain ${p.precip.toFixed(2)} inches`:''}${p.wind>15?`, wind ${p.wind} miles per hour`:''}">${!only?`<span class="temperature-row"><b class="temp-high">${p.high}°</b><span class="divider">/</span><span class="temp-low">${p.low}°</span></span><span class="secondary-row"><span class="uv-value">UV${p.uvMax}</span>${p.precip>.05?`<span class="rain-value">${p.precip.toFixed(2)}″</span>`:''}</span>`:anchor?`<b class="temp-high">${p.high}°</b>`:''}${wind(p)}</button>`;
+ }).join('');
+}
+function markup(s){return `<div class="map-canvas"><div class="map-model">${geography(s)}<div class="weather-layer">${readings(s)}</div>${F.beaches.map(b=>`<button class="beach-marker" data-beach="${b.id}" style="${position(b.lon,b.lat)}" aria-label="${b.name}: beach conditions">${icons.svg('freestyle')}</button>`).join('')}<span class="person-marker" role="img" aria-label="Simulated personal location" style="${position(-122.448,37.730)}">${icons.svg('person-pin')}</span><div class="region-exits"><button data-destination="Marin">${icons.svg('compass-solid')} Marin</button><button data-destination="East Bay">East Bay ${icons.svg('compass-solid')}</button></div></div></div>`;}
+const key='sf-map-combinations-v6';
+let state={cards:[],columns:2,next:1,preset:'curated'},stored;
+try{stored=JSON.parse(localStorage.getItem(key));}catch{}
+const recipe=(t,p,w)=>({terrain:t,parks:p,weather:w,density:'11'});
+function recipes(mode){
+ if(mode==='curated')return [recipe('bands','elevation','readings'),recipe('texture','trees','readings'),recipe('bands','outline','gradient'),recipe('relief','fill','hybrid'),recipe('flat','trees','gradient'),recipe('topographic','outline','readings'),recipe('contours','fill','gradient'),recipe('texture','elevation','hybrid'),recipe('relief','trees','gradient'),recipe('flat','fill','readings'),recipe('topographic','trees','hybrid'),recipe('contours','elevation','readings')];
+ const result=[];for(const[t]of terrain)for(const[p]of mode==='weather'?[[$('#builder-parks').value]]:parks)for(const[w]of mode==='all'||mode==='weather'?weather:[[$('#builder-weather').value]])result.push(recipe(t,p,w));return result;
+}
+function select(name,value,cls=''){return `<label>${name==='terrain'?'Hills':name==='parks'?'Parks':'Weather'}<select class="${cls}" data-setting="${name}">${options[name].map(([id,label])=>`<option value="${id}" ${id===value?'selected':''}>${label}</option>`).join('')}</select></label>`;}
+function save(){try{localStorage.setItem(key,JSON.stringify(state));$('#save-status').textContent='Choices saved on this browser';}catch{$('#save-status').textContent='Browser storage unavailable; export choices to save.';}}
+const resizer=new ResizeObserver(entries=>entries.forEach(({target})=>{const model=target.querySelector('.map-model');if(model)model.style.transform=`scale(${target.clientWidth/1000})`;}));
+const lazy=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){loadMap(e.target);lazy.unobserve(e.target);}}),{rootMargin:'700px'});
+function loadMap(target){if(target.dataset.loaded)return;const card=state.cards.find(c=>c.id===target.dataset.map);if(!card)return;target.innerHTML=markup(card);target.dataset.loaded='true';resizer.observe(target.querySelector('.map-canvas'));}
+const label=(name,id)=>options[name].find(o=>o[0]===id)?.[1]||id;
+function render(){
+ lazy.disconnect();resizer.disconnect();$('#preset').value=state.preset||'curated';$('#board').style.setProperty('--columns',state.columns);
+ $('#board').innerHTML=state.cards.filter(c=>!c.hidden).map(c=>`<article class="choice-card ${c.kept?'kept':''} ${c.minimized?'minimized':''}" data-card="${c.id}"><header><h2>${label('terrain',c.terrain)} <span>× ${label('parks',c.parks)}</span></h2><button data-action="keep" aria-pressed="${!!c.kept}">${c.kept?'Kept':'Keep'}</button></header><div class="card-controls">${select('terrain',c.terrain)}${select('parks',c.parks)}${select('weather',c.weather)}</div><div class="map-slot" data-map="${c.id}"></div><div class="map-key">${c.weather==='readings'?'<span>High / low °F · UV max · rain in</span>':'<span class="gradient-key">60° <i></i> 74° · daily high</span>'}<span>${c.weather==='gradient'?'5 temperature labels':c.density+' forecast points'} · wind &gt;15 mph</span></div><footer><button data-action="inspect">Inspect larger</button><button data-action="minimize">${c.minimized?'Expand':'Minimize'}</button><button data-action="hide">Hide</button></footer></article>`).join('');
+ document.querySelectorAll('.map-slot').forEach(el=>lazy.observe(el));
+ $('#board-count').textContent=`${state.cards.filter(c=>!c.hidden).length} of ${state.cards.length} maps shown · ${state.cards.filter(c=>c.kept).length} kept`;
+ $('#restore').disabled=!state.cards.some(c=>c.hidden||c.minimized);
+ document.querySelectorAll('[data-columns]').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.columns)===state.columns));save();
+}
+function preset(mode){state.preset=mode;state.cards=recipes(mode).map(r=>({...r,id:'c'+state.next++}));render();}
+for(const name of Object.keys(options))$('#builder-'+name).innerHTML=options[name].map(([id,label])=>`<option value="${id}" ${id===({terrain:'bands',parks:'elevation',weather:'readings'}[name])?'selected':''}>${label}</option>`).join('');
+if(stored&&Array.isArray(stored.cards)&&stored.cards.length&&stored.cards.length<=100&&stored.cards.every(c=>Object.keys(options).every(k=>options[k].some(o=>o[0]===c[k])))){state=stored;render();}else preset('curated');
+$('#preset').onchange=e=>preset(e.target.value);
+$('#add').onclick=()=>{const r=recipe(...['terrain','parks','weather'].map(k=>$('#builder-'+k).value));const existing=state.cards.find(c=>Object.keys(r).every(k=>c[k]===r[k]));if(existing){existing.hidden=false;existing.minimized=false;render();document.querySelector(`[data-card="${existing.id}"]`).scrollIntoView({block:'center'});}else{const card={...r,id:'c'+state.next++};state.cards.unshift(card);render();}};
+$('#board').onchange=e=>{const el=e.target.closest('[data-card]');if(!el)return;const c=state.cards.find(c=>c.id===el.dataset.card);c[e.target.dataset.setting]=e.target.value;render();document.querySelector(`[data-card="${c.id}"] [data-setting="${e.target.dataset.setting}"]`)?.focus({preventScroll:true});};
+function inspect(c){$('#inspect-title').textContent=`${label('terrain',c.terrain)} × ${label('parks',c.parks)} · ${label('weather',c.weather)}`;$('#inspect-map').innerHTML=markup(c);$('#inspector').showModal();resizer.observe($('#inspect-map .map-canvas'));$('#inspect-legend').hidden=c.weather==='readings';$('#inspect-message').textContent='Select a forecast or a beach to inspect its illustrative conditions.';}
+$('#board').onclick=e=>{const b=e.target.closest('[data-action]');if(!b){const marker=e.target.closest('[data-point],[data-beach],[data-destination]');if(marker){const c=state.cards.find(c=>c.id===marker.closest('[data-card]').dataset.card);inspect(c);const attr=['data-point','data-beach','data-destination'].find(k=>marker.hasAttribute(k));$('#inspect-map').querySelector(`[${attr}="${marker.getAttribute(attr)}"]`)?.click();}return;}const c=state.cards.find(c=>c.id===b.closest('[data-card]').dataset.card);if(b.dataset.action==='inspect'){inspect(c);return;}if(b.dataset.action==='keep')c.kept=!c.kept;if(b.dataset.action==='minimize')c.minimized=!c.minimized;if(b.dataset.action==='hide')c.hidden=true;render();document.querySelector(`[data-card="${c.id}"] [data-action="${b.dataset.action}"]`)?.focus({preventScroll:true});if(b.dataset.action==='hide')$('#restore').focus({preventScroll:true});};
+$('#restore').onclick=()=>{state.cards.forEach(c=>{c.hidden=false;c.minimized=false;});render();};
+document.querySelectorAll('[data-columns]').forEach(b=>b.onclick=()=>{state.columns=Number(b.dataset.columns);render();});
+$('#inspector').onclick=e=>{const p=e.target.closest('[data-point]'),b=e.target.closest('[data-beach]'),d=e.target.closest('[data-destination]');if(p){const v=points.find(x=>x.id===p.dataset.point);$('#inspect-message').textContent=`${v.name} · high ${v.high}° / low ${v.low}°F · UV max ${v.uvMax}${v.precip>.05?' · rain '+v.precip.toFixed(2)+'″':''}${v.wind>15?' · wind '+v.wind+' mph':''} · demo forecast`;}if(b){const v=F.beaches.find(x=>x.id===b.dataset.beach);$('#inspect-message').textContent=`${v.name} · water ${v.water}°F · surf ${v.surf} · wind ${v.wind} · ${v.quality} · illustrative beach conditions`;}if(d)$('#inspect-message').textContent=`${d.dataset.destination} would open its regional map. This study covers SF.`;};
+$('#export').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({version:6,...state,windRule:'strictly >15 mph',rainRule:'strictly >0.05 inches',gradient:'Synthetic interpolated daily highs; not live weather'},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='sf-map-combinations.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+const renderAll=()=>document.querySelectorAll('.map-slot').forEach(loadMap);window.addEventListener('beforeprint',renderAll);
+window.MapStudy={options,points,getState:()=>structuredClone(state),renderAll,preset,renderMap:markup,overviewIds:F.overviewIds};
 })();
