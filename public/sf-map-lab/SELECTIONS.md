@@ -1,6 +1,8 @@
 # Selected SF map — revision 3
 
-The current mockup is [parks-study.html](parks-study.html). The previous alternatives are preserved at [parks-study-v2.html](parks-study-v2.html).
+**Reference note:** revision 4 reopens weather typography, small shapes and swimmer-button treatments, and expands the demo to 22 locations. See [DENSITY-STUDY.md](DENSITY-STUDY.md). This selected reference is preserved at [parks-study-v3.html](parks-study-v3.html).
+
+This revision's mockup is [parks-study-v3.html](parks-study-v3.html). The earlier alternatives are preserved at [parks-study-v2.html](parks-study-v2.html).
 
 ## Confirmed treatment
 

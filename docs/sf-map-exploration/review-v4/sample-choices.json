@@ -1,0 +1,95 @@
+{
+  "version": 4,
+  "recipe": {
+    "terrain": "bands",
+    "swim": "freestyle",
+    "jump": "compass-solid",
+    "location": "person-pin",
+    "weatherStyle": "compact",
+    "swimmerStyle": "disc",
+    "density": "22",
+    "sample": "mixed",
+    "selected": "innerSunset",
+    "located": true
+  },
+  "kept": [
+    "weather:capsule"
+  ],
+  "locationCount": 22,
+  "addedDemoLocations": [
+    {
+      "id": "presidio",
+      "name": "Presidio",
+      "lon": -122.468,
+      "lat": 37.795
+    },
+    {
+      "id": "haight",
+      "name": "Haight-Ashbury",
+      "lon": -122.447,
+      "lat": 37.77
+    },
+    {
+      "id": "castro",
+      "name": "Castro",
+      "lon": -122.435,
+      "lat": 37.761
+    },
+    {
+      "id": "noeValley",
+      "name": "Noe Valley",
+      "lon": -122.4335,
+      "lat": 37.7489
+    },
+    {
+      "id": "glenPark",
+      "name": "Glen Park",
+      "lon": -122.433,
+      "lat": 37.736
+    },
+    {
+      "id": "bernal",
+      "name": "Bernal Heights",
+      "lon": -122.416,
+      "lat": 37.741
+    },
+    {
+      "id": "potreroHill",
+      "name": "Potrero Hill",
+      "lon": -122.398,
+      "lat": 37.7572
+    },
+    {
+      "id": "missionBay",
+      "name": "Mission Bay",
+      "lon": -122.392,
+      "lat": 37.773
+    },
+    {
+      "id": "bayview",
+      "name": "Bayview",
+      "lon": -122.3895,
+      "lat": 37.7347
+    },
+    {
+      "id": "excelsior",
+      "name": "Excelsior",
+      "lon": -122.429,
+      "lat": 37.722
+    },
+    {
+      "id": "westPortal",
+      "name": "West Portal",
+      "lon": -122.465,
+      "lat": 37.741
+    },
+    {
+      "id": "ingleside",
+      "name": "Ingleside",
+      "lon": -122.458,
+      "lat": 37.721
+    }
+  ],
+  "terrainBlend": 0.7,
+  "precipitationRule": "daily inches strictly greater than 0.05"
+}

@@ -2,7 +2,9 @@
 
 Branch: `codex/sf-regional-map-exploration`.
 
-The latest user-directed revision is [Parks, bridges & hills](../../public/sf-map-lab/parks-study.html), documented in [REVISION.md](../../public/sf-map-lab/REVISION.md). Parks-first is now confirmed. The original lab below remains an archive. Revision 2 uses real USGS-derived terrain, four daily-label alternatives, and SVG-only symbol choice lists. Its browser script and evidence are `browser-qa-v2.cjs` and `review-v2/`.
+The current revision is the [density and style comparison](../../public/sf-map-lab/parks-study.html), documented in [DENSITY-STUDY.md](../../public/sf-map-lab/DENSITY-STUDY.md): 22 demo locations, six weather styles, five swimmer-button treatments and softer elevation bands. Its browser script and evidence are `browser-qa-v4.cjs` and `review-v4/`.
+
+Revision 3's selected bare-text reference is preserved as `parks-study-v3.*`. The earlier [Parks, bridges & hills](../../public/sf-map-lab/parks-study-v2.html) revision is documented in [REVISION.md](../../public/sf-map-lab/REVISION.md). It uses real USGS-derived terrain, four daily-label alternatives, and SVG-only symbol choice lists. Its browser script and evidence are `browser-qa-v2.cjs` and `review-v2/`. The original lab below remains an archive.
 
 Open [the comparison lab](../../public/sf-map-lab/index.html), [morning report](../../public/sf-map-lab/report.html), or [all-option atlas](../../public/sf-map-lab/atlas.html) directly in a browser. They also work at `/sf-map-lab/` under `npm run dev`. A server is optional; there are no fetch calls.
 
