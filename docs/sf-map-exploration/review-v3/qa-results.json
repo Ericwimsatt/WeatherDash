@@ -1,0 +1,66 @@
+{
+  "checks": [
+    "Selected terrain is pinned",
+    "Selected label is pinned",
+    "Selected swim is pinned",
+    "Selected jump is pinned",
+    "Selected location is pinned",
+    "No park, bridge or water text on map",
+    "No weather leader or dot elements",
+    "All ten forecast labels remain",
+    "Labels have no region names",
+    "Label layout is H/L over UV and optional rain",
+    "UV is in the second rendered row",
+    "Every weather label has no backing, border or shadow",
+    "Hover never adds a background",
+    "Selection never adds a background",
+    "Rain threshold still suppresses exactly 0.05 inches",
+    "Only three qualifying rain readings appear",
+    "Rain is beside UV in row two",
+    "Dry sample has no rain readings",
+    "Four brown and four park-clipped green bands",
+    "Golden Gate illustration flipped across road deck",
+    "Bay Bridge still drawn",
+    "I-80 still crosses the Bay Bridge",
+    "Tight viewport includes mainland city extents",
+    "Competition swimmers remain centered at beach coordinates",
+    "No beach map labels",
+    "Swimmer still opens beach-specific detail",
+    "Person-in-pin demo is visible",
+    "Location can be hidden",
+    "Measured high contrast is at least 4.5:1",
+    "Measured low contrast is at least 4.5:1",
+    "Measured uv contrast is at least 4.5:1",
+    "Measured rain contrast is at least 4.5:1",
+    "Old query recipes cannot override confirmed choices",
+    "Selected design exports",
+    "No document overflow at 320px",
+    "No document overflow at 390px",
+    "No document overflow at 768px",
+    "No document overflow at 1440px",
+    "Phone exposes all regions through its picker",
+    "Phone selection stays bare",
+    "No browser errors",
+    "No external HTTP requests"
+  ],
+  "contrast": {
+    "high": {
+      "color": "#7e202a",
+      "minimum": 4.961022500410051
+    },
+    "low": {
+      "color": "#124577",
+      "minimum": 4.923553321720537
+    },
+    "uv": {
+      "color": "#5c3e00",
+      "minimum": 4.921804158081312
+    },
+    "rain": {
+      "color": "#064860",
+      "minimum": 5.0166018814429565
+    }
+  },
+  "errors": [],
+  "external": []
+}

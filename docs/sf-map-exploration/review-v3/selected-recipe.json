@@ -1,0 +1,29 @@
+{
+  "version": 3,
+  "recipe": {
+    "terrain": "bands",
+    "label": "bare",
+    "swim": "freestyle",
+    "jump": "compass-solid",
+    "location": "person-pin",
+    "sample": "mixed",
+    "selected": "innerSunset",
+    "located": true
+  },
+  "confirmed": {
+    "parkLabels": false,
+    "bridgeLabels": false,
+    "roadLabels": false,
+    "weatherBackground": false,
+    "weatherLeaders": false,
+    "weatherDots": false,
+    "uvRow": 2,
+    "viewport": {
+      "w": -122.522,
+      "e": -122.351,
+      "n": 37.82,
+      "s": 37.706
+    }
+  },
+  "precipitationRule": "daily inches strictly greater than 0.05"
+}

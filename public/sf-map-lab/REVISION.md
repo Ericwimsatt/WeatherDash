@@ -1,5 +1,7 @@
 # Selected parks direction — next mockup
 
+**Archive note:** this document describes revision 2. The current selected brown / green bands and bare overlays are documented in [SELECTIONS.md](SELECTIONS.md); revision 2's alternatives remain at [parks-study-v2.html](parks-study-v2.html).
+
 This revision records the user's selections and presents the remaining choices at [parks-study.html](parks-study.html). The original comparison and report remain available as an archive.
 
 ## Kept and changed

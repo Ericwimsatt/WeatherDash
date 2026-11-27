@@ -1,0 +1,53 @@
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const assert=require('node:assert/strict');
+const {resolve,join}=require('node:path');
+const {pathToFileURL}=require('node:url');
+const fs=require('node:fs/promises');
+(async()=>{
+ const output=resolve(__dirname,'review-v3');await fs.mkdir(output,{recursive:true});
+ const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1100},acceptDownloads:true});
+ const errors=[],external=[],checks=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))external.push(r.url())});
+ const check=(name,result)=>{assert.ok(result,name);checks.push(name)};
+ const base=pathToFileURL(resolve(__dirname,'../../public/sf-map-lab/parks-study.html')).href;
+ const settle=()=>page.evaluate(async()=>{await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))});
+ await page.goto(base);await settle();
+ const config=await page.evaluate(()=>ParksStudy.getConfig());
+ for(const [key,value] of Object.entries({terrain:'bands',label:'bare',swim:'freestyle',jump:'compass-solid',location:'person-pin'}))check(`Selected ${key} is pinned`,config[key]===value);
+ check('No park, bridge or water text on map',await page.locator('.geography-v3 text').count()===0);
+ check('No weather leader or dot elements',await page.locator('.fixed-point,.label-leaders-v2,.anchor-dot').count()===0);
+ check('All ten forecast labels remain',await page.locator('.weather-label').count()===10);
+ check('Labels have no region names',await page.locator('.weather-label').evaluateAll(items=>items.every(e=>!e.textContent.match(/Richmond|Sunset|Mission|Marina|Heights|Market|Beach|Merced/))));
+ check('Label layout is H/L over UV and optional rain',await page.locator('.weather-label').evaluateAll(items=>items.every(e=>e.querySelector('.temperature-row')&&e.querySelector('.secondary-row .uv-value')&&e.children.length===2)));
+ check('UV is in the second rendered row',await page.locator('.weather-label').evaluateAll(items=>items.every(e=>e.querySelector('.secondary-row').getBoundingClientRect().top>=e.querySelector('.temperature-row').getBoundingClientRect().bottom-1)));
+ const bare=()=>page.locator('.weather-label').evaluateAll(items=>items.every(e=>{const c=getComputedStyle(e);return c.backgroundColor==='rgba(0, 0, 0, 0)'&&c.backgroundImage==='none'&&c.boxShadow==='none'&&c.borderTopWidth==='0px'&&c.textShadow==='none'}));
+ check('Every weather label has no backing, border or shadow',await bare());
+ await page.locator('[data-point="mission"]').hover();check('Hover never adds a background',await bare());await page.locator('[data-point="mission"]').click();check('Selection never adds a background',await bare());
+ check('Rain threshold still suppresses exactly 0.05 inches',await page.locator('[data-point="pacHeights"] .rain-value').count()===0&&await page.locator('[data-point="lakeMerced"] .rain-value').count()===0);
+ check('Only three qualifying rain readings appear',await page.locator('.rain-value').count()===3);
+ check('Rain is beside UV in row two',await page.locator('.rain-value').evaluateAll(items=>items.every(e=>e.parentElement.classList.contains('secondary-row'))));
+ await page.locator('#sample-day').selectOption('dry');check('Dry sample has no rain readings',await page.locator('.rain-value').count()===0);await page.locator('#sample-day').selectOption('mixed');
+ check('Four brown and four park-clipped green bands',await page.locator('[clip-path="url(#sf-land)"] [data-elevation]').count()===4&&await page.locator('[clip-path="url(#sf-parks)"] [data-elevation]').count()===4);
+ check('Golden Gate illustration flipped across road deck',await page.locator('.golden-gate .bridge-structure').getAttribute('transform')==='scale(1,-1)');
+ check('Bay Bridge still drawn',await page.locator('.bay-bridge .bridge-deck').count()===1);
+ check('I-80 still crosses the Bay Bridge',await page.evaluate(()=>{const p=ParksStudy.roads.find(r=>r.id==='80').points;return [[-122.386,37.789],[-122.365,37.808]].every(c=>p.some(v=>v[0]===c[0]&&v[1]===c[1]))}));
+ check('Tight viewport includes mainland city extents',await page.evaluate(()=>{const b=ParksStudy.bounds;return b.w< -122.51495&&b.e> -122.35696&&b.n>37.81202&&b.s<37.70813&&b.n<37.821&&b.w> -122.523}));
+ check('Competition swimmers remain centered at beach coordinates',await page.locator('.beach-marker').evaluateAll(items=>items.length===4&&items.every(e=>{const r=e.getBoundingClientRect(),p=e.parentElement.getBoundingClientRect();return Math.abs(r.left+r.width/2-p.left-parseFloat(e.style.left)/100*p.width)<1&&Math.abs(r.top+r.height/2-p.top-parseFloat(e.style.top)/100*p.height)<1})));
+ check('No beach map labels',await page.locator('.beach-marker').evaluateAll(items=>items.every(e=>e.textContent.trim()==='')));
+ await page.locator('[data-beach="ocean"]').click();check('Swimmer still opens beach-specific detail',await page.locator('#beach-content h2').textContent()==='Ocean Beach');await page.keyboard.press('Escape');
+ check('Person-in-pin demo is visible',await page.locator('.person-marker').isVisible());await page.locator('#demo-location').click();check('Location can be hidden',await page.locator('.person-marker').count()===0);await page.locator('#demo-location').click();
+ const contrast=await page.evaluate(()=>{
+   const luminance=h=>{const a=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return a[0]*.2126+a[1]*.7152+a[2]*.0722;};
+   const backgrounds=['#f0ede1','#dce7ce','#bcdfe6',...ParksStudy.bandColors.brown,...ParksStudy.bandColors.green];
+   const style=getComputedStyle(document.documentElement),result={};
+   for(const key of ['high','low','uv','rain']){const fg=style.getPropertyValue('--'+key).trim();result[key]={color:fg,minimum:Math.min(...backgrounds.map(bg=>(luminance(bg)+.05)/(luminance(fg)+.05)))};}
+   return result;
+ });
+ for(const [key,value]of Object.entries(contrast))check(`Measured ${key} contrast is at least 4.5:1`,value.minimum>=4.5);
+ await page.goto(base+'?terrain=shade&label=ticket&jump=compass-ring&location=crosshair');await settle();check('Old query recipes cannot override confirmed choices',await page.evaluate(()=>ParksStudy.getConfig().terrain==='bands'&&ParksStudy.getConfig().label==='bare'&&ParksStudy.getConfig().jump==='compass-solid'));
+ await page.locator('[data-point="innerSunset"]').click();await settle();await page.locator('#main-map').screenshot({path:join(output,'main-map.png')});await page.screenshot({path:join(output,'desktop.png'),fullPage:true});
+ const downloadPromise=page.waitForEvent('download');await page.locator('#save-recipe').click();const download=await downloadPromise;await download.saveAs(join(output,'selected-recipe.json'));check('Selected design exports',download.suggestedFilename()==='sf-selected-recipe.json');
+ for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:1000});await settle();check(`No document overflow at ${width}px`,await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}
+ await page.setViewportSize({width:390,height:844});await settle();await page.locator('#main-map').screenshot({path:join(output,'phone-map.png')});check('Phone exposes all regions through its picker',await page.locator('[data-point-picker] option').count()===10);await page.locator('[data-point-picker]').selectOption('outerRichmond');check('Phone selection stays bare',await bare());await page.locator('#main-map').screenshot({path:join(output,'phone-richmond.png')});
+ check('No browser errors',errors.length===0);check('No external HTTP requests',external.length===0);
+ await fs.writeFile(join(output,'qa-results.json'),JSON.stringify({checks,contrast,errors,external},null,2));console.log(JSON.stringify({passed:checks.length,contrast,errors,external},null,2));await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});

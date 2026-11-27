@@ -8,7 +8,7 @@ const fs=require('node:fs/promises');
  const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1100},acceptDownloads:true});
  const errors=[],external=[],checks=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))external.push(r.url())});
  const check=(name,result)=>{assert.ok(result,name);checks.push(name)};
- const base=pathToFileURL(resolve(__dirname,'../../public/sf-map-lab/parks-study.html')).href;
+ const base=pathToFileURL(resolve(__dirname,'../../public/sf-map-lab/parks-study-v2.html')).href;
  async function settle(){await page.evaluate(async()=>{await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))});}
  async function load(query=''){await page.goto(base+query);await settle();}
  async function capture(name,selector='#main-map'){await settle();await page.locator(selector).screenshot({path:join(output,name)});}
