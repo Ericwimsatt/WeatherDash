@@ -1,5 +1,7 @@
 # More locations and smaller weather treatments
 
+**Revision 4 archive:** the comparison described here is preserved at [parks-study-v4.html](parks-study-v4.html). The user's selected 18 pt / 14 pt treatment, half-size swimmer glyph and all-location preview policy are recorded in [TYPE-SELECTION.md](TYPE-SELECTION.md).
+
 Open [the current comparison](parks-study.html). The [previous selected map](parks-study-v3.html) remains available as a reference.
 
 ## What changed

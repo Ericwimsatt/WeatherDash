@@ -2,7 +2,9 @@
 
 Branch: `codex/sf-regional-map-exploration`.
 
-The current revision is the [density and style comparison](../../public/sf-map-lab/parks-study.html), documented in [DENSITY-STUDY.md](../../public/sf-map-lab/DENSITY-STUDY.md): 22 demo locations, six weather styles, five swimmer-button treatments and softer elevation bands. Its browser script and evidence are `browser-qa-v4.cjs` and `review-v4/`.
+The current [selected preview](../../public/sf-map-lab/parks-study.html) uses 18 pt / 14 pt high-led weather, the solid teal swimmer button with a half-size glyph, and all 22 locations at every width. See [TYPE-SELECTION.md](../../public/sf-map-lab/TYPE-SELECTION.md), `browser-qa-v5.cjs` and `review-v5/`.
+
+The earlier [density and style comparison](../../public/sf-map-lab/parks-study-v4.html), documented in [DENSITY-STUDY.md](../../public/sf-map-lab/DENSITY-STUDY.md), preserves six weather styles, five swimmer-button treatments and softer elevation bands. Its browser script and evidence are `browser-qa-v4.cjs` and `review-v4/`.
 
 Revision 3's selected bare-text reference is preserved as `parks-study-v3.*`. The earlier [Parks, bridges & hills](../../public/sf-map-lab/parks-study-v2.html) revision is documented in [REVISION.md](../../public/sf-map-lab/REVISION.md). It uses real USGS-derived terrain, four daily-label alternatives, and SVG-only symbol choice lists. Its browser script and evidence are `browser-qa-v2.cjs` and `review-v2/`. The original lab below remains an archive.
 

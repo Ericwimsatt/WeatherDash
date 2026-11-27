@@ -23,21 +23,17 @@
   ].map(([id,name,lon,lat,high,low,uvMax,precip])=>({id,name,lon,lat,high,low,uvMax,precip,added:true}));
   const points = [...original,...additions];
   const pinned = {terrain:'bands',swim:'freestyle',jump:'compass-solid',location:'person-pin'};
-  const defaults = {...pinned,weatherStyle:'compact',swimmerStyle:'disc',density:'22',sample:'mixed',selected:'innerSunset',located:true};
+  const defaults = {...pinned,weatherStyle:'high-led',swimmerStyle:'filled',density:'22',sample:'mixed',selected:'innerSunset',located:true};
   let stored = {};
-  try { stored = JSON.parse(localStorage.getItem('sf-parks-study-v4') || '{}') || {}; } catch {}
+  try { stored = JSON.parse(localStorage.getItem('sf-parks-study-v5') || '{}') || {}; } catch {}
   const query = Object.fromEntries(new URLSearchParams(location.search));
   const config = {...defaults};
-  for (const [key,values] of Object.entries({weatherStyle:choices.weather.map(o=>o.id),swimmerStyle:choices.swimmer.map(o=>o.id),density:['10','16','22'],sample:['mixed','dry'],selected:points.map(p=>p.id)})) {
+  for (const [key,values] of Object.entries({weatherStyle:choices.weather.map(o=>o.id),swimmerStyle:choices.swimmer.map(o=>o.id),density:['22'],sample:['mixed','dry'],selected:points.map(p=>p.id)})) {
     const value = query[key] ?? stored[key]; if (values.includes(value)) config[key] = value;
   }
   config.located = query.located !== undefined ? query.located === 'true' : stored.located !== undefined ? stored.located === true : true;
   let kept = Array.isArray(stored.kept)?stored.kept:[], hidden={weather:[],swimmer:[]}, minimized=[], activeFamily='weather';
-  function visiblePoints(state) {
-    if(state.density==='10')return original;
-    if(state.density==='16')return [...original,...additions.filter(p=>['noeValley','glenPark','potreroHill','bayview','excelsior','westPortal'].includes(p.id))];
-    return points;
-  }
+  function visiblePoints() { return points; }
   function normalizeSelection(){if(!visiblePoints(config).some(p=>p.id===config.selected))config.selected='innerSunset';}
   const roads=[
     {id:'101-north',highway:true,points:[[-122.4786,37.8324],[-122.4758,37.8077],[-122.473,37.800],[-122.460,37.7987],[-122.447,37.8003],[-122.424,37.799]]},
@@ -77,39 +73,17 @@
     return `<svg class="geography-v3" viewBox="0 0 1000 900" aria-hidden="true"><defs><clipPath id="${landId}"><path d="${land}"/></clipPath><clipPath id="${parkId}"><path d="${parks}"/></clipPath></defs><rect width="1000" height="900" class="map-sea"/><path class="map-land" d="${land}"/>${bands(landId,bandColors.brown)}<path class="map-parks" d="${parks}"/>${bands(parkId,bandColors.green)}<path class="lake-water" d="${path([[-122.497,37.727],[-122.494,37.730],[-122.491,37.730],[-122.489,37.725],[-122.490,37.720],[-122.494,37.720],[-122.496,37.723]])}Z"/><g class="road-lines">${roads.map(r=>`<path data-road="${r.id}" class="${r.highway?'highway':''}" d="${path(r.points)}"/>`).join('')}</g>${bridge([-122.4758,37.8077],[-122.4786,37.8324],'golden-gate')}${bridge([-122.386,37.789],[-122.365,37.808],'bay-bridge')}</svg>`;
   }
   function weatherLabel(p,state) {
-    let mobile=['outerSunset','pacHeights','mission','westPortal','bayview','lakeMerced'];
-    if(['innerSunset','innerRichmond','outerRichmond','haight','presidio'].includes(state.selected))mobile=mobile.filter(id=>id!=='outerSunset');
-    if(['marina','northBeach'].includes(state.selected))mobile=mobile.filter(id=>id!=='pacHeights');
-    if(['marketStreet','potreroHill','missionBay','castro'].includes(state.selected))mobile=mobile.filter(id=>id!=='mission');
-    if(['noeValley','glenPark','bernal','ingleside','excelsior'].includes(state.selected))mobile=mobile.filter(id=>id!=='westPortal');
     const rain=state.sample==='dry'?0:p.precip;
-    return `<button type="button" class="weather-label ${p.id===state.selected?'is-selected':''} ${mobile.includes(p.id)?'mobile-show':''}" data-point="${p.id}" style="${position(p.lon,p.lat)}" title="${p.name}${p.added?' · added demo point':''}" aria-pressed="${p.id===state.selected}" aria-label="${p.name}: daily high ${p.high}, low ${p.low} degrees Fahrenheit, UV maximum ${p.uvMax}${rain>.05?`, precipitation ${rain.toFixed(2)} inches`:''}"><span class="weather-body"><span class="temperature-row"><span class="temp-high">${p.high}°</span><span class="temp-divider">/</span><span class="temp-low">${p.low}°</span></span><span class="secondary-row"><span class="uv-value">UV${p.uvMax}</span>${rain>.05?`<span class="rain-value">${rain.toFixed(2)}″</span>`:''}</span></span></button>`;
+    return `<button type="button" class="weather-label ${p.id===state.selected?'is-selected':''}" data-point="${p.id}" style="${position(p.lon,p.lat)}" title="${p.name}${p.added?' · added demo point':''}" aria-pressed="${p.id===state.selected}" aria-label="${p.name}: daily high ${p.high}, low ${p.low} degrees Fahrenheit, UV maximum ${p.uvMax}${rain>.05?`, precipitation ${rain.toFixed(2)} inches`:''}"><span class="weather-body"><span class="temperature-row"><span class="temp-high">${p.high}°</span><span class="temp-divider">/</span><span class="temp-low">${p.low}°</span></span><span class="secondary-row"><span class="uv-value">UV${p.uvMax}</span>${rain>.05?`<span class="rain-value">${rain.toFixed(2)}″</span>`:''}</span></span></button>`;
   }
   function markup(state=config) {
     const selected=points.find(p=>p.id===state.selected)||original[3],visible=visiblePoints(state);
-    return `<article class="selected-map weather-${state.weatherStyle} swim-${state.swimmerStyle}"><header class="map-header"><div class="map-brand">Eric’s weather<span>San Francisco</span></div><div class="map-units">${visible.length} illustrative forecast points<br>High / low °F · UV max · rain in</div></header><div class="map-surface">${geography()}<div class="weather-layer">${visible.map(p=>weatherLabel(p,state)).join('')}</div><div class="beach-layer">${SFMap.beaches.map(b=>`<button type="button" class="beach-marker" data-beach="${b.id}" style="${position(b.lon,b.lat)}" aria-label="${b.name}: show beach conditions">${icons.svg(pinned.swim)}</button>`).join('')}</div>${state.located?`<div class="person-layer"><div class="person-marker" role="img" aria-label="Simulated personal location" style="${position(-122.448,37.730)}">${icons.svg(pinned.location)}</div></div>`:''}<div class="region-exits"><button type="button" data-destination="Marin">${icons.svg(pinned.jump)} Marin</button><button type="button" data-destination="East Bay">East Bay ${icons.svg(pinned.jump)}</button></div></div><div class="region-picker"><label>Forecast point<select data-point-picker>${visible.map(p=>`<option value="${p.id}" ${p.id===state.selected?'selected':''}>${p.name}${p.added?' · added':''}</option>`).join('')}</select></label><span>${selected.name}${selected.added?' · proposed demo location':''}</span></div><footer class="map-footer"><span>${visible.length} demo locations · ${visible.filter(p=>p.added).length} added for this study</span><span>Land / parks: DataSF · elevation: USGS · schematic roads</span><span class="location-note" hidden>Demo location hidden at this scale to keep the selected forecast clear.</span></footer></article>`;
-  }
-  function fitMobile(root) {
-    const map=root.querySelector('.selected-map');if(!map)return;
-    const labels=[...root.querySelectorAll('.weather-label')],person=root.querySelector('.person-marker'),note=root.querySelector('.location-note');
-    labels.forEach(e=>e.classList.remove('density-collapsed'));person?.classList.remove('is-obscured');if(note)note.hidden=true;
-    if(map.getBoundingClientRect().width>650)return;
-    const overlaps=(a,b,padding=2)=>a.left<b.right+padding&&a.right>b.left-padding&&a.top<b.bottom+padding&&a.bottom>b.top-padding;
-    const visible=labels.filter(e=>getComputedStyle(e).display!=='none');
-    visible.sort((a,b)=>Number(b.classList.contains('is-selected'))-Number(a.classList.contains('is-selected')));
-    const selected=visible.find(e=>e.classList.contains('is-selected'))?.querySelector('.weather-body').getBoundingClientRect();
-    const personRect=person?.getBoundingClientRect(),personHidden=personRect&&selected&&overlaps(personRect,selected);
-    if(personHidden){person.classList.add('is-obscured');if(note)note.hidden=false;}
-    const obstacles=[...root.querySelectorAll('.beach-marker')].map(e=>e.getBoundingClientRect());
-    if(personRect&&!personHidden)obstacles.push(personRect);
-    const placed=[];
-    for(const label of visible){const r=label.querySelector('.weather-body').getBoundingClientRect();const blocked=[...placed,...obstacles].some(p=>overlaps(r,p));if(blocked&&!label.classList.contains('is-selected'))label.classList.add('density-collapsed');else placed.push(r);}
+    return `<article class="selected-map weather-${state.weatherStyle} swim-${state.swimmerStyle}"><header class="map-header"><div class="map-brand">Eric’s weather<span>San Francisco</span></div><div class="map-units">${visible.length} illustrative forecast points<br>High / low °F · UV max · rain in</div></header><div class="map-surface">${geography()}<div class="weather-layer">${visible.map(p=>weatherLabel(p,state)).join('')}</div><div class="beach-layer">${SFMap.beaches.map(b=>`<button type="button" class="beach-marker" data-beach="${b.id}" style="${position(b.lon,b.lat)}" aria-label="${b.name}: show beach conditions">${icons.svg(pinned.swim)}</button>`).join('')}</div>${state.located?`<div class="person-layer"><div class="person-marker" role="img" aria-label="Simulated personal location" style="${position(-122.448,37.730)}">${icons.svg(pinned.location)}</div></div>`:''}<div class="region-exits"><button type="button" data-destination="Marin">${icons.svg(pinned.jump)} Marin</button><button type="button" data-destination="East Bay">East Bay ${icons.svg(pinned.jump)}</button></div></div><div class="region-picker"><label>Forecast point<select data-point-picker>${visible.map(p=>`<option value="${p.id}" ${p.id===state.selected?'selected':''}>${p.name}${p.added?' · added':''}</option>`).join('')}</select></label><span>${selected.name}${selected.added?' · proposed demo location':''}</span></div><footer class="map-footer"><span>${visible.length} demo locations · ${visible.filter(p=>p.added).length} added for this study</span><span>Land / parks: DataSF · elevation: USGS · schematic roads</span></footer></article>`;
   }
   function save() {
-    try {localStorage.setItem('sf-parks-study-v4',JSON.stringify({...config,kept}));} catch {}
+    try {localStorage.setItem('sf-parks-study-v5',JSON.stringify({...config,kept}));} catch {}
     $('#choice-status').textContent=`${config.density} locations · ${kept.length} options kept · choices saved locally`;
   }
-  let mainObserver;
   function renderMain() {
     normalizeSelection();const target=$('#main-map');target.innerHTML=markup();
     target.querySelectorAll('[data-point]').forEach(b=>b.onclick=()=>{config.selected=b.dataset.point;renderMain();target.querySelector(`[data-point="${config.selected}"]`)?.focus({preventScroll:true});save();});
@@ -120,7 +94,6 @@
       $('#beach-content').innerHTML=`<h2>${beach.name}</h2><dl><dt>Water</dt><dd>${beach.water}°F</dd><dt>Surf</dt><dd>${beach.surf}</dd><dt>Wind</dt><dd>${beach.wind}</dd><dt>Quality</dt><dd>${beach.quality}</dd></dl><p>Illustrative beach conditions, independent of the selected weather region.</p>`;
       $('#beach-detail').showModal();
     });
-    mainObserver?.disconnect();mainObserver=new ResizeObserver(()=>fitMobile(target));mainObserver.observe(target);requestAnimationFrame(()=>fitMobile(target));
   }
   const previewObserver=new ResizeObserver(entries=>entries.forEach(e=>scalePreview(e.target)));
   function scalePreview(el) {
@@ -133,7 +106,7 @@
     el.classList.remove('carousel');
     el.innerHTML=options.filter(o=>!hidden[family].includes(o.id)).map(o=>{
       const identity=family+':'+o.id;
-      return `<article class="choice-card ${config[key]===o.id?'active':''} ${kept.includes(identity)?'kept':''} ${minimized.includes(identity)?'minimized':''}" data-card="${identity}"><header><h3>${o.title}</h3><span>${o.recommended?'Suggested starting point':o.id==='reference'||o.id==='bare'?'Reference treatment':'Alternative'}</span></header><div class="choice-map ${family==='swimmer'?'swimmer-crop':''}" data-preview="${o.id}"></div>${family==='swimmer'?`<div class="button-specimens swim-${o.id}" aria-hidden="true" inert>${['water','land','park'].map(surface=>`<div class="specimen-${surface}"><span class="button-sample"><button class="beach-marker" tabindex="-1">${icons.svg(pinned.swim)}</button></span><small>${surface}</small></div>`).join('')}</div>`:''}<p>${o.note}</p><p class="tradeoff">${o.tradeoff}</p><div class="choice-actions"><button type="button" data-try="${identity}" aria-pressed="${config[key]===o.id}">${config[key]===o.id?'On the map':'Try on map'}</button><button type="button" data-keep="${identity}" aria-pressed="${kept.includes(identity)}">${kept.includes(identity)?'Kept':'Keep option'}</button><button type="button" data-minimize="${identity}">${minimized.includes(identity)?'Expand':'Minimize'}</button><button type="button" data-hide="${identity}">Hide</button></div></article>`;
+      return `<article class="choice-card ${config[key]===o.id?'active':''} ${kept.includes(identity)?'kept':''} ${minimized.includes(identity)?'minimized':''}" data-card="${identity}"><header><h3>${o.title}</h3><span>${o.confirmed?'Selected direction':o.recommended?'Suggested starting point':o.id==='reference'||o.id==='bare'?'Reference treatment':'Alternative'}</span></header><div class="choice-map ${family==='swimmer'?'swimmer-crop':''}" data-preview="${o.id}"></div>${family==='swimmer'?`<div class="button-specimens swim-${o.id}" aria-hidden="true" inert>${['water','land','park'].map(surface=>`<div class="specimen-${surface}"><span class="button-sample"><button class="beach-marker" tabindex="-1">${icons.svg(pinned.swim)}</button></span><small>${surface}</small></div>`).join('')}</div>`:''}<p>${o.note}</p><p class="tradeoff">${o.tradeoff}</p><div class="choice-actions"><button type="button" data-try="${identity}" aria-pressed="${config[key]===o.id}">${config[key]===o.id?'On the map':'Try on map'}</button><button type="button" data-keep="${identity}" aria-pressed="${kept.includes(identity)}">${kept.includes(identity)?'Kept':'Keep option'}</button><button type="button" data-minimize="${identity}">${minimized.includes(identity)?'Expand':'Minimize'}</button><button type="button" data-hide="${identity}">Hide</button></div></article>`;
     }).join('');
     el.querySelectorAll('[data-preview]').forEach(preview=>{preview.innerHTML=markup({...config,[key]:preview.dataset.preview});preview.setAttribute('inert','');preview.setAttribute('aria-hidden','true');previewObserver.observe(preview);scalePreview(preview);});
     el.querySelectorAll('[data-try]').forEach(b=>b.onclick=()=>{const[f,id]=b.dataset.try.split(':');activeFamily=f;config[f==='weather'?'weatherStyle':'swimmerStyle']=id;render();});
@@ -160,7 +133,7 @@
   $('#sample-day').onchange=e=>{config.sample=e.target.value;render();};
   $('#demo-location').onclick=()=>{config.located=!config.located;render();};
   $('#save-recipe').onclick=()=>{
-    const url=URL.createObjectURL(new Blob([JSON.stringify({version:4,recipe:config,kept,locationCount:visiblePoints(config).length,addedDemoLocations:additions.map(p=>({id:p.id,name:p.name,lon:p.lon,lat:p.lat})),terrainBlend:.7,precipitationRule:'daily inches strictly greater than 0.05'},null,2)],{type:'application/json'}));
+    const url=URL.createObjectURL(new Blob([JSON.stringify({version:5,recipe:config,kept,locationCount:visiblePoints(config).length,addedDemoLocations:additions.map(p=>({id:p.id,name:p.name,lon:p.lon,lat:p.lat})),terrainBlend:.7,precipitationRule:'daily inches strictly greater than 0.05'},null,2)],{type:'application/json'}));
     const a=document.createElement('a');a.href=url;a.download='sf-density-choices.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   };
   document.querySelectorAll('[data-scroll]').forEach(b=>b.onclick=()=>{const[f,direction]=b.dataset.scroll.split(':');activeFamily=f;$('#'+f+'-deck').scrollBy({left:Number(direction)*510,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});});

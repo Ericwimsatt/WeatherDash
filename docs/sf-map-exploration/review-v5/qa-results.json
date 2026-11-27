@@ -1,0 +1,66 @@
+{
+  "checks": [
+    "Selected weather direction is the new default",
+    "Solid teal swimmer is the new default",
+    "Previous density choices cannot trim the new preview",
+    "Locations control exposes all locations only",
+    "Teal button remains 44 px with a 34 px visible disc",
+    "All 22 labels render at 1440px",
+    "No automatic collapse classes at 1440px",
+    "High is 18 pt / 24 CSS px at 1440px",
+    "Low is 14 pt / 18.667 CSS px at 1440px",
+    "Swimmer glyph is half its prior 27 px size at 1440px",
+    "No document overflow at 1440px",
+    "All 22 labels render at 768px",
+    "No automatic collapse classes at 768px",
+    "High is 18 pt / 24 CSS px at 768px",
+    "Low is 14 pt / 18.667 CSS px at 768px",
+    "Swimmer glyph is half its prior 27 px size at 768px",
+    "No document overflow at 768px",
+    "All 22 labels render at 390px",
+    "No automatic collapse classes at 390px",
+    "High is 18 pt / 24 CSS px at 390px",
+    "Low is 14 pt / 18.667 CSS px at 390px",
+    "Swimmer glyph is half its prior 27 px size at 390px",
+    "No document overflow at 390px",
+    "All 22 labels render at 320px",
+    "No automatic collapse classes at 320px",
+    "High is 18 pt / 24 CSS px at 320px",
+    "Low is 14 pt / 18.667 CSS px at 320px",
+    "Swimmer glyph is half its prior 27 px size at 320px",
+    "No document overflow at 320px",
+    "Selecting an added location keeps all 22 labels",
+    "Smaller swimmer still opens beach details",
+    "All weather labels still have UV/rain second row",
+    "Selected recipe still exports",
+    "Reload preserves selected direction and all locations",
+    "No uncaught browser errors"
+  ],
+  "sizes": [
+    {
+      "width": 1440,
+      "high": 24,
+      "low": 18.6667,
+      "icon": 13.5
+    },
+    {
+      "width": 768,
+      "high": 24,
+      "low": 18.6667,
+      "icon": 13.5
+    },
+    {
+      "width": 390,
+      "high": 24,
+      "low": 18.6667,
+      "icon": 13.5
+    },
+    {
+      "width": 320,
+      "high": 24,
+      "low": 18.6667,
+      "icon": 13.5
+    }
+  ],
+  "errors": []
+}
