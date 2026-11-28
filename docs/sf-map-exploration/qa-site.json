@@ -1,0 +1,12 @@
+{
+  "checks": 32,
+  "errors": [],
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "weather": "Controlled schema-valid fixtures; external providers blocked",
+  "location": "Granted Noe Valley fixture; denied permission also exercised"
+}

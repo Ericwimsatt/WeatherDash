@@ -1,3 +1,4 @@
+import sfMapLocations from "./assets/maps/sf-locations.json" with { type: "json" };
 export type Location = {
   id: string;
   name: string;
@@ -152,6 +153,14 @@ export const LOCATIONS: Location[] = [
     group: "San Diego",
   },
 ];
+// Additional forecast samples for the SF map; display density is selected separately.
+export const SF_MAP_LOCATIONS: Location[] = sfMapLocations.map(l => ({ ...l, group: "San Francisco" }));
+export const SF_MAP_BEACHES: Location[] = [
+  { id: "map-ocean", name: "Ocean Beach", lon: -122.5108, lat: 37.7597 },
+  { id: "map-baker", name: "Baker Beach", lon: -122.4829, lat: 37.7946 },
+  { id: "map-crissy", name: "Crissy Field", lon: -122.448, lat: 37.8045 },
+  { id: "map-aquatic", name: "Aquatic Park", lon: -122.422, lat: 37.806 },
+];
 export const SWIM_SPOTS: Record<string, Location> = Object.fromEntries(
   Object.entries({
     innerRichmond: { name: "Baker Beach", lat: 37.7946, lon: -122.4829 },
@@ -185,7 +194,7 @@ export const coordKey = (l: Pick<Location, "lat" | "lon">) =>
   `${Math.round(l.lat * 1e6)},${Math.round(l.lon * 1e6)}`;
 export const ALL_LOCATIONS = [
   ...new Map(
-    [...LOCATIONS, ...Object.values(SWIM_SPOTS), INLAND].map((l) => [
+    [...LOCATIONS, ...SF_MAP_LOCATIONS, ...SF_MAP_BEACHES, ...Object.values(SWIM_SPOTS), INLAND].map((l) => [
       coordKey(l),
       l,
     ]),

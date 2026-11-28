@@ -1,5 +1,6 @@
 import { colorToken, colorWithAlpha } from "./color-tokens.ts";
 import { useEffect, useMemo, useState } from "octane";
+import { RegionalMap } from "./components/RegionalMap.tsx";
 import { Chart } from "./components/Chart.tsx";
 import { DateRuler } from "./components/DateRuler.tsx";
 import { timeMarkers, uvCrossingMarkers } from "./data/chart-axis.ts";
@@ -576,6 +577,7 @@ export function App() {
         <span className="visually-hidden" id="forecast-instructions">
           Use the left and right arrow keys when a chart is focused to change dates.
         </span>
+        {!regionId && <RegionalMap today={today} range={range} timeline={timeline} onNavigate={navigate} />}
         <ForecastHeading location={region} today={today} timeline={timeline} />
         <div className="card-grid">
           <Daylight location={region} today={today} range={range} timeline={timeline} />

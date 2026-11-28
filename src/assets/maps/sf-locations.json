@@ -1,0 +1,134 @@
+[
+  {
+    "id": "outerRichmond",
+    "name": "Outer Richmond",
+    "lat": 37.7761,
+    "lon": -122.4895
+  },
+  {
+    "id": "innerRichmond",
+    "name": "Inner Richmond",
+    "lat": 37.7811,
+    "lon": -122.4635
+  },
+  {
+    "id": "outerSunset",
+    "name": "Outer Sunset",
+    "lat": 37.7626,
+    "lon": -122.4945
+  },
+  {
+    "id": "innerSunset",
+    "name": "Inner Sunset",
+    "lat": 37.7626,
+    "lon": -122.4684
+  },
+  {
+    "id": "marketStreet",
+    "name": "Market Street",
+    "lat": 37.7749,
+    "lon": -122.4194
+  },
+  {
+    "id": "pacHeights",
+    "name": "Pacific Heights",
+    "lat": 37.7914,
+    "lon": -122.4362
+  },
+  {
+    "id": "marina",
+    "name": "Marina",
+    "lat": 37.8027,
+    "lon": -122.4348
+  },
+  {
+    "id": "mission",
+    "name": "Mission",
+    "lat": 37.7599,
+    "lon": -122.4148
+  },
+  {
+    "id": "northBeach",
+    "name": "North Beach",
+    "lat": 37.8005,
+    "lon": -122.4103
+  },
+  {
+    "id": "lakeMerced",
+    "name": "Lake Merced",
+    "lat": 37.7235,
+    "lon": -122.492
+  },
+  {
+    "id": "presidio",
+    "name": "Presidio",
+    "lat": 37.795,
+    "lon": -122.468
+  },
+  {
+    "id": "haight",
+    "name": "Haight-Ashbury",
+    "lat": 37.77,
+    "lon": -122.447
+  },
+  {
+    "id": "castro",
+    "name": "Castro",
+    "lat": 37.761,
+    "lon": -122.435
+  },
+  {
+    "id": "noeValley",
+    "name": "Noe Valley",
+    "lat": 37.7489,
+    "lon": -122.4335
+  },
+  {
+    "id": "glenPark",
+    "name": "Glen Park",
+    "lat": 37.736,
+    "lon": -122.433
+  },
+  {
+    "id": "bernal",
+    "name": "Bernal Heights",
+    "lat": 37.741,
+    "lon": -122.416
+  },
+  {
+    "id": "potreroHill",
+    "name": "Potrero Hill",
+    "lat": 37.7572,
+    "lon": -122.398
+  },
+  {
+    "id": "missionBay",
+    "name": "Mission Bay",
+    "lat": 37.773,
+    "lon": -122.392
+  },
+  {
+    "id": "bayview",
+    "name": "Bayview",
+    "lat": 37.7347,
+    "lon": -122.3895
+  },
+  {
+    "id": "excelsior",
+    "name": "Excelsior",
+    "lat": 37.722,
+    "lon": -122.429
+  },
+  {
+    "id": "westPortal",
+    "name": "West Portal",
+    "lat": 37.741,
+    "lon": -122.465
+  },
+  {
+    "id": "ingleside",
+    "name": "Ingleside",
+    "lat": 37.721,
+    "lon": -122.458
+  }
+]
