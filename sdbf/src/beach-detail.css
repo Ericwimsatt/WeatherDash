@@ -98,7 +98,9 @@ dialog.beach-detail {
 }
 .beach-detail dt { font-weight: 600; }
 .beach-detail .quick-evidence dd { padding-bottom: 8px; border-color: var(--line); }
+.beach-detail .sample-reading { margin: 6px 0 0; color: var(--detail-ink); font-weight: 400; }
 .beach-detail small { font-size: 12px; }
+.beach-detail .sample-collected { color: var(--muted); font-weight: 400; }
 .beach-detail .monitoring-details { margin-top: 20px; border-color: var(--line); }
 .beach-detail .monitoring-details summary { font-size: 14px; }
 .beach-detail .monitoring-details p { color: var(--muted); }

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { assess, assessCoast } from "./rating.mjs";
-import { contributionClass, evidenceLimitations, mapCauses, rainDrivesScore, sampleSummary } from "../src/evidence.js";
+import { bacteriaExplanation, contributionClass, evidenceLimitations, mapCauses, rainDrivesScore, sampleSummary } from "../src/evidence.js";
 
 const now = Date.parse("2026-11-24T20:00:00Z");
 const verifiedAt = new Date(now).toISOString();
@@ -59,9 +59,9 @@ test("rain moves ahead of evidence only when it reaches the displayed score", ()
 });
 
 test("sample summaries respect test method and reported bounds", () => {
-  assert.equal(sampleSummary(sample), "Below advisory level");
-  assert.equal(sampleSummary({...sample, value:1413}), "At or above advisory level");
-  assert.equal(sampleSummary({...sample, value:195, qualifier:"<", method:"MF", units:"CFU/100ml"}), "Advisory comparison unavailable");
+  assert.equal(sampleSummary(sample), "Below Safe Levels");
+  assert.equal(sampleSummary({...sample, value:1413}), "Above Safe Levels");
+  assert.equal(sampleSummary({...sample, value:195, qualifier:"<", method:"MF", units:"CFU/100ml"}), "Safe Level Unknown");
   assert.equal(sampleSummary(null), "Unavailable");
 });
 
@@ -70,6 +70,25 @@ test("limitations omit old sample explanations and retain unavailable rain", () 
   assert.deepEqual(evidenceLimitations({...base, sample:{...sample, collectedAt:"2026-10-19T20:00:00Z"}, coastal:null, inlandRain:null,regionalEstimate:null}, now),
     ["Recent local and regional rain data are unavailable."]);
   assert.deepEqual(mapCauses(assessed(), now), []);
+});
+
+test("bacteria warning explains the historical result that caused it, not a newer low test", () => {
+  const older = {...sample, value:2826, collectedAt:"2026-11-23T20:00:00Z"};
+  const site = assessed({history:[older]});
+  const factor = mapCauses(site,now).find(factor => factor.field === "bacteria");
+  assert.match(factor.why,/2,826\/100ml/);
+  assert.match(factor.why,/Nov 23, 12:00 PM Pacific \(1 day ago\)/);
+  assert.match(factor.why,/Safe limit is 1,413\/100ml/);
+});
+
+test("bacteria explainers use method-specific thresholds and preserve reported bounds", () => {
+  const culture = {...sample, method:"MF", units:"CFU/100ml", value:195, qualifier:"<"};
+  assert.match(bacteriaExplanation(culture,now),/<195\/100ml/);
+  assert.match(bacteriaExplanation(culture,now),/Safe limit is 104\/100ml/);
+  assert.equal(sampleSummary(culture),"Safe Level Unknown");
+  assert.equal(bacteriaExplanation({...sample,value:400},now,false),"Enterococcus: 400/100ml. Safe limit is 1,413/100ml.");
+  assert.match(bacteriaExplanation({...sample,method:"unknown"},now),/Safe limit unavailable/);
+  assert.match(bacteriaExplanation(null,now),/Bacteria reading unavailable/);
 });
 
 test("duplicate uncertainty messages collapse without hiding a known spill", () => {

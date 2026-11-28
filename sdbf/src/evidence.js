@@ -46,9 +46,21 @@ export function contributionClass(points) {
 export function sampleSummary(sample) {
   const evidence = sampleEvidence(sample);
   if (!sample) return "Unavailable";
-  if (evidence?.above) return "At or above advisory level";
-  if (evidence?.below) return "Below advisory level";
-  return "Advisory comparison unavailable";
+  if (evidence?.above) return "Above Safe Levels";
+  if (evidence?.below) return "Below Safe Levels";
+  return "Safe Level Unknown";
+}
+
+export function bacteriaExplanation(sample, now, includeTime = true) {
+  if (!sample) return "Bacteria reading unavailable.";
+  const evidence = sampleEvidence(sample);
+  const units = evidence ? "/100ml" : ` ${sample.units || "(units unavailable)"}`;
+  const measured = `${sample.parameter || "Bacteria"}: ${reading(sample)}${units}.`;
+  const limit = evidence ? `Safe limit is ${evidence.threshold.toLocaleString("en-US")}/100ml.` : "Safe limit unavailable.";
+  const collected = Number.isFinite(Date.parse(sample.collectedAt))
+    ? `Collected ${date(sample.collectedAt)} Pacific (${age(sample.collectedAt, now)}).`
+    : "Collection time unavailable.";
+  return `${measured} ${limit}${includeTime ? ` ${collected}` : ""}`;
 }
 
 export function evidenceLimitations(site, now) {
@@ -106,11 +118,13 @@ export function scoreFactors(site, now) {
       return rating.gaps.map(text => ({ score:signal.score, text, why:FACTOR_WHY.unverified }));
     if (signal.field === "bacteria" && signal.historical) {
       const ageText = signal.collectedAt ? age(signal.collectedAt,now) : "date unknown";
-      return [{ score:signal.score, text:`Past bacteria exceedance · ${ageText}`, why:FACTOR_WHY.bacteria }];
+      return [{ score:signal.score, text:`Past bacteria exceedance · ${ageText}`, why:bacteriaExplanation(site.sample,now) }];
     }
     if (signal.field === "bacteria" && signal.ratio != null) {
+      const sample = [site.sample, ...(site.history ?? [])].filter(Boolean).find(point =>
+        point.collectedAt === signal.collectedAt && point.value / sampleEvidence(point)?.threshold === signal.ratio);
       return [{ score:signal.score, text:signal.reason,
-        why:`This concern comes from a sample collected ${age(signal.collectedAt,now)}. ${signal.score < 7 ? "A below-limit result does not mean no risk. “Higher than normal” is the app’s caution label, not a measured local average or a County advisory." : FACTOR_WHY.bacteria}` }];
+        why:`${bacteriaExplanation(sample,now)} ${signal.score < 7 ? "A below-limit result does not mean no risk. This caution is from the app, not a County advisory." : FACTOR_WHY.bacteria}` }];
     }
     if (Number.isFinite(signal.amount)) {
       const local = signal.field === "local";
@@ -134,7 +148,7 @@ export function mapCauses(site, now) {
     if (/local rain/i.test(factor.text)) return { ...factor, warning:undefined };
     if (/regional rain/i.test(factor.text)) return { ...factor, warning:undefined };
     if (/bacteria/i.test(factor.text) && factor.score < 7) return { ...factor, warning:undefined };
-    if (/bacteria/i.test(factor.text)) return { ...factor, text:"Elevated bacteria can make swimming unsafe.", warning:undefined, why:"Bacteria in the water can cause stomach illness, rashes, and infections." };
+    if (/bacteria/i.test(factor.text)) return { ...factor, text:"Elevated bacteria can make swimming unsafe.", warning:undefined };
     if (/posting|advisory|closure|warning/i.test(factor.text)) return { ...factor, warning:undefined };
     if (/regional rain|rain advisory/i.test(factor.text)) return { ...factor, text:"Widespread rain can carry pollutants into coastal water.", warning:undefined, why:"Rain across the region can wash pollutants into beaches and bays." };
     if (/no current risk/i.test(factor.text)) return [];
